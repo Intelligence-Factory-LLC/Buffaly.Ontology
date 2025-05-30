@@ -1,0 +1,27 @@
+﻿@page
+@model IndexModel
+@{
+	ViewData["Title"] = "Home page";
+	Layout = "_SimpleLayout";
+}
+
+@section MainPanelContent
+{
+	<div id="divIndexContent"></div>
+}
+
+@section Breadcrumbs
+{
+
+}
+
+@section MainPanelTitle
+{
+	Home
+}
+
+@section SidebarMenu
+{
+	@Html.Raw(Model.SidebarMenu)
+}
+

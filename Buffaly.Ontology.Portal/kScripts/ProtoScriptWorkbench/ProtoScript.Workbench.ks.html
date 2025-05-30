@@ -1,0 +1,645 @@
+<%using Simple.ks.html%>
+<%using ProtoScript.Workbench.Controls.ks.html%>
+
+<%redefinefunction SimplePage.Title
+{
+	(return "Ontology - ProtoScript")
+}%>
+
+<%redefinefunction SimplePage.MainPanelTitle
+{
+	(return "")
+}%>
+
+
+
+<%redefinefunction SimplePage.MainPanelContent
+{
+	(declare oSideTabs [])
+	(declare oSymbols {Title : "Symbols", ControlID : "tab-symbols", Content : "" })
+	(declare oFiles {Title: "Files", ControlID: "tab-files", Content : "" })
+	(declare oProject {Title: "Project", ControlID: "tab-project", Content : "", bActive : true})
+
+	(oSideTabs.push (oProject))
+	(oSideTabs.push (oFiles))
+	(oSideTabs.push (oSymbols))
+
+	(declare oTopTabs [])
+
+	(declare oSolution {Title: "Project", ControlID: "tab-solution", Content : ""})
+	(declare oFile {Title: "File", ControlID: "tab-file", Content : ""})
+
+	(oTopTabs.push (oSolution))
+	(oTopTabs.push (oFile))
+
+
+
+	(returnex{%>
+
+<style type="text/css">
+	.content-page {
+		background-color: white;
+		margin-left: 0px;
+	}
+	#sidebar {
+		display: none;
+	}
+	#divPageTitle {
+		display: none;
+	}
+</style>
+
+<div class="row g-3" id="divDirective">
+    <div class="col-lg-9 border">
+        <%oFile.Content{%>
+        <div id="divFileContent" class="overflow-auto">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="txtFileName" placeholder="Enter file name..." />
+                <button class="btn btn-primary" type="button" onclick="OnLoadFile()">
+                    <i class="bi bi-folder2-open"></i> Load
+                </button>
+                <button class="btn btn-success" type="button" onclick="OnSaveCurrentFile()">
+                    <i class="bi bi-save"></i> Save
+                </button>
+            </div>
+            <textarea id="txtCode" kcs:FieldName="Directive" class="form-control no-autosize" style="width: 100%; min-height:600px; white-space:pre;"></textarea>
+            <div id="divOffset"></div>
+            <div id="divDescription"></div>
+            <div id="divPredictions" class="text-pre"></div>
+        </div>
+        <%}%>
+
+        <%oSolution.Content{%>
+        <div class="mb-3">
+            <label for="txtSolution" class="form-label">Project</label>
+            <input type="text" kcs:FieldName="Directory" id="txtSolution" class="form-control" />
+            <div id="divSolutionHistory"></div>
+        </div>
+        <div class="mb-3">
+            <button class="btn btn-primary" onclick="OnLoadProject()">Load Project</button>
+        </div>
+        <%}%>
+        <%SimplePage.GetTabs(oTopTabs)%>
+    </div>
+    <div class="col-lg-3 border">
+        <div id="divSymbolContainer" class="position-fixed" style="z-index: 100; height: 80vh; overflow: scroll;">
+            <%oProject.Content{%>
+            <div class="mb-2">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="txtProjectFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterProjectFiles()" />
+                </div>
+            </div>
+            <button class="btn btn-success mb-2" onclick="OnAddNewFile()" title="Add a new file">
+                <i class="bi bi-plus"></i> Add File
+            </button>
+            <div id="divProject" class="overflow-auto"></div>
+            <%}%>
+            <%oSymbols.Content{%>
+			<div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="txtSymbolSearch" class="form-control" placeholder="Search symbols..." onkeyup="OnFilterSymbols()" />
+                </div>
+            </div>
+
+            <div id="divRecentSymbols" class="text-pre overflow-auto mt-3"></div>
+            <div id="divSymbolTable" class="text-pre overflow-auto"></div>
+            <%}%>
+            <%oFiles.Content{%>
+			<div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="txtFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterFiles()"  autocomplete="off" />
+                </div>
+            </div>
+            <div id="divSolution" class="overflow-auto"></div>
+            <%}%>
+            <%SimplePage.GetTabs(oSideTabs)%>
+        </div>
+    </div>
+</div>
+
+ 
+
+<%ProtoScriptWorkbench.GetImmediateWindow%>
+<%ProtoScriptWorkbench.GetModals%>
+
+
+
+	<%})
+}%>
+
+<%redefinefunction SimplePage.CommandButtons
+{
+	(returnex{%>
+
+	<%})
+}%>
+
+<%redefinefunction SimplePage.ShowAgent
+{
+	(return false)
+}%>
+
+<%redefinefunction SimplePage.BottomScripts
+{
+	(returnex{%>
+<script type="text/javascript" src="/JsonWs/ProtoScript.Extensions.ProtoScriptWorkbench.ashx.js?v=2"></script>
+<script type="text/javascript" src="/JsonWs/Ontology.Agents.Business.DevAgent.ashx.js?v=<%JsVersion%>"></script>
+<script type="text/javascript" src="/JsonWs/Ontology.Agents.Business.BuffalyAgent.ashx.js?v=<%JsVersion%>"></script>
+
+<script type="text/javascript" src="/js/protoscript-workbench.js"></script>
+
+
+<style type="text/css">
+	.CodeMirror {
+		border: 1px solid #eee;
+		height: auto;
+	}
+
+	.loading {
+		position: relative;
+	}
+
+		.loading::after {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 32px;
+			height: 32px;
+			margin-top: -16px;
+			margin-left: -16px;
+			border: 4px solid #ccc;
+			border-top-color: #333;
+			border-radius: 50%;
+			animation: spin 0.8s infinite linear;
+			z-index: 9999;
+		}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+</style>
+
+
+
+<script src="js/plugins/codemirror/mode/clike/clike.js?v=3"></script>
+<script type="text/javascript" src="js/plugins/codemirror/simple-hint.js"></script>
+<link rel="stylesheet" href="js/plugins/codemirror/simple-hint.css" />
+
+
+<script type="text/javascript">
+	function isLetter(str) {
+		return str.length === 1 && str.match(/[a-z]/i);
+	}
+
+	function OnPredictNextLine(cm, option) {
+
+		const doc = window.editor.getDoc();
+		const cursorPos = doc.getCursor();
+		let iPos = doc.indexFromPos(cursorPos);
+
+		const beforeCursor = doc.getRange({ line: 0, ch: 0 }, cursorPos);
+		const afterCursor = doc.getRange(cursorPos, { line: Infinity, ch: Infinity });
+
+		Output("Thinking");
+
+		results = ProtoScriptWorkbench.PredictNextLine(iPos, function (oRes) {
+			// Remove the loading indication
+			Output(oRes.length + " results found");
+
+			if (oRes && oRes.length > 0) {
+				// Construct new content: code before + generated code + code after
+				const newPart = StringUtil.ReplaceAll(oRes[0], "\n", "\r\n");
+				const newContent = beforeCursor + "\r\n" + newPart + "\r\n" + afterCursor;
+				window.editor.setValue(newContent);
+			}
+		});
+
+		return;
+	}
+	
+	function isNumber(str) {
+		return str.length === 1 && str.match(/\d/);
+	}
+		
+	function OnSuggest(cm, option) {
+		var cursor = cm.getCursor(), line = cm.getLine(cursor.line)		
+		let iPos = cm.indexFromPos(cursor);
+
+		line = line.substr(0, cursor.ch);
+
+		if (StringUtil.InString(line, "//"))
+			return null;
+
+		var results = [];
+		let iOffset = line.length;
+		let sSearch = "";
+
+		let iLastSaved = GetCode().length - sLastSaved.length;
+
+		if (StringUtil.IsEmpty(line)) {
+			return null;
+		}
+
+
+		else {
+			let sType = '';
+
+			for (var i = line.length - 1; i >= 0; i--) {
+				let ch = line[i];
+				if (isLetter(ch) || isNumber(ch) || ch == '_') {
+					sSearch = ch + sSearch;
+					iOffset--;
+				}
+				else if (ch == ".") {
+					sType = 'SubObject';
+					break;
+				}
+				else if (ch == "(" || ch == ",") {
+					sType = "Parameter";
+					break;
+				}
+				else {
+					sType = 'Symbol';
+					break;
+				}
+			}
+
+			console.log(sType);
+
+			let oRes2 = [];
+			if (!StringUtil.IsEmpty(sSearch) && ['Symbol', 'Parameter'].contains(sType)) {
+				//oRes2 = ProtoScriptWorkbench.GetSymbolsAtCursor(Page.LocalSettings.Solution, Page.LocalSettings.File, iPos);
+				//if (null == oRes2)
+					oRes2 = ProtoScriptWorkbench.GetSymbolsAtCursor(Page.LocalSettings.Solution, Page.LocalSettings.File, iPos - iLastSaved);
+
+				if (null == oRes2)
+					oRes2 = [];
+
+				oRes2 = oRes2.filter(x => StringUtil.StartsWith(x.SymbolName, sSearch));
+			}
+
+			let oRes3 = [];
+			if (sType == 'SubObject' && !StringUtil.IsEmpty(line)) {
+				oRes3 = ProtoScriptWorkbench.Suggest(Page.LocalSettings.Solution, line, iPos);
+				if (null == oRes3)
+					oRes3 = [];
+			}
+
+			let oRes = [];
+			if (!StringUtil.IsEmpty(sSearch) && ['Symbol', 'Parameter'].contains(sType))
+				oRes = Symbols.filter(x => StringUtil.StartsWith(x.SymbolName, sSearch) /* && sSearch != x.SymbolName*/);
+
+			for (let i = 0; i < oRes3.length; i++)
+				results.push(oRes3[i].SymbolName);
+
+			for (let i = 0; i < oRes2.length; i++)
+				results.push(oRes2[i].SymbolName);
+
+			for (let i = 0; i < oRes.length && i < 10; i++)
+				results.push(oRes[i].SymbolName);
+		}
+
+		if (results.length > 0) {
+			var iStartingOffset = iOffset;
+			var iLength = sSearch.length;
+
+			return {
+				list: results,
+				from: CodeMirror.Pos(cursor.line, iStartingOffset),
+				to: CodeMirror.Pos(cursor.line, iStartingOffset + iLength)
+			}
+		}
+		else
+			return null;
+	}
+	
+
+
+
+	window.editor = CodeMirror.fromTextArea(document.getElementById('txtCode'), {
+		mode: "text/x-csharp",
+		indentWithTabs: true,
+		smartIndent: true,
+		lineNumbers: true,
+		matchBrackets: true, 
+		autofocus: true,
+		lineSeparator: '\r\n',
+		newline : "crlf",
+		extraKeys: { "Ctrl-Space": "autocomplete", "Ctrl-Enter" : OnEnter, "Alt-Space" : OnPredictNextLine },
+		hintOptions: { hint: OnSuggest, completeSingle : false },
+		gutters: ['gutter-error', "breakpoints"]
+	});
+
+
+	window.editor.on("gutterClick", function (cm, n) {
+		var info = cm.lineInfo(n);
+		if (info.gutterMarkers) {
+			cm.setGutterMarker(n, "breakpoints", null);
+			RemoveBreakPoint(info);
+		}
+		else {
+			cm.setGutterMarker(n, "breakpoints", makeBreakpoint());
+			SetBreakPoint(info);
+		}
+	});
+
+	function makeBreakpoint() {
+		var marker = document.createElement("div");
+		marker.className = 'breakpoint';
+		//marker.style.color = "#822";
+		marker.innerHTML = "●";
+		return marker;
+	}
+
+	function SetCode(sCode) {
+		// Replace single \r or \n with \r\n
+		  sCode = sCode.replace(/\r(?!\n)|(?<!\r)\n/g, "\r\n");
+
+
+		ControlUtil.SetValue("txtCode", sCode);
+		window.editor.setValue(sCode);
+	}
+
+	function GetCode()
+	{
+		return window.editor.getValue();
+	}
+
+
+	let movedByMouse = false;
+
+	let editor = window.editor;
+
+
+	editor.on("cursorActivity", function (cm) {
+		if (!bMouseDown && !StringUtil.IsEmpty(editor.getSelection())) {
+			OnSelectedText(editor);
+		}
+	});
+
+	var ExcludedIntelliSenseTriggerKeys =
+	{
+		"8": "backspace",
+		"9": "tab",
+		"13": "enter",
+		"16": "shift",
+		"17": "ctrl",
+		"18": "alt",
+		"19": "pause",
+		"20": "capslock",
+		"27": "escape",
+		"33": "pageup",
+		"34": "pagedown",
+		"35": "end",
+		"36": "home",
+		"37": "left",
+		"38": "up",
+		"39": "right",
+		"40": "down",
+		"45": "insert",
+		"46": "delete",
+		"91": "left window key",
+		"92": "right window key",
+		"93": "select",
+		"107": "add",
+		"109": "subtract",
+		"110": "decimal point",
+		"111": "divide",
+		"112": "f1",
+		"113": "f2",
+		"114": "f3",
+		"115": "f4",
+		"116": "f5",
+		"117": "f6",
+		"118": "f7",
+		"119": "f8",
+		"120": "f9",
+		"121": "f10",
+		"122": "f11",
+		"123": "f12",
+		"144": "numlock",
+		"145": "scrolllock",
+		"186": "semicolon",
+		"187": "equalsign",
+		"188": "comma",
+		"189": "dash",
+		//"190": "period",
+		"191": "slash",
+		"192": "graveaccent",
+		"220": "backslash",
+		"222": "quote"
+	}
+
+	editor.on("keyup", function (cm, event) {
+		if (!cm.state.completionActive && /*Enables keyboard navigation in autocomplete list*/
+           !ExcludedIntelliSenseTriggerKeys[(event.keyCode || event.which).toString()] ) {        /*Enter - do not open autocomplete list just after item has been selected in it*/
+			CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
+		}
+	});
+
+	let bMouseDown = false;
+
+	ControlUtil.AddEvent(document, "mousedown", function() { bMouseDown = true; })
+	ControlUtil.AddEvent(document, "mouseup", function () {
+		bMouseDown=false;
+
+		if (!bMouseDown&&!StringUtil.IsEmpty(editor.getSelection())) {
+			OnSelectedText(window.event);
+		}
+		else {
+			if (StringUtil.IsEmpty(editor.getSelection()))
+				OnCloseContextActions();
+
+			OnCloseDebugContext();
+		}
+	});
+	
+	ControlUtil.AddEvent(document, "keydown", function () {
+		OnCloseContextActions();
+	});
+
+	ControlUtil.AddEvent(document, "keyup", function () {
+		if (!StringUtil.IsEmpty(editor.getSelection())) {
+			OnSelectedText(window.event);
+		}
+	});
+
+	function getSelectedText() {
+		return editor.getSelection();
+	}
+
+	function highlightError(error) {
+
+		if (null!=error.Info) {
+			if (StringUtil.EqualNoCase(error.Info.File, Page.LocalSettings.File)) {
+				var errorLine=editor.posFromIndex(error.Info.StartingOffset).line;
+
+				var marker=makeMarker('(Error '+error.Type+') '+error.Message);
+				editor.setGutterMarker(errorLine, 'gutter-error', marker);
+			}
+		}
+		//jQuery('[data-toggle="tooltip"]').tooltip();
+	}
+
+	function ScrollTo(info, markerClass)
+	{
+		let lineStart = editor.posFromIndex(info.StartingOffset);
+		let lineStop = editor.posFromIndex(info.StartingOffset + Math.max(info.Length, 2));
+
+		//Parsing exceptions can return the next expected, so highlight the whole line
+		if (lineStart.line == lineStop.line && lineStart.ch == lineStop.ch) {
+			lineStart.ch = 0;
+		}
+
+		let sText = editor.getLine(lineStart.line)	
+		if (sText.length <= lineStart.ch)
+			lineStart.ch = 0;
+
+		//jumpToLine(lineStart.line);
+		ScrollToLine(lineStart.line);
+		//editor.scrollIntoView({ line: lineStart.line, char: lineStart.ch }, window.innerHeight / 1.5);
+		editor.markText(lineStart, lineStop, { clearOnEnter: true, className: markerClass == null ? 'found-text-marker' : markerClass })
+	}
+
+	//> create a method to scroll to the bottom of the CodeMirror editor
+	function ScrollToBottom() {
+		editor.scrollIntoView({ line: editor.lastLine(), ch: 0 });
+	}
+
+
+	function ScrollToLine(line) {
+		//_$("divFileContent").scrollTop = 65	//height to first line
+		//	+ (line * 20);
+		const scroller = _$("divFileContent");                // your wrapper utility
+		const top      = editor.heightAtLine(line, "local"); // px distance of line’s top edge
+		scroller.scrollTop = Math.max(0, top - 65);          // keep header offset
+	}
+
+	function jumpToLine(i) {
+		var t = editor.charCoords({ line: i, ch: 0 }, "local").top;
+		var middleHeight = editor.getScrollerElement().offsetHeight / 2;
+		editor.scrollTo(null, t - middleHeight - 5);
+	}
+
+	function clearErrors()
+	{
+		editor.clearGutter('gutter-error');
+	}
+
+	function makeMarker(msg) {
+		const marker = document.createElement('div');
+		marker.classList.add('error-marker');
+		marker.innerHTML = '&nbsp;';
+
+		const error = document.createElement('div');
+		error.innerHTML = msg;
+		error.classList.add('error-message');
+		marker.appendChild(error);
+
+		return marker;
+	}
+
+	function ReplaceCurrentLine(sText)
+	{
+		let cur = window.editor.getCursor();
+		window.editor.getDoc().replaceRange(sText, { line: cur.line, ch: 0 }, { line: cur.line, ch: cur.ch })
+	}
+
+	function InsertAtOffset(sText, oInfo)
+	{
+		let oFrom = window.editor.posFromIndex(oInfo.StartingOffset);
+		let oTo = window.editor.posFromIndex(oInfo.StartingOffset + oInfo.Length);
+
+		window.editor.getDoc().replaceRange(sText, oFrom, oTo);
+	}
+
+
+	$$('.tabstop').each(x => x.addEventListener('keydown', function (e) {
+				
+			if (e.key == 'Tab') {
+				e.preventDefault();
+				var start = this.selectionStart;
+				var end = this.selectionEnd;
+
+				// set textarea value to: text before caret + tab + text after caret
+				this.value = this.value.substring(0, start) +
+					"\t" + this.value.substring(end);
+
+				// put caret at right position again
+				this.selectionStart =
+					this.selectionEnd = start + 1;
+			}
+		}));
+</script>
+<style type="text/css">
+	.found-text-marker {
+		background-color:cornflowerblue;
+	}
+	.debug-break-marker {
+		background-color: yellow;
+	}
+.error-marker {
+  color: black;
+  width: 12px !important;
+  height: 12px;
+  background-color: #ff4d4d; /* Slightly softer red */
+  border-radius: 50%; /* Circular error indicator */
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+.error-marker .error-message {
+  display: none;
+  position: absolute;
+  white-space: pre-wrap; /* Preserve whitespace and allow wrapping if needed */
+  background-color: #fff; /* Fully opaque background */
+  color: #212529; /* Dark text for readability */
+  border: 1px solid #999;
+  padding: 10px 16px; /* More padding, especially on the left */
+  left: 50px; /* Move tooltip further right */
+  top: -1.5em;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Stronger shadow for visibility */
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 9999; /* Higher z-index to keep it above everything */
+  opacity: 1;
+  border-radius: 4px; /* Soft edges */
+  max-width: none; /* Prevent unwanted width constraints */
+  width: 500px; /* Allow width to expand naturally */
+  min-width: fit-content; /* Ensures small messages aren't too narrow */
+}
+
+.error-marker:hover .error-message {
+  display: block;
+}
+
+
+      .breakpoints {width: .8em;}
+      .breakpoint { color: #822; font-size: x-large; padding-top: 0px; margin-top : -5px; }
+</style>
+	<%})
+}%>
+
+
+
+<%redefinefunction SimplePage.FileMenu
+{
+	(returnex{%>
+					
+ 
+	<%})
+}%>

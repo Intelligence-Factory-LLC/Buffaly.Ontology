@@ -1,0 +1,113 @@
+﻿body, html {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.container-fixed {
+    width: 500px;
+    max-width:500px;
+    height: 800px;
+    margin: 0 auto;
+    box-sizing: border-box; /* Ensure padding doesn't affect total width */
+}
+
+.page-content {
+    margin: 0 auto;
+    padding: 20px; /* Optional: Add padding if needed */
+    height: 100vh; /* Ensure it takes the full height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+}
+
+
+.caller-number {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 28.13px;
+}
+
+.caller-content {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 28.13px;
+    text-align:center
+}
+
+.caller-name {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 56.25px;
+    margin-bottom: 5px;
+}
+
+.custom-dialer {
+    background-color: rgba(248, 249, 250, 0.8) !important;
+    border-color: rgba(204, 204, 204, 0.8) !important;
+    color: rgba(80, 80, 80, 0.8) !important;
+}
+
+.btnSendDigit {
+    width: 100% !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.hidden {
+    display: none;
+}
+
+.CallControl.hidden {
+    display: none;
+}
+
+.button-list {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 4px;
+    flex-direction: column;
+}
+
+.button-list .btn {
+    width: 100%; /* Ensure buttons take full width of the container */
+}
+#tblDialPad .row > .col-4 {
+    padding: 5px;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the icon horizontally */
+    padding: 10px; /* Add padding for better click area */
+    font-size: 12px;
+}
+
+
+@media (max-width: 500px) {
+    .caller-name {
+        font-size: 36px;
+        line-height: 42px;
+    }
+
+    .caller-number {
+        font-size: 20px;
+        line-height: 24px;
+    }
+
+    .custom-dialer {
+        width: 100%;
+    }
+
+    .container-fixed {
+        width: 100%;
+    }
+}

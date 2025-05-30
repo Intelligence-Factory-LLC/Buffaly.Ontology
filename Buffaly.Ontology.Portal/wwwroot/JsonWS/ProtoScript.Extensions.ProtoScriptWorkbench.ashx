@@ -1,0 +1,1 @@
+{"Assembly":"ProtoScript.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","Type":"ProtoScript.Extensions.ProtoScriptWorkbench"}

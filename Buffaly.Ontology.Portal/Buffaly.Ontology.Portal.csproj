@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="kScripts\ProtoScript\**" />
+    <Content Remove="kScripts\ProtoScript\**" />
+    <EmbeddedResource Remove="kScripts\ProtoScript\**" />
+    <None Remove="kScripts\ProtoScript\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis" Version="1.68.0" />
+    <PackageReference Include="Google.Apis.Docs.v1" Version="1.68.0.3498" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.68.0.3627" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BasicUtilities">
+      <HintPath>..\lib\BasicUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Buffaly.Common">
+      <HintPath>..\lib\Buffaly.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Buffaly.SemanticDB.UI">
+      <HintPath>..\lib\Buffaly.SemanticDB.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="kScript">
+      <HintPath>..\lib\kScript.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenAIAPI">
+      <HintPath>..\lib\OpenAIAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Cache">
+      <HintPath>..\lib\RooTrax.Cache.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Common">
+      <HintPath>..\lib\RooTrax.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Common.DB">
+      <HintPath>..\lib\RooTrax.Common.DB.dll</HintPath>
+    </Reference>
+    <Reference Include="WebAppUtilities">
+      <HintPath>..\lib\WebAppUtilities.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Middelware\" />
+    <Folder Include="wwwroot\JsonWS\APIs\" />
+    <Folder Include="wwwroot\js\plugins\marked\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Buffaly.NLU.Tagger\Buffaly.NLU.Tagger.csproj" />
+    <ProjectReference Include="..\Buffaly.NLU\Buffaly.NLU.csproj" />
+    <ProjectReference Include="..\Ontology.Parsers\Ontology.Parsers.csproj" />
+    <ProjectReference Include="..\Ontology.Simulation\Ontology.Simulation.csproj" />
+    <ProjectReference Include="..\Ontology\Ontology.csproj" />
+    <ProjectReference Include="..\ProtoScript.Extensions\ProtoScript.Extensions.csproj" />
+    <ProjectReference Include="..\ProtoScript.Interpretter\ProtoScript.Interpretter.csproj" />
+    <ProjectReference Include="..\ProtoScript.Parsers\ProtoScript.Parsers.csproj" />
+    <ProjectReference Include="..\ProtoScript\ProtoScript.csproj" />
+  </ItemGroup>
+
+</Project>

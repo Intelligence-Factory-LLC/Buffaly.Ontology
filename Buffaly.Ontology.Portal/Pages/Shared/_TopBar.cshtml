@@ -1,0 +1,66 @@
+﻿@model Buffaly.Admin.Portal.Pages.Shared._TopBarModel;
+
+
+<!-- Chat Sidebar -->
+<div id="chatSidebar" class="chat-sidebar hidden" tabindex="-1">
+	<!-- Top Bar Container -->
+	<div class="d-flex justify-content-between align-items-center p-2 border-bottom" style="flex-shrink: 0; background:#343a40">
+		<h5 class="mb-0 text-white">Chat with Our AI Assistant</h5>
+		<div id="tooltips-container" class="d-flex align-items-center">
+			<a href="javascript:void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" onclick="maximizeChat()" title="Maximize">
+				<i id="maximizeBtn" class="fas fa-expand" data-bs-container="#tooltips-container" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Maximize"></i>
+			</a>
+			<a href="javascript:void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" onclick="restoreChat()" title="Restore">
+				<i id="restoreBtn" class="fas fa-compress" data-bs-container="#tooltips-container" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Restore" style="display: none;"></i>
+			</a>
+			<!-- New Buttons for Clearing History and Starting New Chat -->
+			<a href="javascript:void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" onclick="clearHistory()" title="Clear History">
+				<i id="clearHistoryBtn" class="fas fa-trash" data-bs-container="#tooltips-container" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Clear History"></i>
+			</a>
+			<a href="javascript:void(0);" class="text-reset font-19 py-1 px-2 d-inline-block" onclick="newChat()" title="New Chat">
+				<i id="newChatBtn" class="fas fa-comments" data-bs-container="#tooltips-container" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="New Chat"></i>
+			</a>
+		</div>
+	</div>
+
+	<div id="chatWindow" class="p-3 bg-white border-bottom">
+		<!-- Chatbot Message -->
+		<div class="chat-message chatbot-message">
+			<i class="mdi mdi-robot-outline" style="font-size: 20px; color: #007bff; vertical-align: middle;"></i>
+			Hello! How can I assist you today?
+		</div>
+	</div>
+
+	<div id="chatInputContainer">
+		<div id="chatInput" class="d-flex p-3">
+			<input type="text" id="messageInput" class="form-control" placeholder="Type a message...">
+			<button class="btn btn-primary ms-2" onclick="sendMessage()">Send</button>
+		</div>
+	</div>
+</div>
+
+
+
+
+<link href="~/css/automation.css" rel="stylesheet" />
+<script type="text/javascript" src="js/plugins/marked/marked.min.js"></script>
+<script type="text/javascript" src="js/automation_chat.js?v=2"></script>
+<script type="text/javascript" src="js/automation_billing.js?v=2"></script>
+
+<script type="text/javascript">
+
+	function ToggleQuickHelpOn() {
+		new LocalStorage().set("ShowQuickHelp", true);
+		if (typeof ShowQuickHelp !== 'undefined') {
+			ShowQuickHelp();
+		}
+
+	}
+	function ToggleQuickHelpOff() {
+		new LocalStorage().set("ShowQuickHelp", false);
+		Page.Reload();
+
+	}
+
+
+</script>

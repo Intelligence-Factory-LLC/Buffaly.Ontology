@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Buffaly.NLU\Buffaly.NLU.csproj" />
+    <ProjectReference Include="..\Ontology.Simulation\Ontology.Simulation.csproj" />
+    <ProjectReference Include="..\Ontology\Ontology.csproj" />
+    <ProjectReference Include="..\ProtoScript.Interpretter\ProtoScript.Interpretter.csproj" />
+    <ProjectReference Include="..\ProtoScript.Parsers\ProtoScript.Parsers.csproj" />
+    <ProjectReference Include="..\ProtoScript\ProtoScript.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BasicUtilities">
+      <HintPath>..\lib\BasicUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenAIAPI">
+      <HintPath>..\lib\OpenAIAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Cache">
+      <HintPath>..\lib\RooTrax.Cache.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Common">
+      <HintPath>..\lib\RooTrax.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Common.DB">
+      <HintPath>..\lib\RooTrax.Common.DB.dll</HintPath>
+    </Reference>
+    <Reference Include="WebAppUtilities">
+      <HintPath>..\lib\WebAppUtilities.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' != 'Release'">
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)Deploy\$(ProjectName).dll&quot;" />
+  </Target>
+</Project>
