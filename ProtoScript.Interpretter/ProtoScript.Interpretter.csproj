@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ontology.Data\Ontology.Data.csproj" />
     <ProjectReference Include="..\Ontology.Parsers\Ontology.Parsers.csproj" />
     <ProjectReference Include="..\Ontology.Simulation\Ontology.Simulation.csproj" />
     <ProjectReference Include="..\Ontology\Ontology.csproj" />

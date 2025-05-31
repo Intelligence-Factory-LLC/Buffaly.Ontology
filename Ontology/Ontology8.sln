@@ -50,6 +50,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{02
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{ADE6EE4C-8355-42FE-B175-43AFB3728E8E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HelloWorld", "HelloWorld", "{6FB0CC09-C939-4797-A431-D7573617CD2D}"
+	ProjectSection(SolutionItems) = preProject
+		..\examples\HelloWorld\hello.pts = ..\examples\HelloWorld\hello.pts
+		..\examples\HelloWorld\README.md = ..\examples\HelloWorld\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simpsons", "Simpsons", "{255DE81E-021F-4216-9270-29903684B560}"
+	ProjectSection(SolutionItems) = preProject
+		..\examples\Simpsons\project.pts = ..\examples\Simpsons\project.pts
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +114,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6FB0CC09-C939-4797-A431-D7573617CD2D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{255DE81E-021F-4216-9270-29903684B560} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7F4563CF-E35F-4622-862A-F28FE7189E93}
