@@ -600,7 +600,6 @@ function OnFilterSymbols() {
 
 
 ////////////////////////////Extensions//////////////////
-var iLength = 0;
 
 function countCR(sTxt, iOffset) {
 	var iCount = 0;
