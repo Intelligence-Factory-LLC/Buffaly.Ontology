@@ -152,7 +152,7 @@ async function GetWebRoot() {
 //////////////////Solution and File Loading/////////////////////////////
 
 function BindSolutionHistory() {
-	var oUl = ["ul", { class: "list-group" }];
+        const oUl = ["ul", { class: "list-group" }];
 
 	Page.LocalSettings.SolutionHistory.each(function (item) {
 		oUl.push(["li", { class: "list-group-item list-group-item-action" }, ["a", { click: function () { ControlUtil.SetValue("txtSolution", item); OnLoadProject(); } }, item]]);
@@ -187,9 +187,9 @@ async function OnLoadProject() {
 			allFiles.sort((a, b) => a.displayPath.toLowerCase().localeCompare(b.displayPath.toLowerCase()));
 
 			// Create the <ul> structure
-			var oUl = ["ul",
-				{ class: "list-group" }
-			];
+                        const oUl = ["ul",
+                                { class: "list-group" }
+                        ];
 
 			// For each file in the project, create an <li> with a tooltip showing the full path
 			allFiles.each(function (obj) {
@@ -256,13 +256,14 @@ async function OnLoadProject() {
 
 
 async function OnLoadFile() {
-        var sFile = ControlUtil.GetValue("txtFileName");
+        const sFile = ControlUtil.GetValue("txtFileName");
         try {
                 await LoadFile(sFile);
         }
         catch (err) {
                 Output(err);
         }
+
 }
 
 async function LoadFile(sFile) {
@@ -339,7 +340,7 @@ function OnBindFileSymbols() {
 
 
 function BindFileHistory() {
-	var oUl = ["ul", { class: "list-group" }]; // Use Bootstrap 5 list group for file history
+        const oUl = ["ul", { class: "list-group" }]; // Use Bootstrap 5 list group for file history
 
 	Page.LocalSettings.FileHistory.each(function (item) {
 		oUl.push([
@@ -400,7 +401,7 @@ function BindFileHistory() {
 	}
 }
 
-var sLastSaved = null;
+let sLastSaved = null;
 async function OnSaveCurrentFile() {
         try {
                 await SaveCurrentFile();
@@ -411,7 +412,7 @@ async function OnSaveCurrentFile() {
 }
 
 async function SaveCurrentFile() {
-        var sCode = GetCode();
+        const sCode = GetCode();
         sLastSaved = sCode;
 
         try {
@@ -434,7 +435,7 @@ async function SaveCurrentFile() {
 
 
 function OnFilterFiles() {
-	var sSearch = ControlUtil.GetValue("txtFileSearch");
+        const sSearch = ControlUtil.GetValue("txtFileSearch");
 
 	$$("#divSolution li").each(function (oLi) {
 		if (StringUtil.InString(oLi.innerText, sSearch))
@@ -448,7 +449,7 @@ function OnFilterFiles() {
 
 
 
-var Symbols = [];
+let Symbols = [];
 
 ProtoScriptWorkbench.GetSymbols.Serialize = { Info: true };
 async function OnLoadSymbols() {
@@ -469,7 +470,7 @@ async function OnLoadSymbols() {
 }
 
 function OnBindSymbols(oSymbols) {
-	var oUl = ["ul", { class: "list-group" }];
+        const oUl = ["ul", { class: "list-group" }];
 
 	let sCurrentFile = Page.LocalSettings.File;
 
@@ -505,7 +506,7 @@ async function NavigateTo(info, sSymbol, markerClass) {
 }
 
 function BindRecentNavigations() {
-	var oUl = ["ul", { class: "list-group" }];
+        const oUl = ["ul", { class: "list-group" }];
 
 	oRecentNavigations.each(x => {
 		oUl.push(["li", { class: "list-group-item list-group-item-action" }, ["a", { click: function () { NavigateTo(x, x.SymbolName); } }, x.SymbolName]]);
@@ -520,7 +521,7 @@ function BindRecentNavigations() {
 }
 
 function OnFilterProjectFiles() {
-	var sSearch = ControlUtil.GetValue("txtProjectFileSearch");
+        const sSearch = ControlUtil.GetValue("txtProjectFileSearch");
 
 	$$("#divProject li").each(function (oLi) {
 		if (StringUtil.InString(oLi.innerText, sSearch)) {
@@ -640,16 +641,17 @@ function OnNavigateToSelectedSymbol() {
 	}
 }
 
+
 function OnFilterSymbols(evt) {
-        //(function () {
-        if (!evt || (evt.code != "ArrowDown" && evt.code != "ArrowUp")) {
-		var sSearch = ControlUtil.GetValue("txtSymbolSearch");
+        if (window.event.code != "ArrowDown" && window.event.code != "ArrowUp") {
+                const sSearch = ControlUtil.GetValue("txtSymbolSearch");
 		if (StringUtil.IsEmpty(sSearch))
 			OnBindFileSymbols();
 		else {
-			var oMatch = null;
-			var oSymbols = Symbols.filter(x => StringUtil.InString(x.SymbolName, sSearch));
-			var oExact = Symbols.filter(x => StringUtil.EqualNoCase(x.SymbolName, sSearch));
+                        let oMatch = null;
+                        const oSymbols = Symbols.filter(x => StringUtil.InString(x.SymbolName, sSearch));
+                        const oExact = Symbols.filter(x => StringUtil.EqualNoCase(x.SymbolName, sSearch));
+
 			if (oExact.length > 0)
 				oSymbols.insertAt(0, oExact[0]);
 
@@ -658,8 +660,6 @@ function OnFilterSymbols(evt) {
 			iSelected = -1;
 		}
 	}
-
-	//}).delay(100);
 }
 
 
@@ -667,8 +667,8 @@ function OnFilterSymbols(evt) {
 ////////////////////////////Extensions//////////////////
 
 function countCR(sTxt, iOffset) {
-	var iCount = 0;
-	for (var i = 0; i < sTxt.length && i < iOffset; i++) {
+        let iCount = 0;
+        for (let i = 0; i < sTxt.length && i < iOffset; i++) {
 		if (sTxt.charAt(i) == '\n')
 			iCount++
 	}
@@ -681,7 +681,7 @@ function OnSelectedText(evt) {
 
 
 function ParseFile() {
-	var sCode = GetCode();
+        const sCode = GetCode();
 	ProtoScriptWorkbench.ParseCode(sCode, function (oRes) {
 		clearErrors();
 
@@ -697,10 +697,12 @@ async function CompileCode() {
 
                 Output("Compilation starting...");
 
-                var sCode = GetCode();
-                ProtoScriptWorkbench.CompileCode.onErrorReceived = function (oErr) {
-                        Output("Compilation failed");
-                };
+
+        const sCode = GetCode();
+	ProtoScriptWorkbench.CompileCode.onErrorReceived = function (oErr) {
+		Output("Compilation failed");
+	};
+
 
                 ProtoScriptWorkbench.CompileCodeWithProject.onErrorReceived = function (oErr) {
                         Output("Compilation failed");
@@ -780,7 +782,7 @@ function Output(sMessage) {
 }
 
 function BindImmediateHistory() {
-	var oUl = ["ul", { class: "list-group" }];
+        const oUl = ["ul", { class: "list-group" }];
 
 	Page.LocalSettings.ImmediateHistory.each(x => {
 		oUl.push(["li", { class: "list-group-item list-group-item-action" }, ["a", { click: function () { ControlUtil.SetValue("txtImmediate", x) } }, x]]);
@@ -854,8 +856,8 @@ async function OnProcessImmediate() {
 	}
 }
 
-var bIsTagging = false;
-var timerUpdate = null;
+let bIsTagging = false;
+let timerUpdate = null;
 async function OnTagImmediate(ctrl) {
 
 	if (bIsTagging) {
@@ -1103,7 +1105,7 @@ function ProcessCodeOperation(op) {
 }
 
 
-var Breakpoints = [];
+let Breakpoints = [];
 
 function SetBreakPoint(info) {
 	console.log(info);
@@ -1142,7 +1144,7 @@ function IsDebugging() {
 	return !($$(".DebuggingControls")[0].hasClass("hidden"));
 }
 
-var oCurrentBlockedOn = null;
+let oCurrentBlockedOn = null;
 
 function OnBlockedOn() {
 	if (IsDebugging()) {
@@ -1195,7 +1197,7 @@ async function NavigateToDebugging(info, sSymbol, markerClass) {
 	BindRecentNavigations();
 }
 
-var BrokeOnMarker = null;
+let BrokeOnMarker = null;
 
 function ScrollToDebugging(info, markerClass) {
 	let lineStart = editor.posFromIndex(info.StartingOffset);
