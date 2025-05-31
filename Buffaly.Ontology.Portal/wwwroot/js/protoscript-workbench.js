@@ -189,8 +189,15 @@ async function OnLoadProject() {
 			$$$(oUl).inject(_$("divProject"));
 
 			ShowTab("tab-project");
-			if ($$(".navbar-header").length > 0)
-				$$(".navbar-header")[0].innerHTML = "<h3 style='color: white;'>" + sProjectFile + "</h3>";
+                        if ($$(".navbar-header").length > 0) {
+                                var header = $$(".navbar-header")[0];
+                                while (header.firstChild)
+                                        header.removeChild(header.firstChild);
+                                var h3 = document.createElement("h3");
+                                h3.style.color = "white";
+                                h3.textContent = sProjectFile;
+                                header.appendChild(h3);
+                        }
 
 			Page.LocalSettings.Solution = sProjectFile;
 			Page.LocalSettings.SolutionHistory = QueueFront(
