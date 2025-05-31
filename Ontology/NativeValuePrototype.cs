@@ -1,4 +1,5 @@
-﻿using BasicUtilities;
+﻿
+using BasicUtilities;
 using BasicUtilities.Collections;
 using Ontology.BaseTypes;
 
@@ -44,8 +45,8 @@ namespace Ontology
 				NativeValuePrototype nv = new NativeValuePrototype();
 				nv.NativeValue = strValue;
 				nv.PrototypeName = strPrototypeName;
-				nv.InsertTypeOf(System_String.Prototype);
 				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
+				nv.InsertTypeOf(System_String.Prototype);
 				return nv;
 			}
 			
@@ -64,9 +65,11 @@ namespace Ontology
 			if (null == prototype)
 			{
 				NativeValuePrototype nv = new NativeValuePrototype();
+				nv.NativeValue = iValue;
 				nv.PrototypeName = strPrototypeName;
-				nv.InsertTypeOf(System_Int32.Prototype);
 				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
+				nv.InsertTypeOf(System_Int32.Prototype);
+
 				return nv;
 			}
 			if (prototype is not NativeValuePrototype nv2)
@@ -83,9 +86,10 @@ namespace Ontology
 			if (null == prototype)
 			{
 				NativeValuePrototype nv = new NativeValuePrototype();
+				nv.NativeValue = bValue;
 				nv.PrototypeName = strPrototypeName;
-				nv.InsertTypeOf(System_Boolean.Prototype);
 				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
+				nv.InsertTypeOf(System_Boolean.Prototype);
 				return nv;
 			}
 			if (prototype is not NativeValuePrototype nv2)
@@ -102,9 +106,10 @@ namespace Ontology
 			if (null == prototype)
 			{
 				NativeValuePrototype nv = new NativeValuePrototype();
+				nv.NativeValue = dValue;
 				nv.PrototypeName = strPrototypeName;
-				nv.InsertTypeOf(System_Double.Prototype);
 				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
+				nv.InsertTypeOf(System_Double.Prototype);
 				return nv;
 			}
 			if (prototype is not NativeValuePrototype nv2)

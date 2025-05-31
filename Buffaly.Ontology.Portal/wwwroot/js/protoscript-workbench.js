@@ -6,7 +6,8 @@ Page.LocalSettings = {
 	File: null,
 	FileHistory: [],
 	ImmediateHistory: [],
-	WindowSize: "Halfize"
+	WindowSize: "Halfize",
+	WebRoot: null
 }
 Page.GetLocalSettings();
 Page.PreserveLocalSettings();
@@ -22,6 +23,20 @@ function IsCurrentFileSaved() {
 	return StringUtil.IsEmpty(sLastSaved) || GetCode() == sLastSaved;
 }
 
+
+Page.HandleUnexpectedError = function (oErr) {
+	if (oErr instanceof ReferenceError) {
+		// specific handling if you want it
+		Output(`ReferenceError: ${oErr.message}\n${oErr.stack ?? ""}`);
+	}
+	else if (oErr instanceof Error) {
+		// any other Error subtype (TypeError, SyntaxError, etc.)
+		Output(`${oErr.name}: ${oErr.message}\n${oErr.stack ?? ""}`);
+	}
+	else {
+		Output(oErr);
+	}
+}
 
 
 Page.AddOnLoad(async function () {
@@ -81,6 +96,8 @@ Page.AddOnLoad(async function () {
 	});
 
 	try {
+		await GetWebRoot();
+
 		if (!StringUtil.IsEmpty(Page.LocalSettings.Solution)) {
 			ControlUtil.SetValue("txtSolution", Page.LocalSettings.Solution);
 			await OnLoadProject();
@@ -107,14 +124,30 @@ Page.AddOnLoad(async function () {
 	}
 
 
+
+
+
 	ShowTab("tab-solution");
 
 })
 
-Page.HandleUnexpectedError = function (oErr) {
-	Output(oErr.Error);
-}
+async function GetWebRoot() {
+	let f = new Promise(resolve => {
+		ProtoScriptWorkbench.GetWebRoot(function (sRes) {
+			if (!StringUtil.IsEmpty(sRes)) {
+				Page.LocalSettings.WebRoot = sRes;
+				if (!StringUtil.EndsWith(sRes, "\\"))
+					Page.LocalSettings.WebRoot += "\\";
+			}
 
+			resolve();
+		});
+	})
+
+	await f;
+
+	return Page.LocalSettings.WebRoot;
+}
 
 //////////////////Solution and File Loading/////////////////////////////
 
@@ -131,9 +164,14 @@ function BindSolutionHistory() {
 
 async function OnLoadProject() {
 	let sProjectFile = ControlUtil.GetValue("txtSolution");
+	if (!StringUtil.InString(sProjectFile, ":")) {
+		sProjectFile = Page.LocalSettings.WebRoot + sProjectFile;
+	}
 	let sRoot = StringUtil.LeftOfLast(sProjectFile, "\\");
 
+
 	Output("Loading Project: " + sProjectFile);
+
 
 	let f = new Promise((resolve) => {
 		ProtoScriptWorkbench.LoadProject(sProjectFile, function (oRes) {
@@ -883,6 +921,8 @@ async function OnTagImmediate(ctrl) {
 }
 
 function GetRelativePath(sRoot, sFile) {
+
+
 	// Split both root and file paths into segments
 	const rootParts = sRoot.split("\\");
 	const fileParts = sFile.split("\\");

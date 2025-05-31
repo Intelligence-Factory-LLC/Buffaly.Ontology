@@ -29,6 +29,9 @@ if (!ObjectUtil.HasValue(ProtoScriptWorkbenchValidatorsFields.strSessionKey)) {
 if (!ObjectUtil.HasValue(ProtoScriptWorkbenchValidatorsFields.iLastMessageID)) {
 	ProtoScriptWorkbenchValidatorsFields.iLastMessageID = {Validators : [Validators.Integer], InvalidMessage: "Invalid iLastMessageID"};
 }
+if (!ObjectUtil.HasValue(ProtoScriptWorkbenchValidatorsFields.path)) {
+	ProtoScriptWorkbenchValidatorsFields.path = {Validators : [Validators.Text], InvalidMessage: "Invalid path"};
+}
 if (!ObjectUtil.HasValue(ProtoScriptWorkbenchValidatorsFields.strCode)) {
 	ProtoScriptWorkbenchValidatorsFields.strCode = {Validators : [Validators.Text], InvalidMessage: "Invalid strCode"};
 }
@@ -539,6 +542,37 @@ var ProtoScriptWorkbench = {
         else
             return JsonMethod.callSync(ProtoScriptWorkbench.Url, "GetTaggingProgress", { strSessionKey : oObject.strSessionKey}, ProtoScriptWorkbench.GetTaggingProgress.Serialize || {});
     },
+	GetWebRoot : function(Callback) {
+        return ProtoScriptWorkbench.GetWebRootObject({ }, Callback);
+    },
+
+	GetWebRootObject : function(oObject, Callback) {
+        if (!ObjectUtil.HasValue(oObject.IsValidated) || !oObject.IsValidated)
+        {
+            if (!Validators.Validate(oObject, ProtoScriptWorkbenchValidators.GetWebRoot)) {
+				var oError = { Error: "Invalid data", Data: oObject };
+				if (ObjectUtil.HasValue(ProtoScriptWorkbench.GetWebRoot.onValidationError))
+					ProtoScriptWorkbench.GetWebRoot.onValidationError(oError)
+					
+				else if (Page.HandleValidationErrors)
+					Page.HandleValidationErrors(oError);	
+								
+				throw "Invalid data";
+            }
+        }
+        
+        if (Callback)
+        {
+            JsonMethod.callWithInitializer({Page: ProtoScriptWorkbench.Url, 
+					Method : "GetWebRoot", 
+					Params : { }, 
+					Serialize : ProtoScriptWorkbench.GetWebRoot.Serialize || {},
+					onDataReceived : Callback, 
+					onErrorReceived : (ObjectUtil.HasValue(ProtoScriptWorkbench.GetWebRoot.onErrorReceived) ? ProtoScriptWorkbench.GetWebRoot.onErrorReceived : Page.HandleUnexpectedError) });
+        }
+        else
+            return JsonMethod.callSync(ProtoScriptWorkbench.Url, "GetWebRoot", { }, ProtoScriptWorkbench.GetWebRoot.Serialize || {});
+    },
 	InterpretImmediate : function(strProject, strImmediate, taggingSettings, Callback) {
         return ProtoScriptWorkbench.InterpretImmediateObject({ strProject : strProject,strImmediate : strImmediate,taggingSettings : taggingSettings}, Callback);
     },
@@ -849,6 +883,37 @@ var ProtoScriptWorkbench = {
         else
             return JsonMethod.callSync(ProtoScriptWorkbench.Url, "SaveCurrentCode", { strSessionKey : oObject.strSessionKey,strFile : oObject.strFile,Code : oObject.Code}, ProtoScriptWorkbench.SaveCurrentCode.Serialize || {});
     },
+	SetWebRoot : function(path, Callback) {
+        return ProtoScriptWorkbench.SetWebRootObject({ path : path}, Callback);
+    },
+
+	SetWebRootObject : function(oObject, Callback) {
+        if (!ObjectUtil.HasValue(oObject.IsValidated) || !oObject.IsValidated)
+        {
+            if (!Validators.Validate(oObject, ProtoScriptWorkbenchValidators.SetWebRoot)) {
+				var oError = { Error: "Invalid data", Data: oObject };
+				if (ObjectUtil.HasValue(ProtoScriptWorkbench.SetWebRoot.onValidationError))
+					ProtoScriptWorkbench.SetWebRoot.onValidationError(oError)
+					
+				else if (Page.HandleValidationErrors)
+					Page.HandleValidationErrors(oError);	
+								
+				throw "Invalid data";
+            }
+        }
+        
+        if (Callback)
+        {
+            JsonMethod.callWithInitializer({Page: ProtoScriptWorkbench.Url, 
+					Method : "SetWebRoot", 
+					Params : { path : oObject.path}, 
+					Serialize : ProtoScriptWorkbench.SetWebRoot.Serialize || {},
+					onDataReceived : Callback, 
+					onErrorReceived : (ObjectUtil.HasValue(ProtoScriptWorkbench.SetWebRoot.onErrorReceived) ? ProtoScriptWorkbench.SetWebRoot.onErrorReceived : Page.HandleUnexpectedError) });
+        }
+        else
+            return JsonMethod.callSync(ProtoScriptWorkbench.Url, "SetWebRoot", { path : oObject.path}, ProtoScriptWorkbench.SetWebRoot.Serialize || {});
+    },
 	StepNext : function(Callback) {
         return ProtoScriptWorkbench.StepNextObject({ }, Callback);
     },
@@ -1106,6 +1171,9 @@ var ProtoScriptWorkbenchValidators = {
 			strSessionKey : ProtoScriptWorkbenchValidatorsFields.strSessionKey	
 	},
 
+	GetWebRoot : {	
+	},
+
 	InterpretImmediate : {
 			strProject : ProtoScriptWorkbenchValidatorsFields.strProject,
 			strImmediate : ProtoScriptWorkbenchValidatorsFields.strImmediate,
@@ -1150,6 +1218,10 @@ var ProtoScriptWorkbenchValidators = {
 			strSessionKey : ProtoScriptWorkbenchValidatorsFields.strSessionKey,
 			strFile : ProtoScriptWorkbenchValidatorsFields.strFile,
 			Code : ProtoScriptWorkbenchValidatorsFields.Code	
+	},
+
+	SetWebRoot : {
+			path : ProtoScriptWorkbenchValidatorsFields.path	
 	},
 
 	StepNext : {	

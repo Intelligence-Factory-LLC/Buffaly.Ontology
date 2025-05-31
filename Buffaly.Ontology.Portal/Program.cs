@@ -28,9 +28,9 @@ public class Program
 
 		builder.Services.AddDistributedMemoryCache();
 
-                var app = builder.Build();
-                // Make ProtoScriptWorkbench aware of wwwroot for relative project paths
-                ProtoScript.Extensions.ProtoScriptWorkbench.SetWebRoot(app.Environment.WebRootPath);
+        var app = builder.Build();
+        // Make ProtoScriptWorkbench aware of wwwroot for relative project paths
+        ProtoScript.Extensions.ProtoScriptWorkbench.SetWebRoot(app.Environment.WebRootPath);
 
 		// Configure the HTTP request pipeline.
 		if (!app.Environment.IsDevelopment())

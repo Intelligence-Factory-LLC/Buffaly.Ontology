@@ -1,0 +1,10 @@
+prototype HelloWorld
+{
+	String Message = "Hello World!";
+}
+
+//Execute the function main(), in the immediate window or via the interpretter
+function main() : Prototype
+{
+	return HelloWorld.Message;
+}

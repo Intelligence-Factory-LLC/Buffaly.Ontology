@@ -22,9 +22,6 @@ namespace ProtoScript.Extensions
 
 		}
 
-
-
-		//		public SessionsRow SessionsRow;
 		public string SessionKey;
 		public ProtoScriptTagger Tagger;
 		public JsonObject Settings = new JsonObject();
@@ -35,13 +32,10 @@ namespace ProtoScript.Extensions
 		public static SessionObject Create(string strSessionKey = null)
 		{
 			strSessionKey ??= Guid.NewGuid().ToString();
-//			SessionsRow rowNewSession = new SessionsRow();
-//			rowNewSession.DataObject["ExternalKey"] = strSessionKey;
 
 			SessionObject session = new SessionObject()
 			{
 				SessionKey = strSessionKey,
-//				SessionsRow = rowNewSession
 			};
 
 			return session;
@@ -60,21 +54,6 @@ namespace ProtoScript.Extensions
 				ObjectCacheManager.SetAsyncLocalCache(this.m_objectCache);
 			}
 		}
-
-		//public List<OpenAIAPI.OpenAICompletions.Message> ConvertMessagesToList()
-		//{
-		//	List<OpenAIAPI.OpenAICompletions.Message> lstMessages = new List<OpenAIAPI.OpenAICompletions.Message>();
-		//	foreach (Data.MessagesRow row in this.SessionsRow.Messages)
-		//	{
-		//		OpenAIAPI.OpenAICompletions.Message message = new OpenAIAPI.OpenAICompletions.Message()
-		//		{
-		//			Content = row.MessageText,
-		//			Role = row.IsIncoming ? OpenAIAPI.OpenAICompletions.MessageRole.User : (row.IsSystemMessage ? OpenAIAPI.Completions.MessageRole.System : OpenAIAPI.Completions.MessageRole.Assistant)
-		//		};
-		//		lstMessages.Add(message);
-		//	}
-		//	return lstMessages;
-		//}
 
 
 		//The idea behind these methods is to allow for an object Session to be saved 

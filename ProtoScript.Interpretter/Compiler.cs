@@ -1,14 +1,15 @@
 ﻿using BasicUtilities;
+using BasicUtilities.Collections;
 using Ontology;
 using Ontology.Simulation;
 using ProtoScript.Diagnostics;
 using ProtoScript.Interpretter.Compiled;
+using ProtoScript.Interpretter.Compiling;
 using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Symbols;
-using ProtoScript.Interpretter.Compiling;
-using BasicUtilities.Collections;
 using ProtoScript.Parsers;
 using System.Collections.Concurrent;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace ProtoScript.Interpretter
 {
@@ -51,6 +52,23 @@ namespace ProtoScript.Interpretter
 			this.Symbols.InsertSymbol("string", new TypeInfo(typeof(string)));
 			this.Symbols.InsertSymbol("int", new TypeInfo(typeof(int)));
 			this.Symbols.InsertSymbol("Function", new TypeInfo(typeof(FunctionRuntimeInfo)));
+
+			//Default imports
+			string strCode = @"
+reference Ontology Ontology; 
+reference Ontology.Simulation Ontology.Simulation;
+
+import Ontology Ontology.Collection Collection;
+import Ontology Ontology.Prototype Prototype;
+
+import Ontology.Simulation Ontology.Simulation.StringWrapper String;
+import Ontology.Simulation Ontology.Simulation.IntWrapper Int;
+import Ontology.Simulation Ontology.Simulation.DoubleWrapper Double;
+import Ontology.Simulation Ontology.Simulation.BoolWrapper Bool;
+
+";
+			File file = ProtoScript.Parsers.Files.ParseFileContents(strCode);
+			this.Compile(file);
 		}
 
 		public List<Compiled.Statement> CompileProject(string strProjectFile)

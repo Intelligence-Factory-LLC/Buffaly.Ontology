@@ -42,10 +42,10 @@ namespace Ontology
 		// ── utility ───────────────────────────────────────────────────────────────
 		public static void ResetCache()
 		{
-			Cache.Clear();
-			ListCache.Clear();
+			// clear only if the slot already has a cache
+			ObjectCacheManager.Instance.GetOrCreateCache(nameof(TemporaryPrototypes)).Clear();
+			ObjectCacheManager.Instance.GetOrCreateCache(nameof(TemporaryPrototypes) + ".IDList").Clear();
 
-			// clear async-local holders so the next access repopulates them
 			_cacheLocal.Value = null;
 			_listCacheLocal.Value = null;
 			_listLocal.Value = null;

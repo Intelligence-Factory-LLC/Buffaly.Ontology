@@ -9,7 +9,7 @@ namespace ProtoScript.Parsers
 		public class FileDoesNotExistException : Exception
 		{
 			public FileDoesNotExistException() { }
-			public FileDoesNotExistException(string message) : base(message) { }
+			public FileDoesNotExistException(string message) : base("File does not exist: " + message) { }
 			public FileDoesNotExistException(string message, Exception inner) : base(message, inner) { }
 			protected FileDoesNotExistException(
 			  System.Runtime.Serialization.SerializationInfo info,

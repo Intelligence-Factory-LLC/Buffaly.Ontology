@@ -9,7 +9,7 @@ namespace Ontology.Tests
 
 
 	[TestClass]
-	public sealed class MedOnt_Tests_2
+	public sealed class BasicInterpretter_Tests_2
 	{
 
 
