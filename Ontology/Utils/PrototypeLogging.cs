@@ -40,7 +40,7 @@ namespace Ontology
 
 		static public void LogPrototypeShort(Prototype prototype)
 		{
-			Logs.DebugLog.WriteEvent("Prototype", "\r\n" + ToFriendlyShadowString(prototype).ToString());
+			Logs.DebugLog.WriteEvent("Prototype", "\r\n" + ToFriendlyString(prototype).ToString());
 		}
 
 		static public void LogPrototypesShort(IEnumerable<Prototype> prototypes)
@@ -49,7 +49,7 @@ namespace Ontology
 
 			foreach (Prototype prototype in prototypes)
 			{
-				Logs.DebugLog.WriteEvent("Prototype " + i++ + "\r\n", ToFriendlyShadowString(prototype).ToString());
+				Logs.DebugLog.WriteEvent("Prototype " + i++ + "\r\n", ToFriendlyString(prototype).ToString());
 			}
 		}
 
@@ -115,8 +115,7 @@ namespace Ontology
 		static public string ToFormattedString2(string strJSON)
 		{
 			Prototype prototype = Prototype.FromJSON(strJSON);
-			return ToFriendlyShadowString(prototype).ToString();
-			//return ToFormattedString(new JsonValue(strJSON)).ToString();
+			return ToFriendlyString(prototype).ToString();
 		}
 
 		static public StringBuilder ToFormattedString(JsonValue jsonValue, int iLevels = 0)
@@ -126,9 +125,6 @@ namespace Ontology
 			if (jsonValue.ToJsonObject() != null)
 			{
 				JsonObject jsonObject = jsonValue.ToJsonObject();
-
-				//if (iLevels > 0)
-				//	sb.Append(new string('\t', iLevels));
 
 				sb.Append("{");
 
@@ -161,8 +157,6 @@ namespace Ontology
 			{
 				JsonArray jsonArray = jsonValue.ToJsonArray();
 
-				//if (iLevels > 0)
-				//	sb.Append(new string('\t', iLevels));
 
 				sb.Append("[");
 
@@ -181,8 +175,6 @@ namespace Ontology
 
 				iLevels--;
 
-				//if (iLevels > 0)
-				//	sb.Append(new string('\t', iLevels));
 
 				sb.Append("]");
 			}
@@ -224,10 +216,10 @@ namespace Ontology
 			return sb;
 		}
 
-		//kScript
-		static public string ToFriendlyShadowString2(Prototype prototype)
+		
+		static public string ToFriendlyString2(Prototype prototype)
 		{
-			return ToFriendlyShadowString(prototype).ToString(); 
+			return ToFriendlyString(prototype).ToString(); 
 		}
 
 		static public bool IncludeLexemes = false;
@@ -236,7 +228,7 @@ namespace Ontology
 		static public bool IncludeValues = false;
 
 		static private Set<int> m_setCircular = new Set<int>();
-		static public StringBuilder ToFriendlyShadowString(Prototype prototype)
+		static public StringBuilder ToFriendlyString(Prototype prototype)
 		{
 			m_setCircular.Clear();
 
@@ -333,9 +325,11 @@ namespace Ontology
 				sb.Append("null");
 				return sb;
 			}
-	
+
 			if (Prototypes.TypeOf(prototype, System_String.Prototype))
 				sb.Append("\"").Append(StringUtil.Between(prototype.PrototypeName, "[", "]")).Append("\"");
+			else if (Prototypes.TypeOf(prototype, System_Int32.Prototype) || Prototypes.TypeOf(prototype, System_Boolean.Prototype) || Prototypes.TypeOf(prototype, System_Double.Prototype))
+				sb.Append(StringUtil.Between(prototype.PrototypeName, "[", "]"));
 			else
 				sb.Append(prototype.PrototypeName);
 
@@ -352,6 +346,16 @@ namespace Ontology
 
 			if (IncludeValues)
 				sb.Append(" ").Append(prototype.Value);
+
+			if (IncludeTypeOfs)
+			{
+				var typeOfs = prototype.Ancestors;
+				if (typeOfs.Any())
+				{
+					sb.Append(":");
+					sb.Append(" [").Append(String.Join(", ", typeOfs.Select(x => x.PrototypeName))).Append("]");
+				}
+			}
 
 			// Process properties
 			var propertyList = prototype.Properties.ToList();
@@ -373,16 +377,6 @@ namespace Ontology
 
 				sb.Append(strName).Append(" = ");
 
-				//if (protoName.PrototypeID == TypeOf.PrototypeID)
-				//{
-				//	sb.Append("["); 
-				//	if (IncludePrototypeIDs)
-				//		sb.Append(string.Join(", ", pair.Value.Children.Select(x => x.PrototypeName + " (" + x.PrototypeID + ")")));
-				//	else
-				//		sb.Append(string.Join(", ", pair.Value.Children.Select(x => x.PrototypeName)));
-				//	sb.Append("]");
-				//}
-				//else
 				{
 					// Recurse with the correct prefix for the value
 					string newPrefix = prefix + (isLast ? "    " : "│   ");

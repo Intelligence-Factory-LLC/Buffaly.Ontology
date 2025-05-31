@@ -1,118 +1,111 @@
 ﻿using Ontology.Simulation;
 using System.Reflection;
 
+
 namespace ProtoScript.Interpretter
 {
-        public class ReflectionUtil
-        {
-                /// <summary>
-                /// Enumerate all candidate methods that have the specified name and arity.
-                /// </summary>
-                static public IEnumerable<MethodInfo> GetCandidateMethods(System.Type type, string name, int arity)
-                {
-                        return type.GetMethods()
-                                .Where(m => m.Name == name && m.GetParameters().Length == arity);
-                }
+	public static class ReflectionUtil
+	{
+		//──────────────────── helpers ──────────────────────────────────────────
+		private static System.Type Normalise(System.Type t) => t switch
+		{
+			var x when x == typeof(IntWrapper) => typeof(int),
+			var x when x == typeof(StringWrapper) => typeof(string),
+			var x when x == typeof(DoubleWrapper) => typeof(double),
+			var x when x == typeof(BoolWrapper) => typeof(bool),
+			_ => t
+		};
 
-                /// <summary>
-                /// Try to resolve the best matching method for the provided argument types.
-                /// </summary>
-                static public MethodInfo? GetMethod(System.Type type, string strMethodName, List<System.Type> lstParameters)
-                {
-                        if (lstParameters.Any(x => x == null))
-                                return GetCandidateMethods(type, strMethodName, lstParameters.Count).FirstOrDefault();
+		private static bool IsWrapperFor(System.Type wrapper, System.Type primitive) =>
+			(wrapper, primitive) switch
+			{
+				(System.Type w, System.Type p) when w == typeof(IntWrapper) && p == typeof(int) => true,
+				(System.Type w, System.Type p) when w == typeof(StringWrapper) && p == typeof(string) => true,
+				(System.Type w, System.Type p) when w == typeof(DoubleWrapper) && p == typeof(double) => true,
+				(System.Type w, System.Type p) when w == typeof(BoolWrapper) && p == typeof(bool) => true,
+				_ => false
+			};
 
-                        // First try an exact match using the runtime types.
-                        MethodInfo? methodInfo = type.GetMethod(strMethodName, lstParameters.ToArray());
-                        if (null != methodInfo)
-                                return methodInfo;
+		//──────────────────── public API ───────────────────────────────────────
+		/// <summary>Enumerate all methods with the given <paramref name="name"/> and arity.</summary>
+		public static IEnumerable<MethodInfo> GetCandidateMethods(System.Type type, string name, int arity) =>
+			type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
+				.Where(m => m.Name == name && m.GetParameters().Length == arity);
 
-                        // Attempt again after normalising wrappers to their primitive counterparts.
-                        List<System.Type> normalized = new List<System.Type>(lstParameters);
-                        for (int i = 0; i < normalized.Count; i++)
-                        {
-                                System.Type typeParam = normalized[i];
+		/// <summary>
+		/// Resolve the most specific overload of <paramref name="strMethodName"/> for the supplied argument types.
+		/// Wrapper types (IntWrapper, StringWrapper, …) are treated as their primitive counterparts.
+		/// </summary>
+		public static MethodInfo? GetMethod(System.Type type,
+											string strMethodName,
+											IReadOnlyList<System.Type> lstParameters)
+		{
+			//──── 1. try exact match on normalised parameter list ────────────
+			var normalised = lstParameters.Select(Normalise).ToArray();
 
-                                if (typeParam == typeof(IntWrapper))
-                                        normalized[i] = typeof(int);
-                                else if (typeParam == typeof(StringWrapper))
-                                        normalized[i] = typeof(string);
-                                else if (typeParam == typeof(DoubleWrapper))
-                                        normalized[i] = typeof(double);
-                                else if (typeParam == typeof(BoolWrapper))
-                                        normalized[i] = typeof(bool);
-                        }
+			MethodInfo? exact = type.GetMethod(
+									strMethodName,
+									BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance,
+									binder: null,
+									types: normalised,
+									modifiers: null);
 
-                        methodInfo = type.GetMethod(strMethodName, normalized.ToArray());
-                        if (null != methodInfo)
-                                return methodInfo;
+			if (exact != null)
+				return exact;            // best possible match
 
-                        // Enumerate candidates and pick the most compatible one.
-                        MethodInfo? best = null;
-                        int bestScore = int.MaxValue;
-                        foreach (MethodInfo candidate in GetCandidateMethods(type, strMethodName, lstParameters.Count))
-                        {
-                                ParameterInfo[] parameters = candidate.GetParameters();
-                                int score = 0;
-                                bool compatible = true;
+			//──── 2. manual scoring among the remaining candidates ───────────
+			MethodInfo? best = null;
+			int bestScore = int.MaxValue;  // lower == better
 
-                                for (int i = 0; i < parameters.Length; i++)
-                                {
-                                        System.Type argType = lstParameters[i];
-                                        System.Type paramType = parameters[i].ParameterType;
+			foreach (MethodInfo candidate in GetCandidateMethods(type, strMethodName, normalised.Length))
+			{
+				ParameterInfo[] pars = candidate.GetParameters();
+				int score = 0;
+				bool compatible = true;
 
-                                        if (argType == paramType)
-                                                continue;
+				for (int i = 0; i < pars.Length; i++)
+				{
+					System.Type arg = normalised[i];
+					System.Type dest = pars[i].ParameterType;
 
-                                        // handle wrappers
-                                        if (argType == typeof(IntWrapper) && paramType == typeof(int))
-                                        {
-                                                score += 1;
-                                                continue;
-                                        }
-                                        if (argType == typeof(StringWrapper) && paramType == typeof(string))
-                                        {
-                                                score += 1;
-                                                continue;
-                                        }
-                                        if (argType == typeof(DoubleWrapper) && paramType == typeof(double))
-                                        {
-                                                score += 1;
-                                                continue;
-                                        }
-                                        if (argType == typeof(BoolWrapper) && paramType == typeof(bool))
-                                        {
-                                                score += 1;
-                                                continue;
-                                        }
+					if (arg == dest)                         // exact
+						continue;
 
-                                        if (paramType.IsAssignableFrom(argType))
-                                        {
-                                                score += 2;
-                                                continue;
-                                        }
+					if (IsWrapperFor(lstParameters[i], dest)) // wrapper -> primitive
+					{
+						score += 1;
+						continue;
+					}
 
-                                        compatible = false;
-                                        break;
-                                }
+					if (dest.IsAssignableFrom(arg))         // up-cast
+					{
+						score += 2;
+						continue;
+					}
 
-                                if (compatible && score < bestScore)
-                                {
-                                        best = candidate;
-                                        bestScore = score;
-                                }
-                        }
+					compatible = false;
+					break;
+				}
 
-                        return best;
-                }
+				if (compatible && score < bestScore)
+				{
+					best = candidate;
+					bestScore = score;
+				}
+			}
 
-               static public bool HasBaseType(System.Type typeTarget, System.Type type)
-               {
-                       if (typeTarget == null)
-                               return false;
+			return best;
+		}
 
-                       return type.IsAssignableFrom(typeTarget);
-               }
+		public static bool HasBaseType(System.Type typeTarget, System.Type type)
+		{
+			// Everything ultimately derives from object
+			if (type == typeof(object)) return true;
 
+			for (System.Type? t = typeTarget; t != null && t != typeof(object); t = t.BaseType)
+				if (t == type) return true;
+
+			return false;
+		}
 	}
 }

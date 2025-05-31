@@ -9,10 +9,8 @@ namespace Ontology.Tests
 
 
 	[TestClass]
-	public sealed class BasicInterpretter_Tests_2
+	public sealed class BasicInterpretter_Tests
 	{
-
-
 		[TestInitialize]
 		public void TestInit()
 		{
@@ -29,12 +27,8 @@ namespace Ontology.Tests
 
 			BasicUtilities.Settings.SetAppSettings(config);
 
-	
-			Buffaly.Data.DataAccess.SetConnectionString(config.GetConnectionString("buffaly.readwrite") ?? throw new Exception("buffaly.readwrite is not set"));
-
 			// This method is called before each test method.
 			Initializer.Initialize();
-
 
 			TemporaryPrototypes.Cache.InsertLogFrequency = 10000;
 		}

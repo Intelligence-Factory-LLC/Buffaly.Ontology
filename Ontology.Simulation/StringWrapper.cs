@@ -9,6 +9,8 @@ namespace Ontology.Simulation
 		public StringWrapper()
 		{
 			this.Prototype = NativeValuePrototype.GetOrCreateNativeValuePrototype("");
+
+			PopulateClone(this, this.Prototype);
 		}
 		public StringWrapper(string strValue)
 		{
@@ -16,6 +18,8 @@ namespace Ontology.Simulation
 				throw new ArgumentNullException(nameof(strValue), "String value cannot be null.");
 
 			this.Prototype = NativeValuePrototype.GetOrCreateNativeValuePrototype(strValue);
+
+			PopulateClone(this, this.Prototype);
 		}
 
 		public StringWrapper(Prototype prototype) 
@@ -27,6 +31,8 @@ namespace Ontology.Simulation
 				throw new Exception("Prototype must be of type NativeValuePrototype.");
 
 			this.Prototype = nvp;
+
+			PopulateClone(this, this.Prototype);
 		}
 
 		//public static implicit operator StringWrapper(string str)

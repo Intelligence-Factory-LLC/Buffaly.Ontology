@@ -1,0 +1,93 @@
+namespace SimpsonsOntology
+{
+    // Gender prototype
+    prototype Gender {
+        String Value = "";
+    }
+
+    // Specific genders
+    prototype Male : Gender {
+        Value = "Male";
+    }
+
+    prototype Female : Gender {
+        Value = "Female";
+    }
+
+    // Location prototype
+    prototype Location {
+        String Name = "";
+        String Address = "";
+    }
+
+    // Person prototype with relationships
+    prototype Person {
+        String Name = "";
+        Gender Gender = new Gender();
+        Int Age = 0;
+        Location Residence = new Location();
+        Collection ParentOf = new Collection();
+        Person Spouse = new Person();
+	    
+	  	function IsParent() : Boolean {
+            return ParentOf.Count > 0;
+        }
+    }
+
+    // Specific location: Simpsons House
+    prototype SimpsonsHouse : Location {
+        Name = "Simpsons House";
+        Address = "742 Evergreen Terrace";
+    }
+
+    // Specific location: Springfield
+    prototype Springfield : Location {
+        Name = "Springfield";
+        Address = "Unknown";
+    }
+
+    // Character: Homer Simpson
+    prototype Homer : Person {
+        Name = "Homer Simpson";
+        Gender = Male;
+        Age = 39;
+        Residence = SimpsonsHouse;
+        ParentOf = [Bart, Lisa, Maggie];
+        Spouse = Marge;
+    }
+
+    // Character: Marge Simpson
+    prototype Marge : Person {
+        Name = "Marge Simpson";
+        Gender = Female;
+        Age = 36;
+        Residence = SimpsonsHouse;
+        ParentOf = [Bart, Lisa, Maggie];
+        Spouse = Homer;
+    }
+
+    // Character: Bart Simpson
+    prototype Bart : Person {
+        Name = "Bart Simpson";
+        Gender = Male;
+        Age = 10;
+        Residence = SimpsonsHouse;
+    }
+
+    // Character: Lisa Simpson
+    prototype Lisa : Person {
+        Name = "Lisa Simpson";
+        Gender = Female;
+        Age = 8;
+        Residence = SimpsonsHouse;
+    }
+
+    // Character: Maggie Simpson
+    prototype Maggie : Person {
+        Name = "Maggie Simpson";
+        Gender = Female;
+        Age = 1;
+        Residence = SimpsonsHouse;
+    }
+
+}

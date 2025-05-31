@@ -152,13 +152,57 @@ async function GetWebRoot() {
 //////////////////Solution and File Loading/////////////////////////////
 
 function BindSolutionHistory() {
-	var oUl = ["ul", { class: "list-group" }];
+	// history -------------------------------------------------------------
+	const ulHist = ["ul", { class: "list-group" }];
 
 	Page.LocalSettings.SolutionHistory.each(function (item) {
-		oUl.push(["li", { class: "list-group-item list-group-item-action" }, ["a", { click: function () { ControlUtil.SetValue("txtSolution", item); OnLoadProject(); } }, item]]);
+		ulHist.push([
+			"li",
+			{ class: "list-group-item list-group-item-action" },
+			[
+				"a",
+				{
+					click() {
+						ControlUtil.SetValue("txtSolution", item);
+						OnLoadProject();
+					}
+				},
+				item
+			]
+		]);
 	});
 
-	$$$(oUl).inject(_$("divSolutionHistory"));
+	$$$(ulHist).inject(_$("divSolutionHistory"));
+
+	// examples ------------------------------------------------------------
+	const examples = ["projects\\hello.pts", "projects\\Simpsons.pts"];
+	const ulEx = ["ul", { class: "list-group" }];
+
+	examples.forEach(p =>
+		ulEx.push([
+			"li",
+			{ class: "list-group-item list-group-item-action" },
+			[
+				"a",
+				{
+					click() {
+						ControlUtil.SetValue("txtSolution", p);
+						OnLoadProject();
+					}
+				},
+				p
+			]
+		])
+	);
+
+	const container = [
+		"div",
+		{},
+		["h6", { class: "fw-bold" }, "Examples"],
+		ulEx
+	];
+
+	$$$(container).inject(_$("divSolutionExamples"));
 }
 
 

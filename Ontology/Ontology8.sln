@@ -49,16 +49,23 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{ADE6EE4C-8355-42FE-B175-43AFB3728E8E}"
+	ProjectSection(SolutionItems) = preProject
+		..\AGENTS.md = ..\AGENTS.md
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HelloWorld", "HelloWorld", "{6FB0CC09-C939-4797-A431-D7573617CD2D}"
 	ProjectSection(SolutionItems) = preProject
-		..\examples\HelloWorld\hello.pts = ..\examples\HelloWorld\hello.pts
 		..\examples\HelloWorld\README.md = ..\examples\HelloWorld\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simpsons", "Simpsons", "{255DE81E-021F-4216-9270-29903684B560}"
 	ProjectSection(SolutionItems) = preProject
-		..\examples\Simpsons\project.pts = ..\examples\Simpsons\project.pts
+		..\examples\Simpsons\images\homer-isa-person.png = ..\examples\Simpsons\images\homer-isa-person.png
+		..\examples\Simpsons\images\homer-marge.png = ..\examples\Simpsons\images\homer-marge.png
+		..\examples\Simpsons\images\more_protoscript.png = ..\examples\Simpsons\images\more_protoscript.png
+		..\examples\Simpsons\images\simpsons-ontology.png = ..\examples\Simpsons\images\simpsons-ontology.png
+		..\examples\Simpsons\Simpsons.md = ..\examples\Simpsons\Simpsons.md
 	EndProjectSection
 EndProject
 Global

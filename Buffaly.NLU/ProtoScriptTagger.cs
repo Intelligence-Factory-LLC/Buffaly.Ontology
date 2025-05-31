@@ -379,7 +379,7 @@ namespace Buffaly.NLU
 
 			if (null != protoResult)
 			{
-				Logs.DebugLog.WriteEvent(infoFunction.ParentPrototype?.PrototypeName + "." + infoFunction.FunctionName, "\r\n" + PrototypeLogging.ToFriendlyShadowString2(protoResult));
+				Logs.DebugLog.WriteEvent(infoFunction.ParentPrototype?.PrototypeName + "." + infoFunction.FunctionName, "\r\n" + PrototypeLogging.ToFriendlyString2(protoResult));
 			}
 
 			return protoResult;

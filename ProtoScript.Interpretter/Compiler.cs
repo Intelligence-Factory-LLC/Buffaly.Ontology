@@ -63,8 +63,10 @@ import Ontology Ontology.Prototype Prototype;
 
 import Ontology.Simulation Ontology.Simulation.StringWrapper String;
 import Ontology.Simulation Ontology.Simulation.IntWrapper Int;
+import Ontology.Simulation Ontology.Simulation.IntWrapper Integer;
 import Ontology.Simulation Ontology.Simulation.DoubleWrapper Double;
 import Ontology.Simulation Ontology.Simulation.BoolWrapper Bool;
+import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 ";
 			File file = ProtoScript.Parsers.Files.ParseFileContents(strCode);
@@ -767,6 +769,16 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Bool;
 
 			switch (obj)
 			{
+				case FieldTypeInfo fieldTypeInfo:
+
+					return new PrototypeFieldReference()
+					{
+						Left = CompileRootIdentifier("this", info),
+						Right = new GetGlobalStack() { Index = fieldTypeInfo.Index, InferredType = fieldTypeInfo.FieldInfo, Info = info },
+						InferredType = fieldTypeInfo.FieldInfo,
+						FieldInfo = fieldTypeInfo,
+						Info = info
+					};
 				case PrototypeTypeInfo pti:
 					return new GetGlobalStack { Index = pti.Index, InferredType = pti, Info = info };
 

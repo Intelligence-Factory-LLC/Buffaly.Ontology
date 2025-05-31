@@ -1634,16 +1634,16 @@ namespace ProtoScript.Interpretter
 			return scope;
 		}
 
-		public Prototype RunMethodAsPrototype(Prototype protoInstance, string strMethodName, List<object> lstParameters)
+		public Prototype ? RunMethodAsPrototype(Prototype protoInstance, string strMethodName, List<object> lstParameters)
 		{
-			object oRes = RunMethodAsObject(protoInstance, strMethodName, lstParameters);
+			object ? oRes = RunMethodAsObject(protoInstance, strMethodName, lstParameters);
 
 			return GetOrConvertToPrototype(oRes);
 		}
-		public object RunMethodAsObject(Prototype protoInstance, string strMethodName, List<object> lstParameters)
+		public object ? RunMethodAsObject(Prototype ? protoInstance, string strMethodName, List<object> lstParameters)
 		{
 
-			FunctionRuntimeInfo infoFunction = null;
+			FunctionRuntimeInfo ? infoFunction = null;
 
 			if (null == protoInstance)
 			{
@@ -1660,26 +1660,23 @@ namespace ProtoScript.Interpretter
 					throw new Exception("Could not find method: " + strMethodName + ", on prototype: " + protoInstance.PrototypeName);
 			}
 
-			object oRes = this.RunMethod(infoFunction, protoInstance, lstParameters);
-
-			return oRes;
+			return this.RunMethod(infoFunction, protoInstance, lstParameters);
 		}
 
-		public Prototype RunMethodAsPrototype(Prototype protoInstance, string strMethodName, object oParam1)
+		public Prototype ? RunMethodAsPrototype(Prototype protoInstance, string strMethodName, object oParam1)
 		{
 			return RunMethodAsPrototype(protoInstance, strMethodName, new List<object> { oParam1 });
 		}
 
-		public Prototype RunMethodAsPrototype(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
+		public Prototype ? RunMethodAsPrototype(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
 		{
-			object oRes = this.RunMethod(infoFunc, objInstance, lstParameters);
+			object ? oRes = this.RunMethod(infoFunc, objInstance, lstParameters);
 
 			return GetOrConvertToPrototype(oRes);
 		}
 
-		public object RunMethod(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
+		public object ? RunMethod(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
 		{
-			//TODO: This method doesn't clone the scope for recursive calls
 			if (LogMethodCalls)
 			{
 				Logs.DebugLog.WriteEvent("Calling Method", (infoFunc.ParentPrototype == null ? "" : infoFunc.ParentPrototype.PrototypeName + ".") +  infoFunc.FunctionName);				
@@ -1690,7 +1687,7 @@ namespace ProtoScript.Interpretter
 
 			Scope scope = GetFunctionEvaluationScope2(infoFunc, lstParameters);
 			Symbols.EnterScope(scope);
-			object oReturn = null;
+			object ? oReturn = null;
 
 			try
 			{

@@ -25,34 +25,34 @@ namespace ProtoScript.Extensions
 	public class ProtoScriptWorkbench : JsonWs
 	{
 
-        static protected ConcurrentDictionary<string, SessionObject> m_mapSessions = new ConcurrentDictionary<string, SessionObject>();
+		static protected ConcurrentDictionary<string, SessionObject> m_mapSessions = new ConcurrentDictionary<string, SessionObject>();
 
-        // When running inside the web portal, project paths may be
-        // relative to the application's wwwroot folder.  SetWebRoot
-        // from Program.cs so we can resolve those paths.
-        static private string? _webRoot;
+		// When running inside the web portal, project paths may be
+		// relative to the application's wwwroot folder.  SetWebRoot
+		// from Program.cs so we can resolve those paths.
+		static private string? _webRoot;
 
-        static public void SetWebRoot(string path)
-        {
-                _webRoot = path;
-        }
+		static public void SetWebRoot(string path)
+		{
+			_webRoot = path;
+		}
 
 		static public string GetWebRoot()
 		{
-				return _webRoot ?? string.Empty;
+			return _webRoot ?? string.Empty;
 		}
-		
+
 
 		static private string EnsureAbsolutePath(string path)
-        {
-                if (!System.IO.Path.IsPathRooted(path) && !string.IsNullOrEmpty(_webRoot))
-                {
-                        // Combine the web root with the relative path so the
-                        // parsers always receive an absolute path.
-                        return System.IO.Path.Combine(_webRoot, path);
-                }
-                return path;
-        }
+		{
+			if (!System.IO.Path.IsPathRooted(path) && !string.IsNullOrEmpty(_webRoot))
+			{
+				// Combine the web root with the relative path so the
+				// parsers always receive an absolute path.
+				return System.IO.Path.Combine(_webRoot, path);
+			}
+			return path;
+		}
 
 		static public SessionObject GetOrCreateSession(string strProject)
 		{
@@ -79,12 +79,12 @@ namespace ProtoScript.Extensions
 			ObjectCacheManager.UseAsyncLocal = true;
 
 			TemporaryPrototypes.Cache.InsertLogFrequency = 10000;
-			
+
 			session.Enter();
 		}
 
 		static private SessionObject CreateSession(string strSessionKey)
-		{		
+		{
 			SessionObject session = SessionObject.Create(strSessionKey);
 
 			// Enter the session before creating the tagger
@@ -106,12 +106,12 @@ namespace ProtoScript.Extensions
 			return strContents;
 		}
 
-                public static bool CreateNewFile(string strProject, string strNewFile)
-                {
-                        // Project path may be relative to wwwroot
-                        strProject = EnsureAbsolutePath(strProject);
+		public static bool CreateNewFile(string strProject, string strNewFile)
+		{
+			// Project path may be relative to wwwroot
+			strProject = EnsureAbsolutePath(strProject);
 
-                        string rootDir = StringUtil.LeftOfLast(strProject, "\\");
+			string rootDir = StringUtil.LeftOfLast(strProject, "\\");
 			// e.g. "C:\\dev\\ai\\Ontology\\ProtoScript.Tests\\DevAgent"
 
 			// 2. Build the final absolute path.
@@ -163,12 +163,12 @@ namespace ProtoScript.Extensions
 
 		static public List<string> LoadProject(string strProject)
 		{
-            // Resolve project paths relative to wwwroot if needed
+			// Resolve project paths relative to wwwroot if needed
 			SessionObject session = GetOrCreateSession(strProject);
 			return LoadProjectInternal(session);
 		}
-        static private List<string> LoadProjectInternal(SessionObject session)
-        {
+		static private List<string> LoadProjectInternal(SessionObject session)
+		{
 			try
 			{
 				string strProject = session.SessionKey;
@@ -192,7 +192,8 @@ namespace ProtoScript.Extensions
 					});
 				}
 
-				project.Files.Add(new ProtoScriptFile() {
+				project.Files.Add(new ProtoScriptFile()
+				{
 					FileName = strProject,
 					Length = fileProject.Info.Length
 				});
@@ -251,7 +252,7 @@ namespace ProtoScript.Extensions
 			return null;
 		}
 
-		static public List<Diagnostic>  CompileCodeWithProject(string strCode, string strProjectName)
+		static public List<Diagnostic> CompileCodeWithProject(string strCode, string strProjectName)
 		{
 			SessionObject session = GetOrCreateSession(strProjectName);
 
@@ -260,10 +261,10 @@ namespace ProtoScript.Extensions
 			session.Tagger = tagger;
 
 			tagger.EnableDatabase = false;
-			UnderstandUtil.SetupDatabaseDisconnectedMode(); 
+			UnderstandUtil.SetupDatabaseDisconnectedMode();
 
 			tagger.Interpretter.InsertGlobalObject("_sockets", new Sockets());  //make it avaialble for compilation only
-			//tagger.Interpretter.InsertGlobalObject("_session", new SessionsRow());
+																				//tagger.Interpretter.InsertGlobalObject("_session", new SessionsRow());
 			tagger.Interpretter.InsertGlobalObject("_sessionObject", session);
 
 			Compiler compiler = tagger.Compiler;
@@ -357,7 +358,7 @@ namespace ProtoScript.Extensions
 			SessionObject session = GetOrCreateSession(strSessionKey);
 
 			List<CodeContext.Symbol> lstSymbols = new List<CodeContext.Symbol>();
-			
+
 			if (null != session.Context.Compiler)
 			{
 				try
@@ -477,17 +478,17 @@ namespace ProtoScript.Extensions
 			public bool IncludeTypeOfs = false;
 			public int MaxIterations = 1000;
 			public string Project;
-			public bool SaveVerification = false;
+
 			public bool IncludeMeaning = false;
 			public bool TransferRecursively = false;
 			public string MeaningDimension = null;
 			public bool Debug = false;
 			public bool Fragment = false;
 			public bool TagAfterFragment = true;
-			public bool TagIteratively = true;
+			public bool TagIteratively = false;
 			public bool AllowAlreadyLinkedSequences = true;
 			public bool PathToStart = true;
-			public bool EnableDatabase = true;
+			public bool EnableDatabase = false;
 			public bool Resume = false;
 			public bool AllowPrecompiled = false;
 
@@ -526,9 +527,7 @@ namespace ProtoScript.Extensions
 		{
 			JsonSerializers.RegisterSerializer(typeof(TagImmediateResult), new NestedJsonSerializer<TagImmediateResult>());
 
-			if (StringUtil.IsEmpty(taggingSettings.SessionKey))
-				taggingSettings.SessionKey = strProject;
-
+			taggingSettings.SessionKey = strProject;
 			SessionObject session = GetOrCreateSession(taggingSettings.SessionKey);
 
 			TagImmediateResult result = new TagImmediateResult();
@@ -544,7 +543,7 @@ namespace ProtoScript.Extensions
 					//Clear diagnostics that (may have been) generated from the last immediate expression
 					tagger.Compiler.Diagnostics.Clear();
 				}
-				else 
+				else
 				{
 					Initializer.ResetCache();
 
@@ -553,7 +552,7 @@ namespace ProtoScript.Extensions
 					//LoadProjectInternal(strProject, session);
 
 					UnderstandUtil.TaggingSettings settings = new UnderstandUtil.TaggingSettings();
-					settings.Project = strProject;
+					settings.Project = taggingSettings.SessionKey;
 					settings.MaxIterations = taggingSettings.MaxIterations;
 					settings.AllowRanges = taggingSettings.AllowRanges;
 					settings.Fragment = taggingSettings.Fragment;
@@ -640,9 +639,9 @@ namespace ProtoScript.Extensions
 						{
 							PrototypeLogging.IncludeTypeOfs = taggingSettings.IncludeTypeOfs;
 							if (Prototypes.TypeOf(protoValue, Ontology.Collection.Prototype) && protoValue.Children.Count == 1)
-								result.Result = PrototypeLogging.ToFriendlyShadowString(protoValue.Children[0]).ToString();
+								result.Result = PrototypeLogging.ToFriendlyString(protoValue.Children[0]).ToString();
 							else
-								result.Result = PrototypeLogging.ToFriendlyShadowString(protoValue).ToString();
+								result.Result = PrototypeLogging.ToFriendlyString(protoValue).ToString();
 							result.ResultPrototype = protoValue;
 						}
 					}
@@ -708,7 +707,7 @@ namespace ProtoScript.Extensions
 				Buffaly.NLU.Tagger.BaseFunctionNode node2 = session.Tagger.TaggingNode.Possibilities.OrderByDescending(x => x.Value).FirstOrDefault() as Buffaly.NLU.Tagger.BaseFunctionNode;
 
 				if (null != node2 && null != node2.Source)
-					jsonObject["CurrentInterpretation"] = PrototypeLogging.ToFriendlyShadowString(node2.Source).ToString();
+					jsonObject["CurrentInterpretation"] = PrototypeLogging.ToFriendlyString(node2.Source).ToString();
 			}
 
 			return jsonObject;
@@ -744,11 +743,11 @@ namespace ProtoScript.Extensions
 				TagAfterFragment = settings.TagAfterFragment,
 				TagIteratively = settings.TagIteratively,
 				AllowAlreadyLinkedSequences = settings.AllowAlreadyLinkedSequences,
-				GlobalObjects = new Map<string, object>() { 
+				GlobalObjects = new Map<string, object>() {
 					{ "_sockets", m_Sockets }, 
 				//	{ "_session", new SessionsRow() { EnableLazyLoadProperties = false } },
 					{ "_sessionObject", session }
-				} ,
+				},
 				PathToStart = settings.PathToStart,
 				EnableDatabase = settings.EnableDatabase,
 				Resume = bResume
@@ -782,20 +781,15 @@ namespace ProtoScript.Extensions
 
 			if (null != result && StringUtil.IsEmpty(result.Error))
 			{
-				if (settings.SaveVerification)
-				{
-					
-				}
-
 
 				PrototypeLogging.IncludeTypeOfs = settings.IncludeTypeOfs;
 				PrototypeLogging.IncludePrototypeIDs = false;
 				StringBuilder sb = null;
 
 				if (Prototypes.TypeOf(result.Result, Ontology.Collection.Prototype) && result.Result.Children.Count == 1)
-					sb = PrototypeLogging.ToFriendlyShadowString(result.Result.Children[0]);
+					sb = PrototypeLogging.ToFriendlyString(result.Result.Children[0]);
 				else
-					sb = PrototypeLogging.ToFriendlyShadowString(result.Result);
+					sb = PrototypeLogging.ToFriendlyString(result.Result);
 
 				sb.AppendLine().AppendLine();
 				sb.Append(result.Iterations).Append(" iterations.");
@@ -889,7 +883,7 @@ namespace ProtoScript.Extensions
 			foreach (Prototype proto in lstTemporary)
 			{
 				if (proto.PrototypeName.StartsWith("System."))
-					continue; 
+					continue;
 
 				if (StringUtil.InString(proto.PrototypeName, strSearch))
 				{
@@ -928,12 +922,12 @@ namespace ProtoScript.Extensions
 				ValueRuntimeInfo valueRuntimeInfo = obj as ValueRuntimeInfo;
 				if (null == valueRuntimeInfo || null == valueRuntimeInfo.Value)
 					strRes = "(null)";
-				else 
+				else
 					strRes = valueRuntimeInfo.Value.ToString();
 			}
 			else
 			{
-				strRes = PrototypeLogging.ToFriendlyShadowString(protoValue).ToString();
+				strRes = PrototypeLogging.ToFriendlyString(protoValue).ToString();
 			}
 			PrototypeLogging.IncludeTypeOfs = bIncludeTypeOfs;
 			return strRes;
@@ -1013,7 +1007,7 @@ namespace ProtoScript.Extensions
 		{
 			public Prototype MessageValue = null;
 			public string MessageText;
-			public int MessageID;			
+			public int MessageID;
 		}
 
 		static public MessageResponse GetNextMessage(int iLastMessageID)
@@ -1028,13 +1022,13 @@ namespace ProtoScript.Extensions
 					MessageResponse messageResponse = new MessageResponse();
 					messageResponse.MessageValue = message.MessageValue;
 					messageResponse.MessageID = message.MessageID;
-					messageResponse.MessageText = PrototypeLogging.ToFriendlyShadowString2(message.MessageValue);
+					messageResponse.MessageText = PrototypeLogging.ToFriendlyString2(message.MessageValue);
 					return messageResponse;
 				}
 			}
 			return null;
 		}
 
-	
+
 	}
 }

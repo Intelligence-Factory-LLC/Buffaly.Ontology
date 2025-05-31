@@ -9,6 +9,8 @@ namespace Ontology.Simulation
 		public BoolWrapper(bool b)
 		{
 			this.Prototype = NativeValuePrototype.GetOrCreateNativeValuePrototype(b);
+
+			PopulateClone(this, this.Prototype);
 		}
 
 		public BoolWrapper(Prototype prototype)
@@ -20,6 +22,8 @@ namespace Ontology.Simulation
 				throw new Exception("Prototype must be of type NativeValuePrototype.");
 
 			this.Prototype = nvp;
+
+			PopulateClone(this, this.Prototype);
 		}
 
 		public bool GetBoolValue()

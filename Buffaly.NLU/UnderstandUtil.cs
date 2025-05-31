@@ -21,6 +21,7 @@ namespace Buffaly.NLU
 			public bool EnableLogging = true;
 			public string Project = null;
 			public bool Fragment = false;
+
 			public bool TagAfterFragment = true;
 			public bool TagIteratively = false;
 
@@ -368,13 +369,13 @@ namespace Buffaly.NLU
 					lstSememes.Add(protoSememe);
 
 					Logs.DebugLog.WriteEvent(action.ToString(),
-						"\r\n" + PrototypeLogging.ToFriendlyShadowString2(prototype) + "\r\n->\r\n" +
-						PrototypeLogging.ToFriendlyShadowString2(protoSememe));
+						"\r\n" + PrototypeLogging.ToFriendlyString2(prototype) + "\r\n->\r\n" +
+						PrototypeLogging.ToFriendlyString2(protoSememe));
 				}
 				else
 				{
 					Logs.DebugLog.WriteEvent(action.ToString(),
-	"\r\n" + PrototypeLogging.ToFriendlyShadowString2(prototype) + "\r\n->\r\n" + "(null)");
+	"\r\n" + PrototypeLogging.ToFriendlyString2(prototype) + "\r\n->\r\n" + "(null)");
 				}
 			}
 

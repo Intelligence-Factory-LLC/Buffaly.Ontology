@@ -9,6 +9,8 @@ namespace Ontology.Simulation
 		public DoubleWrapper(double d)
 		{
 			this.Prototype = NativeValuePrototype.GetOrCreateNativeValuePrototype(d);
+
+			PopulateClone(this, this.Prototype);
 		}
 
 		public DoubleWrapper(Prototype prototype)
@@ -20,6 +22,8 @@ namespace Ontology.Simulation
 				throw new Exception("Prototype must be of type NativeValuePrototype.");
 
 			this.Prototype = nvp;
+
+			PopulateClone(this, this.Prototype);
 		}
 		public double GetDoubleValue()
 		{

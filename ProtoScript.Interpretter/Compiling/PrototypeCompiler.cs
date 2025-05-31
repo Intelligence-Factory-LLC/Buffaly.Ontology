@@ -64,7 +64,7 @@ namespace ProtoScript.Interpretter.Compiling
 				if (protoDef.IsPartial)
 					prototype.Data["IsPartial"] = true;
 
-				if (!protoDef.IsPartial && prototype.Data["IsPartial"] as bool? != true)
+				if (!protoDef.IsPartial && prototype.Data.TryGetValue("IsPartial", out object ? b) && b as bool? != true)
 				{
 					compiler.AddDiagnostic(new Diagnostic("Prototype already exists: " + protoDef.PrototypeName), protoDef, null);
 					return null;

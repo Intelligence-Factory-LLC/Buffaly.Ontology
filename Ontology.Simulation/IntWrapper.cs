@@ -9,6 +9,8 @@ namespace Ontology.Simulation
 		public IntWrapper(int i)
 		{
 			Prototype = NativeValuePrototype.GetOrCreateNativeValuePrototype(i);
+
+			PopulateClone(this, this.Prototype);
 		}
 
 		public IntWrapper(Prototype prototype)
@@ -20,6 +22,8 @@ namespace Ontology.Simulation
 				throw new Exception("Prototype must be of type NativeValuePrototype.");
 
 			this.Prototype = nvp;
+
+			PopulateClone(this, this.Prototype);
 		}
 
 		public int GetIntValue()
