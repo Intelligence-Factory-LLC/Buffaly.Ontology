@@ -8,9 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Helpers\ClinicalEntities.cs" />
     <Compile Remove="Helpers\ICDCodeHelper.cs" />
-    <Compile Remove="Helpers\ICDCodeLearner.cs" />
   </ItemGroup>
 
   <ItemGroup>
