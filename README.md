@@ -31,23 +31,61 @@ dotnet add package Buffaly.Ontology
 using Buffaly.Ontology;
 using Buffaly.Ontology.ICD10CM;
 
-// 1. Boot the engine
-var world = OntologyWorld.CreateDefault();
+	// 1. Boot the engine
+	OntologyWorld world = OntologyWorld.CreateDefault();
 
-// 2. Ask for a code
-var i517 = world.Lookup<ICD10Code>("I51.7");
-Console.WriteLine(i517.Description);   // → "Cardiomegaly"
+	// 2. Ask for a code
+	ICD10Code i517 = world.Lookup<ICD10Code>("I51.7");
+	Console.WriteLine(i517.Description);   // → "Cardiomegaly"
 
-// 3. Dynamically extend with ProtoScript
-string proto = """
-partial prototype Myocardial_HypertrophySememe : Sememe
-{
-    Children = [HeartSememe, HypertrophySememe];
-}
-""";
-world.CompileProtoScript(proto);
+	// 3. Dynamically extend with ProtoScript
+	string proto = """
+	partial prototype Myocardial_HypertrophySememe : Sememe
+	{
+	    Children = [HeartSememe, HypertrophySememe];
+	}
+	""";
+	world.CompileProtoScript(proto);
 ```
 
+```csharp
+using ProtoScript.Interpretter;
+using ProtoScript.Interpretter.Interpretting;
+using ProtoScript.Parsers;
+using System.Collections.Generic;
+
+string script = """
+namespace SimpsonsOntology
+{
+	prototype Person {
+		String Name = "";
+		Collection ParentOf = new Collection();
+		function IsParent() : Boolean {
+			return ParentOf.Count > 0;
+		}
+	}
+
+	prototype Bart : Person {
+		Name = "Bart Simpson";
+	}
+
+	prototype Homer : Person {
+		Name = "Homer Simpson";
+		ParentOf = [Bart];
+	}
+}
+""";
+
+ProtoScript.File file = Files.ParseFileContents(script);
+Compiler compiler = new Compiler();
+compiler.Initialize();
+ProtoScript.Interpretter.Compiled.File compiled = compiler.Compile(file);
+NativeInterpretter interpreter = new NativeInterpretter(compiler);
+interpreter.Evaluate(compiled);
+
+bool isParent = (bool)interpreter.RunMethodAsObject("Homer", "IsParent", new List<object>());
+Console.WriteLine($"Homer is a parent? {isParent}");
+```
 See the unit tests under **Ontology.Tests** for examples on how to load
 the ontology, query concepts and register custom behaviours.
 
@@ -68,9 +106,15 @@ the ontology, query concepts and register custom behaviours.
 ├─ ProtoScript.Interpretter/
 ├─ ProtoScript.Parsers/
 ├─ Scripts/
+	├─ examples/
+	│  ├─ HelloWorld/
+	│  └─ Simpsons/
 └─ lib/
 ```
 
+## 📚 Samples
+- [HelloWorld](examples/HelloWorld/README.md)
+- [Simpsons](examples/Simpsons/Simpsons.md)
 ---
 
 ## 🛠 Building and testing
