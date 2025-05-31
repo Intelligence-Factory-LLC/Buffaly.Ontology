@@ -62,8 +62,9 @@ namespace Buffaly.SemanticDB.Portal
         {
             oHandler.EvaluateFunction1("using", "Administrator\\LeftMenu.ks.html");
 
-			return oHandler.EvaluateFile(FileUtil.BuildPath(oHandler.GetRootDir(), "Administrator\\LeftMenu.ks.html"));
-		}
+            string rootDir = oHandler.GetRootDir() ?? string.Empty;
+            return oHandler.EvaluateFile(FileUtil.BuildPath(rootDir, "Administrator\\LeftMenu.ks.html")) ?? string.Empty;
+        }
 
 		public string? SidebarMenu
         {
@@ -110,11 +111,11 @@ namespace Buffaly.SemanticDB.Portal
             }
             else if (values.Count == 1)
             {
-                return values[0];
+                return values[0] ?? string.Empty;
             }
             else
             {
-                return string.Join(", ", values);
+                return string.Join(", ", values.ToArray());
             }
         }
     }
