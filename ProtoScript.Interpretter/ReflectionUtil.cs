@@ -30,23 +30,13 @@ namespace ProtoScript.Interpretter
 			return methodInfo;
 		}
 
-		static public bool HasBaseType(System.Type typeTarget, System.Type type)
-		{
-			//Everything has a base type of object
-			if (typeof(object) == type)
-				return true;
+               static public bool HasBaseType(System.Type typeTarget, System.Type type)
+               {
+                       if (typeTarget == null)
+                               return false;
 
-			do
-			{
-				if (typeTarget == type)
-					return true;
-
-				typeTarget = typeTarget.BaseType;
-			}
-			while (typeTarget != typeof(object));
-
-			return false;
-		}
+                       return type.IsAssignableFrom(typeTarget);
+               }
 
 	}
 }
