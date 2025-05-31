@@ -44,10 +44,10 @@ namespace Ontology
 			this.Children.AddRange(lstPrototypes);
 		}
 
-		public Collection(IEnumerable<int> lstPrototypes) : base(Collection.PrototypeID)
-		{
-			this.Children.AddRange(lstPrototypes.Select(x => Prototypes.GetPrototype(PrototypeID)));
-		}
+                public Collection(IEnumerable<int> lstPrototypes) : base(Collection.PrototypeID)
+                {
+                        this.Children.AddRange(lstPrototypes.Select(x => Prototypes.GetPrototype(x)));
+                }
 		public Collection(Collection col) : base(Collection.PrototypeID)
 		{
 			this.Children.AddRange(col);
