@@ -38,10 +38,10 @@ Page.AddOnLoad(async function () {
 			OnSaveCurrentFile();
 			event.preventDefault();
 		}
-		else if (event.ctrlKey && event.key == ',') {
-			event.preventDefault();
-			OnStartSymbolSearch();
-		}
+                else if (event.ctrlKey && event.key == ',') {
+                        event.preventDefault();
+                        OnStartSymbolSearch(event);
+                }
 		else if (event.ctrlKey && event.key == 'b') {
 			event.preventDefault();
 			CompileCode();
@@ -542,7 +542,7 @@ function OnNavigateToSelectedProjectFile() {
 }
 
 
-async function OnStartSymbolSearch() {
+async function OnStartSymbolSearch(evt) {
 	ShowTab("tab-symbols");
 	ControlUtil.SetValue("txtSymbolSearch", "");
 
@@ -550,7 +550,7 @@ async function OnStartSymbolSearch() {
 		await CompileCode()
 	}
 
-	OnFilterSymbols();
+        OnFilterSymbols(evt);
 	_$("txtSymbolSearch").scrollIntoView(false)
 	_$("txtSymbolSearch").focus();
 }
@@ -582,9 +582,9 @@ function OnNavigateToSelectedSymbol() {
 	}
 }
 
-function OnFilterSymbols() {
-	//(function () {
-	if (window.event.code != "ArrowDown" && window.event.code != "ArrowUp") {
+function OnFilterSymbols(evt) {
+        //(function () {
+        if (!evt || (evt.code != "ArrowDown" && evt.code != "ArrowUp")) {
 		var sSearch = ControlUtil.GetValue("txtSymbolSearch");
 		if (StringUtil.IsEmpty(sSearch))
 			OnBindFileSymbols();
