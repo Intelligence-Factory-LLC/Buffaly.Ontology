@@ -25,7 +25,28 @@ namespace ProtoScript.Extensions
 	public class ProtoScriptWorkbench : JsonWs
 	{
 
-		static protected ConcurrentDictionary<string, SessionObject> m_mapSessions = new ConcurrentDictionary<string, SessionObject>();
+                static protected ConcurrentDictionary<string, SessionObject> m_mapSessions = new ConcurrentDictionary<string, SessionObject>();
+
+                // When running inside the web portal, project paths may be
+                // relative to the application's wwwroot folder.  SetWebRoot
+                // from Program.cs so we can resolve those paths.
+                static private string? _webRoot;
+
+                static public void SetWebRoot(string path)
+                {
+                        _webRoot = path;
+                }
+
+                static private string EnsureAbsolutePath(string path)
+                {
+                        if (!System.IO.Path.IsPathRooted(path) && !string.IsNullOrEmpty(_webRoot))
+                        {
+                                // Combine the web root with the relative path so the
+                                // parsers always receive an absolute path.
+                                return System.IO.Path.Combine(_webRoot, path);
+                        }
+                        return path;
+                }
 
 		static public SessionObject GetOrCreateSession(string strSessionKey)
 		{
@@ -77,9 +98,12 @@ namespace ProtoScript.Extensions
 			return strContents;
 		}
 
-		public static bool CreateNewFile(string strProject, string strNewFile)
-		{
-			string rootDir = StringUtil.LeftOfLast(strProject, "\\");
+                public static bool CreateNewFile(string strProject, string strNewFile)
+                {
+                        // Project path may be relative to wwwroot
+                        strProject = EnsureAbsolutePath(strProject);
+
+                        string rootDir = StringUtil.LeftOfLast(strProject, "\\");
 			// e.g. "C:\\dev\\ai\\Ontology\\ProtoScript.Tests\\DevAgent"
 
 			// 2. Build the final absolute path.
@@ -134,8 +158,10 @@ namespace ProtoScript.Extensions
 			SessionObject session = GetOrCreateSession(strProject);
 			return LoadProjectInternal(strProject, session);
 		}
-		static private List<string> LoadProjectInternal(string strProject, SessionObject session)
-		{
+                static private List<string> LoadProjectInternal(string strProject, SessionObject session)
+                {
+                        // Resolve project paths relative to wwwroot if needed
+                        strProject = EnsureAbsolutePath(strProject);
 			try
 			{
 				File fileProject = ProtoScript.Parsers.Files.Parse(strProject);

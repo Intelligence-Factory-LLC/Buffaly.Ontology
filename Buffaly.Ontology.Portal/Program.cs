@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using RooTrax.Common;
 using System.Reflection;
 using WebAppUtilities;
+using ProtoScript.Extensions;
 
 public class Program
 {
@@ -27,7 +28,9 @@ public class Program
 
 		builder.Services.AddDistributedMemoryCache();
 
-		var app = builder.Build();
+                var app = builder.Build();
+                // Make ProtoScriptWorkbench aware of wwwroot for relative project paths
+                ProtoScript.Extensions.ProtoScriptWorkbench.SetWebRoot(app.Environment.WebRootPath);
 
 		// Configure the HTTP request pipeline.
 		if (!app.Environment.IsDevelopment())
