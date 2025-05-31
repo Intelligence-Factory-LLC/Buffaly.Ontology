@@ -13,7 +13,7 @@ namespace Buffaly.Admin.Portal.Pages
     {
 
         public string? RequestId { get; set; }
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 

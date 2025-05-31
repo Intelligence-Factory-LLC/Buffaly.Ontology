@@ -4,23 +4,18 @@
 	{
 		public const string PrototypeName = "System.Int32";
 
-		public static int PrototypeID
-		{
-			get
-			{
-				return Prototype.PrototypeID;
-			}
-		}
+		public static int PrototypeID => Prototype.PrototypeID;
 
-		private static Prototype m_Prototype = null;
+		private static readonly AsyncLocal<Prototype> s_prototype = new();
+
 		public static Prototype Prototype
 		{
 			get
 			{
-				if (null == m_Prototype)
-					m_Prototype = Prototypes.GetOrInsertPrototype(PrototypeName);
+				if (s_prototype.Value == null)
+					s_prototype.Value = Prototypes.GetOrInsertPrototype(PrototypeName);
 
-				return m_Prototype;
+				return s_prototype.Value;
 			}
 		}
 	}
@@ -29,49 +24,38 @@
 	{
 		public const string PrototypeName = "System.String";
 
-		public static int PrototypeID
-		{
-			get
-			{
-				return Prototype.PrototypeID;
-			}
-		}
+		public static int PrototypeID => Prototype.PrototypeID;
 
-		private static Prototype m_Prototype = null;
+		private static readonly AsyncLocal<Prototype> s_prototype = new();
+
 		public static Prototype Prototype
 		{
 			get
 			{
-				if (null == m_Prototype)
-					m_Prototype = Prototypes.GetOrInsertPrototype(PrototypeName);
+				if (s_prototype.Value == null)
+					s_prototype.Value = Prototypes.GetOrInsertPrototype(PrototypeName);
 
-				return m_Prototype;
+				return s_prototype.Value;
 			}
 		}
 	}
-
 
 	public class System_Double
 	{
 		public const string PrototypeName = "System.Double";
 
-		public static int PrototypeID
-		{
-			get
-			{
-				return Prototype.PrototypeID;
-			}
-		}
+		public static int PrototypeID => Prototype.PrototypeID;
 
-		private static Prototype m_Prototype = null;
+		private static readonly AsyncLocal<Prototype> s_prototype = new();
+
 		public static Prototype Prototype
 		{
 			get
 			{
-				if (null == m_Prototype)
-					m_Prototype = Prototypes.GetOrInsertPrototype(PrototypeName);
+				if (s_prototype.Value == null)
+					s_prototype.Value = Prototypes.GetOrInsertPrototype(PrototypeName);
 
-				return m_Prototype;
+				return s_prototype.Value;
 			}
 		}
 	}
@@ -80,23 +64,18 @@
 	{
 		public const string PrototypeName = "System.Boolean";
 
-		public static int PrototypeID
-		{
-			get
-			{
-				return Prototype.PrototypeID;
-			}
-		}
+		public static int PrototypeID => Prototype.PrototypeID;
 
-		private static Prototype m_Prototype = null;
+		private static readonly AsyncLocal<Prototype> s_prototype = new();
+
 		public static Prototype Prototype
 		{
 			get
 			{
-				if (null == m_Prototype)
-					m_Prototype = Prototypes.GetOrInsertPrototype(PrototypeName);
+				if (s_prototype.Value == null)
+					s_prototype.Value = Prototypes.GetOrInsertPrototype(PrototypeName);
 
-				return m_Prototype;
+				return s_prototype.Value;
 			}
 		}
 	}

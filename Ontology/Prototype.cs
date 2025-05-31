@@ -163,6 +163,10 @@ namespace Ontology
 			if (!this.TypeOfsCollection.Contains(iParentPrototypeID))
 			{
 				this.TypeOfsCollection.Add(iParentPrototypeID);
+
+				if (this.PrototypeID == 0)
+					throw new Exception("Prototypes should be created before the TypeOf is set.");
+
 				Prototypes.GetPrototype(iParentPrototypeID).DescendantsCollection.Add(this.PrototypeID);
 
 				InvalidateCacheParents();
@@ -180,6 +184,10 @@ namespace Ontology
 			if (!this.TypeOfsCollection.Contains(iParentPrototypeID))
 			{
 				this.TypeOfsCollection.Insert(0, iParentPrototypeID);
+
+				if (this.PrototypeID == 0)
+					throw new Exception("Prototypes should be created before the TypeOf is set.");
+
 				Prototypes.GetPrototype(iParentPrototypeID).DescendantsCollection.Add(this.PrototypeID);
 				InvalidateCacheParents();
 			}

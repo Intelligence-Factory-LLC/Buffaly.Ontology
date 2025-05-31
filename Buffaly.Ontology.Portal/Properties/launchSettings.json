@@ -8,11 +8,11 @@
     }
   },
   "profiles": {
-    "Buffaly.SemanticDB.Portal": {
+    "Buffaly.Ontology.Portal": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "login",
+      "launchUrl": "protoscript",
       "applicationUrl": "https://localhost:7182;http://localhost:5197",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
@@ -21,7 +21,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "login",
+      "launchUrl": "protoscript",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

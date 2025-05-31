@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using RooTrax.Common;
 using System.Reflection;
 using WebAppUtilities;
+using ProtoScript.Extensions;
 
 public class Program
 {
@@ -27,7 +28,9 @@ public class Program
 
 		builder.Services.AddDistributedMemoryCache();
 
-		var app = builder.Build();
+        var app = builder.Build();
+        // Make ProtoScriptWorkbench aware of wwwroot for relative project paths
+        ProtoScript.Extensions.ProtoScriptWorkbench.SetWebRoot(app.Environment.WebRootPath);
 
 		// Configure the HTTP request pipeline.
 		if (!app.Environment.IsDevelopment())
@@ -151,9 +154,10 @@ public class Program
 			jsonWs.SetOptions(jsonWsOptions);
 
 			// Map API routes
-			foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
-			{
-				string strUrl = "/api/" + type.Namespace.ToString().ToLower() + "/" + GetUrlSafeName(type.Name) + "/" + GetUrlSafeName(method.Name);
+                        foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                        {
+                                string ns = type.Namespace ?? string.Empty;
+                                string strUrl = "/api/" + ns.ToLowerInvariant() + "/" + GetUrlSafeName(type.Name) + "/" + GetUrlSafeName(method.Name);
 				// Map the API route with authorization
 				endpoints.Map(strUrl, async (HttpContext context) =>
 				{

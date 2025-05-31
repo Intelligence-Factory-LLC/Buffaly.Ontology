@@ -25,14 +25,43 @@ namespace ProtoScript.Extensions
 	public class ProtoScriptWorkbench : JsonWs
 	{
 
-		static protected ConcurrentDictionary<string, SessionObject> m_mapSessions = new ConcurrentDictionary<string, SessionObject>();
+        static protected ConcurrentDictionary<string, SessionObject> m_mapSessions = new ConcurrentDictionary<string, SessionObject>();
 
-		static public SessionObject GetOrCreateSession(string strSessionKey)
+        // When running inside the web portal, project paths may be
+        // relative to the application's wwwroot folder.  SetWebRoot
+        // from Program.cs so we can resolve those paths.
+        static private string? _webRoot;
+
+        static public void SetWebRoot(string path)
+        {
+                _webRoot = path;
+        }
+
+		static public string GetWebRoot()
 		{
-			if (StringUtil.IsEmpty(strSessionKey)
-				|| !m_mapSessions.TryGetValue(strSessionKey, out SessionObject session))
+				return _webRoot ?? string.Empty;
+		}
+		
+
+		static private string EnsureAbsolutePath(string path)
+        {
+                if (!System.IO.Path.IsPathRooted(path) && !string.IsNullOrEmpty(_webRoot))
+                {
+                        // Combine the web root with the relative path so the
+                        // parsers always receive an absolute path.
+                        return System.IO.Path.Combine(_webRoot, path);
+                }
+                return path;
+        }
+
+		static public SessionObject GetOrCreateSession(string strProject)
+		{
+			strProject = EnsureAbsolutePath(strProject);
+
+			if (StringUtil.IsEmpty(strProject)
+				|| !m_mapSessions.TryGetValue(strProject, out SessionObject session))
 			{
-				return CreateSession(strSessionKey);
+				return CreateSession(strProject);
 			}
 
 			EnterSession(session);
@@ -77,9 +106,12 @@ namespace ProtoScript.Extensions
 			return strContents;
 		}
 
-		public static bool CreateNewFile(string strProject, string strNewFile)
-		{
-			string rootDir = StringUtil.LeftOfLast(strProject, "\\");
+                public static bool CreateNewFile(string strProject, string strNewFile)
+                {
+                        // Project path may be relative to wwwroot
+                        strProject = EnsureAbsolutePath(strProject);
+
+                        string rootDir = StringUtil.LeftOfLast(strProject, "\\");
 			// e.g. "C:\\dev\\ai\\Ontology\\ProtoScript.Tests\\DevAgent"
 
 			// 2. Build the final absolute path.
@@ -131,13 +163,15 @@ namespace ProtoScript.Extensions
 
 		static public List<string> LoadProject(string strProject)
 		{
+            // Resolve project paths relative to wwwroot if needed
 			SessionObject session = GetOrCreateSession(strProject);
-			return LoadProjectInternal(strProject, session);
+			return LoadProjectInternal(session);
 		}
-		static private List<string> LoadProjectInternal(string strProject, SessionObject session)
-		{
+        static private List<string> LoadProjectInternal(SessionObject session)
+        {
 			try
 			{
+				string strProject = session.SessionKey;
 				File fileProject = ProtoScript.Parsers.Files.Parse(strProject);
 
 				string strRootDir = StringUtil.LeftOfLast(strProject, "\\");
@@ -146,7 +180,7 @@ namespace ProtoScript.Extensions
 				project.FileName = strProject;
 				project.RootDirectory = strRootDir;
 
-				//TODO: This needs to not load everything separate from teh compilation process
+				//TODO: This needs to not load everything separate from the compilation process
 				List<File> lstFiles = Compiler.GetAllIncludedFiles(fileProject, false);
 
 				foreach (File file in lstFiles.OrderBy(x => x.Info.Name))
@@ -436,48 +470,6 @@ namespace ProtoScript.Extensions
 			return sb.ToString();
 		}
 
-		static public List<Diagnostic> CompileCode(string strCode)
-		{
-			TemporaryPrototypes.ResetCache();
-
-			List<Diagnostic> lstDiagnostics = new List<Diagnostic>();
-
-			try
-			{
-				File file = ProtoScript.Parsers.Files.ParseFileContents(strCode);
-
-				Compiler compiler = new Compiler();
-				compiler.Initialize();
-				ProtoScript.Interpretter.Compiled.File fileCompiled = compiler.Compile(file);
-
-				foreach (CompilerDiagnostic compilerDiagnostic in compiler.Diagnostics)
-				{
-					Diagnostic diagnostic = new Diagnostic();
-					diagnostic.Message = compilerDiagnostic.Diagnostic.Message;
-					if (null != compilerDiagnostic.Statement)
-					{
-						diagnostic.Info = compilerDiagnostic.Statement.Info;
-						diagnostic.Message += " - " + SimpleGenerator.Generate(compilerDiagnostic.Statement);
-					}
-					else 
-					{
-						diagnostic.Info = compilerDiagnostic.Expression.Info;
-						diagnostic.Message += " - " + SimpleGenerator.Generate(compilerDiagnostic.Expression);
-					}
-
-
-					lstDiagnostics.Add(diagnostic);
-
-				}
-
-			}
-			catch (ProtoScriptTokenizingException err)
-			{
-				lstDiagnostics.Add(new Diagnostic() { Type = "Parsing", Message = "Expected: " + err.Expected, Info = new StatementParsingInfo() { StartingOffset = err.Cursor, Length = 1 } });
-			}
-
-			return lstDiagnostics;
-		}
 
 		public class TaggingSettings
 		{
@@ -686,48 +678,7 @@ namespace ProtoScript.Extensions
 			return result;
 		}
 
-		//Not used now, but saved in case I want to work with a single file 
-		static public string InterpretImmediateSingleFile(string strCode, string strImmediate)
-		{
-			TemporaryPrototypes.ResetCache();
 
-			File file = ProtoScript.Parsers.Files.ParseFileContents(strCode);
-
-			Compiler compiler = new Compiler();
-			compiler.Initialize();
-			ProtoScript.Interpretter.Compiled.File compiledFile = compiler.Compile(file);
-
-			if (compiler.Diagnostics.Count > 0)
-			{
-				throw new JsonWsException("Compilation Error");
-			}
-
-			NativeInterpretter interpretter = new NativeInterpretter(compiler);
-
-			try
-			{
-				interpretter.Evaluate(compiledFile);			
-			}
-			catch (Exception err)
-			{
-				throw new JsonWsException("Interpretter Error", err);
-			}
-
-			ProtoScript.Expression statementImmediate = ProtoScript.Parsers.Expressions.Parse(strImmediate);
-			ProtoScript.Interpretter.Compiled.Expression compiledImmediate = compiler.Compile(statementImmediate);
-			object obj = interpretter.Evaluate(compiledImmediate);
-
-			if (null == obj)
-				return null;
-
-			if (obj is ProtoScript.Interpretter.RuntimeInfo.ValueRuntimeInfo)
-				return PrototypeLogging.ToFriendlyShadowString((obj as ProtoScript.Interpretter.RuntimeInfo.ValueRuntimeInfo).Value as Prototype).ToString();
-
-			if (obj is Prototype)
-				return PrototypeLogging.ToFriendlyShadowString(obj as Prototype).ToString();
-
-			return obj == null ? "null" : obj.ToString();
-		}
 
 		public class TagImmediateResult
 		{
@@ -767,8 +718,7 @@ namespace ProtoScript.Extensions
 		{
 			JsonSerializers.RegisterSerializer(typeof(TagImmediateResult), new NestedJsonSerializer<TagImmediateResult>());
 
-			if (StringUtil.IsEmpty(settings.SessionKey))
-				settings.SessionKey = strProject;
+			settings.SessionKey = strProject;
 
 			SessionObject session = GetOrCreateSession(settings.SessionKey);
 			bool bResume = IsResumable(settings, session);
@@ -779,7 +729,7 @@ namespace ProtoScript.Extensions
 				Buffaly.NLU.Nodes.ProtoScriptControllers.Clear();
 
 				//Populate the context
-				LoadProjectInternal(strProject, session);
+				LoadProjectInternal(session);
 			}
 
 			UnderstandUtil.TaggingSettings settings2 = new UnderstandUtil.TaggingSettings

@@ -6,7 +6,8 @@ Page.LocalSettings = {
 	File: null,
 	FileHistory: [],
 	ImmediateHistory: [],
-	WindowSize: "Halfize"
+	WindowSize: "Halfize",
+	WebRoot: null
 }
 Page.GetLocalSettings();
 Page.PreserveLocalSettings();
@@ -23,6 +24,20 @@ function IsCurrentFileSaved() {
 }
 
 
+Page.HandleUnexpectedError = function (oErr) {
+	if (oErr instanceof ReferenceError) {
+		// specific handling if you want it
+		Output(`ReferenceError: ${oErr.message}\n${oErr.stack ?? ""}`);
+	}
+	else if (oErr instanceof Error) {
+		// any other Error subtype (TypeError, SyntaxError, etc.)
+		Output(`${oErr.name}: ${oErr.message}\n${oErr.stack ?? ""}`);
+	}
+	else {
+		Output(oErr);
+	}
+}
+
 
 Page.AddOnLoad(async function () {
 
@@ -38,10 +53,10 @@ Page.AddOnLoad(async function () {
 			OnSaveCurrentFile();
 			event.preventDefault();
 		}
-		else if (event.ctrlKey && event.key == ',') {
-			event.preventDefault();
-			OnStartSymbolSearch();
-		}
+                else if (event.ctrlKey && event.key == ',') {
+                        event.preventDefault();
+                        OnStartSymbolSearch(event);
+                }
 		else if (event.ctrlKey && event.key == 'b') {
 			event.preventDefault();
 			CompileCode();
@@ -81,6 +96,8 @@ Page.AddOnLoad(async function () {
 	});
 
 	try {
+		await GetWebRoot();
+
 		if (!StringUtil.IsEmpty(Page.LocalSettings.Solution)) {
 			ControlUtil.SetValue("txtSolution", Page.LocalSettings.Solution);
 			await OnLoadProject();
@@ -107,14 +124,30 @@ Page.AddOnLoad(async function () {
 	}
 
 
+
+
+
 	ShowTab("tab-solution");
 
 })
 
-Page.HandleUnexpectedError = function (oErr) {
-	Output(oErr.Error);
-}
+async function GetWebRoot() {
+	let f = new Promise(resolve => {
+		ProtoScriptWorkbench.GetWebRoot(function (sRes) {
+			if (!StringUtil.IsEmpty(sRes)) {
+				Page.LocalSettings.WebRoot = sRes;
+				if (!StringUtil.EndsWith(sRes, "\\"))
+					Page.LocalSettings.WebRoot += "\\";
+			}
 
+			resolve();
+		});
+	})
+
+	await f;
+
+	return Page.LocalSettings.WebRoot;
+}
 
 //////////////////Solution and File Loading/////////////////////////////
 
@@ -131,9 +164,14 @@ function BindSolutionHistory() {
 
 async function OnLoadProject() {
 	let sProjectFile = ControlUtil.GetValue("txtSolution");
+	if (!StringUtil.InString(sProjectFile, ":")) {
+		sProjectFile = Page.LocalSettings.WebRoot + sProjectFile;
+	}
 	let sRoot = StringUtil.LeftOfLast(sProjectFile, "\\");
 
+
 	Output("Loading Project: " + sProjectFile);
+
 
 	let f = new Promise((resolve) => {
 		ProtoScriptWorkbench.LoadProject(sProjectFile, function (oRes) {
@@ -189,8 +227,15 @@ async function OnLoadProject() {
 			$$$(oUl).inject(_$("divProject"));
 
 			ShowTab("tab-project");
-			if ($$(".navbar-header").length > 0)
-				$$(".navbar-header")[0].innerHTML = "<h3 style='color: white;'>" + sProjectFile + "</h3>";
+                        if ($$(".navbar-header").length > 0) {
+                                var header = $$(".navbar-header")[0];
+                                while (header.firstChild)
+                                        header.removeChild(header.firstChild);
+                                var h3 = document.createElement("h3");
+                                h3.style.color = "white";
+                                h3.textContent = sProjectFile;
+                                header.appendChild(h3);
+                        }
 
 			Page.LocalSettings.Solution = sProjectFile;
 			Page.LocalSettings.SolutionHistory = QueueFront(
@@ -212,7 +257,13 @@ async function OnLoadProject() {
 
 async function OnLoadFile() {
         const sFile = ControlUtil.GetValue("txtFileName");
-        await LoadFile(sFile);
+        try {
+                await LoadFile(sFile);
+        }
+        catch (err) {
+                Output(err);
+        }
+
 }
 
 async function LoadFile(sFile) {
@@ -235,27 +286,32 @@ async function LoadFile(sFile) {
 		}
 	}
 
-	let f = new Promise((resolve) => {
-		ProtoScriptWorkbench.LoadFile(Page.LocalSettings.Solution, sFile, function (sFileContents) {
-			SetCode(sFileContents);
-			sLastSaved = sFileContents;
-			Page.LocalSettings.File = sFile;
+        try {
+                let f = new Promise((resolve) => {
+                        ProtoScriptWorkbench.LoadFile(Page.LocalSettings.Solution, sFile, function (sFileContents) {
+                                SetCode(sFileContents);
+                                sLastSaved = sFileContents;
+                                Page.LocalSettings.File = sFile;
 
-			let fCurrent = AddFileToHistory(sFile);
+                                let fCurrent = AddFileToHistory(sFile);
 
-			if (fCurrent.Recent.length > 0) {
-				let cur = fCurrent.Recent[0];
-				_$("divFileContent").scrollTop = cur;
-			}
+                                if (fCurrent.Recent.length > 0) {
+                                        let cur = fCurrent.Recent[0];
+                                        _$("divFileContent").scrollTop = cur;
+                                }
 
-			BindFileHistory();
-			OnBindFileSymbols();
-			AdjustWindowSizes();
-			resolve();
-		})
-	});
+                                BindFileHistory();
+                                OnBindFileSymbols();
+                                AdjustWindowSizes();
+                                resolve();
+                        })
+                });
 
-	await f;
+                await f;
+        }
+        catch (err) {
+                Output(err);
+        }
 
 	return true;
 }
@@ -347,22 +403,32 @@ function BindFileHistory() {
 
 let sLastSaved = null;
 async function OnSaveCurrentFile() {
-	await SaveCurrentFile();
+        try {
+                await SaveCurrentFile();
+        }
+        catch (err) {
+                Output(err);
+        }
 }
 
 async function SaveCurrentFile() {
         const sCode = GetCode();
         sLastSaved = sCode;
 
-	let f = new Promise(async function (resolve) {
+        try {
+                let f = new Promise(async function (resolve) {
 
-		ProtoScriptWorkbench.SaveCurrentCode(Page.LocalSettings.Solution, Page.LocalSettings.File, sCode, function (oRes) {
-			UserMessages.DisplayNow("File saved", "Success")
-			resolve();
-		})
-	});
+                        ProtoScriptWorkbench.SaveCurrentCode(Page.LocalSettings.Solution, Page.LocalSettings.File, sCode, function (oRes) {
+                                UserMessages.DisplayNow("File saved", "Success")
+                                resolve();
+                        })
+                });
 
-	await f;
+                await f;
+        }
+        catch (err) {
+                Output(err);
+        }
 }
 
 ///////////////////File and Symbol Panels///////////////////////////////
@@ -535,7 +601,7 @@ function OnNavigateToSelectedProjectFile() {
 }
 
 
-async function OnStartSymbolSearch() {
+async function OnStartSymbolSearch(evt) {
 	ShowTab("tab-symbols");
 	ControlUtil.SetValue("txtSymbolSearch", "");
 
@@ -543,7 +609,7 @@ async function OnStartSymbolSearch() {
 		await CompileCode()
 	}
 
-	OnFilterSymbols();
+        OnFilterSymbols(evt);
 	_$("txtSymbolSearch").scrollIntoView(false)
 	_$("txtSymbolSearch").focus();
 }
@@ -575,16 +641,17 @@ function OnNavigateToSelectedSymbol() {
 	}
 }
 
-function OnFilterSymbols() {
-	//(function () {
+
+function OnFilterSymbols(evt) {
         if (window.event.code != "ArrowDown" && window.event.code != "ArrowUp") {
                 const sSearch = ControlUtil.GetValue("txtSymbolSearch");
-                if (StringUtil.IsEmpty(sSearch))
-                        OnBindFileSymbols();
-                else {
+		if (StringUtil.IsEmpty(sSearch))
+			OnBindFileSymbols();
+		else {
                         let oMatch = null;
                         const oSymbols = Symbols.filter(x => StringUtil.InString(x.SymbolName, sSearch));
                         const oExact = Symbols.filter(x => StringUtil.EqualNoCase(x.SymbolName, sSearch));
+
 			if (oExact.length > 0)
 				oSymbols.insertAt(0, oExact[0]);
 
@@ -593,14 +660,11 @@ function OnFilterSymbols() {
 			iSelected = -1;
 		}
 	}
-
-	//}).delay(100);
 }
 
 
 
 ////////////////////////////Extensions//////////////////
-let iLength = 0;
 
 function countCR(sTxt, iOffset) {
         let iCount = 0;
@@ -627,23 +691,26 @@ function ParseFile() {
 }
 
 async function CompileCode() {
-	if (!IsCurrentFileSaved())
-		await SaveCurrentFile();
+        try {
+                if (!IsCurrentFileSaved())
+                        await SaveCurrentFile();
 
-	Output("Compilation starting...");
+                Output("Compilation starting...");
+
 
         const sCode = GetCode();
 	ProtoScriptWorkbench.CompileCode.onErrorReceived = function (oErr) {
 		Output("Compilation failed");
 	};
 
-	ProtoScriptWorkbench.CompileCodeWithProject.onErrorReceived = function (oErr) {
-		Output("Compilation failed");
-		Output(oErr);
-	};
 
-	let sProjectFile = ControlUtil.GetValue("txtSolution");
-	if (!StringUtil.IsEmpty(sProjectFile)) {
+                ProtoScriptWorkbench.CompileCodeWithProject.onErrorReceived = function (oErr) {
+                        Output("Compilation failed");
+                        Output(oErr);
+                };
+
+        let sProjectFile = ControlUtil.GetValue("txtSolution");
+        if (!StringUtil.IsEmpty(sProjectFile)) {
 
 		clearErrors();
 
@@ -679,10 +746,10 @@ async function CompileCode() {
 			})
 		});
 
-		await f;
+                await f;
 
-	}
-	else {
+        }
+        else {
 
 		ProtoScriptWorkbench.CompileCode(sCode, function (oRes) {
 			clearErrors();
@@ -693,10 +760,14 @@ async function CompileCode() {
 
 			Output(oRes.length + " errors");
 
-		})
-	}
+                })
+        }
 
-	Output("Compilation finished");
+        Output("Compilation finished");
+        }
+        catch (err) {
+                Output(err);
+        }
 }
 
 function ClearOutput() {
@@ -852,6 +923,8 @@ async function OnTagImmediate(ctrl) {
 }
 
 function GetRelativePath(sRoot, sFile) {
+
+
 	// Split both root and file paths into segments
 	const rootParts = sRoot.split("\\");
 	const fileParts = sFile.split("\\");

@@ -1,5 +1,4 @@
-````markdown
-# Buffaly.Ontology  
+# Buffaly.Ontology
 *A production-ready, neurosymbolic ontology engine for healthcare & beyond*
 
 
@@ -26,7 +25,7 @@
 
 ```bash
 dotnet add package Buffaly.Ontology
-````
+```
 
 ```csharp
 using Buffaly.Ontology;
@@ -49,27 +48,43 @@ partial prototype Myocardial_HypertrophySememe : Sememe
 world.CompileProtoScript(proto);
 ```
 
-See **docs/GettingStarted.md** for a 10-minute tutorial covering:
-
-* Loading the full ICD-10 hierarchy
-* Lazy-loading SNOMED CT concepts on demand
-* Registering a C# transfer function between lexical and clinical layers
+See the unit tests under **Ontology.Tests** for examples on how to load
+the ontology, query concepts and register custom behaviours.
 
 ---
 
 ## 📦 Repository layout
 
 ```
-├─ src/
-│   ├─ Buffaly.Ontology.Core/     // ProtoScript compiler & runtime
-│   ├─ Buffaly.Ontology.ICD10CM/  // 15k ICD-10-CM codes as ProtoScript
-│   └─ Buffaly.Ontology.Lexical/  // WordNet + VerbNet seeds
-├─ examples/
-│   ├─ 01-query-icd10/            // LINQ-style querying demo
-│   └─ 02-hot-compile/            // add prototypes at runtime
-└─ docs/
-    ├─ Architecture.md
-    └─ GettingStarted.md
+├─ Buffaly.NLU/
+├─ Buffaly.NLU.Tagger/
+├─ Buffaly.Ontology.Portal/
+├─ Ontology/                # Core engine
+├─ Ontology.Parsers/
+├─ Ontology.Simulation/
+├─ Ontology.Tests/
+├─ ProtoScript/
+├─ ProtoScript.Extensions/
+├─ ProtoScript.Interpretter/
+├─ ProtoScript.Parsers/
+├─ Scripts/
+└─ lib/
+```
+
+---
+
+## 🛠 Building and testing
+
+This repository is a standard .NET solution. To build everything:
+
+```bash
+dotnet build Ontology/Ontology8.sln
+```
+
+Run the unit tests:
+
+```bash
+dotnet test Ontology.Tests/Ontology.Tests.csproj
 ```
 
 ---
@@ -103,6 +118,3 @@ If you’d like guidance or custom development, drop us a line at **[justin@inte
 ---
 
 *© 2025 Intelligence Factory, LLC* – *Safe, controlled and understandable AI for mission-critical domains*
-
-```
-```

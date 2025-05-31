@@ -68,6 +68,14 @@ namespace Buffaly.NLU
 		public ProtoScriptTagger(bool bDebug)
 		{
 			Compiler = new Compiler();
+
+			if (TemporaryPrototypes.GetCount() > 0)
+			{
+				//Check for this scenario because loading a new project will cause the SymbolTable 
+				//to be rebuilt but temporary prototypes will still exist and will be reachable 
+				throw new Exception("A previous project is still active");
+			}
+
 			Compiler.Initialize();
 
 			if (!bDebug)
