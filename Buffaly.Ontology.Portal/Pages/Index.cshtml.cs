@@ -27,9 +27,10 @@ namespace Buffaly.Admin.Portal.Pages
 			}
 		}
 
-		public string GetSidebarMenu(kScript3.kScriptControl oHandler)
-		{
-			return oHandler.EvaluateFile(FileUtil.BuildPath(oHandler.GetRootDir(), "Administrator\\LeftMenu.ks.html"));
-		}
+                public string GetSidebarMenu(kScript3.kScriptControl oHandler)
+                {
+                        string rootDir = oHandler.GetRootDir() ?? string.Empty;
+                        return oHandler.EvaluateFile(FileUtil.BuildPath(rootDir, "Administrator\\LeftMenu.ks.html")) ?? string.Empty;
+                }
 	}
 }
