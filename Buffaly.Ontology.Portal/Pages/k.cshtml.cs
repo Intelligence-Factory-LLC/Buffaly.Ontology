@@ -95,7 +95,7 @@ namespace Buffaly.Admin.Portal.Pages
 				//kScript3.kScriptControl kScript = RooTraxState.kScriptControl;
 
 
-                kScript3.kScriptControl kScript = null;
+                kScript3.kScriptControl? kScript = null;
                 if (StringUtil.IsEmpty(this.Handler) || StringUtil.EqualNoCase(this.Handler, "Buffaly.SemanticDB.UI"))
                 {
                     kScript = Buffaly.SemanticDB.UI.RooTraxState.kScriptControl; ;
@@ -108,7 +108,9 @@ namespace Buffaly.Admin.Portal.Pages
 				}
 
 
-				kScript3.SymbolTable oSymbolTable = (kScript.GetSymbolTable());
+                                if (kScript == null)
+                                    throw new InvalidOperationException("kScript is not initialized");
+                                kScript3.SymbolTable oSymbolTable = kScript.GetSymbolTable();
 
 				try
 				{
@@ -216,7 +218,7 @@ namespace Buffaly.Admin.Portal.Pages
 			return Page();
 		}
 
-        private string BuildErrorMessage(Exception err)
+        private string BuildErrorMessage(Exception? err)
         {
             if (err == null) return string.Empty;
 
@@ -230,9 +232,9 @@ namespace Buffaly.Admin.Portal.Pages
         <div class=""alert alert-danger"" role=""alert"">
             {WebUtility.HtmlEncode(err.Message)}
             <h3>Source</h3>
-            <pre>{WebUtility.HtmlEncode(err.Source)}</pre>
+            <pre>{WebUtility.HtmlEncode(err.Source ?? string.Empty)}</pre>
             <h3>Stack Trace</h3>
-            <pre>{err.StackTrace}</pre>
+            <pre>{err.StackTrace ?? string.Empty}</pre>
         </div>
         {innerMessage}";
 
@@ -248,23 +250,25 @@ namespace Buffaly.Admin.Portal.Pages
 			return string.Empty;
 		}
 
-		private object TryEvaluateEx(string strClass, string strMember, ref kScript3.SymbolTable oSymbolTable, ref kScript3.kScriptControl oHandler)
-		{
-			if (oSymbolTable.GetScope(strClass).Symbols.ContainsKey(strMember))
-			{
-				return oHandler.EvaluateFunctionNObjectsEx(strClass + "." + strMember, new List<object>(), ref oSymbolTable);
-			}
+                private object? TryEvaluateEx(string strClass, string strMember, ref kScript3.SymbolTable oSymbolTable, ref kScript3.kScriptControl oHandler)
+                {
+                        if (oSymbolTable.GetScope(strClass).Symbols.ContainsKey(strMember))
+                        {
+                                return oHandler.EvaluateFunctionNObjectsEx(strClass + "." + strMember, new List<object>(), ref oSymbolTable);
+                        }
 
 			return string.Empty;
 		}
-		public string GetSidebarMenu(kScript3.kScriptControl oHandler)
-		{
-			return oHandler.EvaluateFile(FileUtil.BuildPath(oHandler.GetRootDir(), "Administrator\\LeftMenu.ks.html"));
-		}
-		public string GetFileMenu(kScript3.kScriptControl oHandler)
-		{
-			return oHandler.EvaluateFile(FileUtil.BuildPath(oHandler.GetRootDir(), "Administrator\\FileMenu.ks.html"));
-		}
+                public string GetSidebarMenu(kScript3.kScriptControl oHandler)
+                {
+                        string rootDir = oHandler.GetRootDir() ?? string.Empty;
+                        return oHandler.EvaluateFile(FileUtil.BuildPath(rootDir, "Administrator\\LeftMenu.ks.html")) ?? string.Empty;
+                }
+                public string GetFileMenu(kScript3.kScriptControl oHandler)
+                {
+                        string rootDir = oHandler.GetRootDir() ?? string.Empty;
+                        return oHandler.EvaluateFile(FileUtil.BuildPath(rootDir, "Administrator\\FileMenu.ks.html")) ?? string.Empty;
+                }
 
 
 	}
