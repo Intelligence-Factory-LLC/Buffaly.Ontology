@@ -1,4 +1,3 @@
-﻿using ProtoScript.Parsers.BasicUtilities;
 using System.Runtime.CompilerServices;
 
 namespace ProtoScript.Parsers
@@ -164,8 +163,8 @@ namespace ProtoScript.Parsers
 			System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 	}
 
-	// This is the C#-specific Tokenizer that inherits from SimpleTokenizer2
-	public class Tokenizer : SimpleTokenizer2
+       // This is the C#-specific Tokenizer that inherits from BasicUtilities.Tokenizer
+       public class Tokenizer : BasicUtilities.Tokenizer
 	{
 		private readonly HashSet<string> m_setOperators;
 		private readonly HashSet<string> m_setUnary;
@@ -253,7 +252,7 @@ namespace ProtoScript.Parsers
 
 		new public string getNextToken()
 		{
-			ReadOnlySpan<char> spanTok = GetNextTokenSpan(); // Get basic token from SimpleTokenizer2
+ReadOnlySpan<char> spanTok = GetNextTokenSpan(); // Get basic token from base Tokenizer
 			if (spanTok.IsEmpty) return string.Empty;
 
 			char firstCharOfSpan = spanTok[0];
@@ -262,7 +261,7 @@ namespace ProtoScript.Parsers
 			// Verbatim string: @"..."
 			if (firstCharOfSpan == '@' && spanTok.Length == 1) // Ensure '@' was a standalone token
 			{
-				var nextTokenAfterAt = PeekNextTokenSpan(); // Base PeekNextTokenSpan (doesn't skip C# comments)
+ReadOnlySpan<char> nextTokenAfterAt = PeekNextTokenSpan(); // Base PeekNextTokenSpan (doesn't skip C# comments)
 				if (!nextTokenAfterAt.IsEmpty && nextTokenAfterAt.Length == 1 && nextTokenAfterAt[0] == '"')
 				{
 					GetNextTokenSpan(); // Consume the '"' token from base
@@ -279,7 +278,7 @@ namespace ProtoScript.Parsers
 					discardNextChar(); // discardNextChar from base
 				}
 
-				var nextTokenAfterDollar = PeekNextTokenSpan(); // Base PeekNextTokenSpan
+ReadOnlySpan<char> nextTokenAfterDollar = PeekNextTokenSpan(); // Base PeekNextTokenSpan
 				if (!nextTokenAfterDollar.IsEmpty && nextTokenAfterDollar.Length == 1 && nextTokenAfterDollar[0] == '"')
 				{
 					GetNextTokenSpan(); // Consume the '"' token from base
@@ -337,7 +336,7 @@ namespace ProtoScript.Parsers
 				if (nextChar == '*')
 				{
 					discardNextChar(); // Consume the '*', m_szCursor is now after "/*"
-					movePast("*/");   // Base SimpleTokenizer2.movePast for fixed delimiter
+movePast("*/");   // Base Tokenizer.movePast for fixed delimiter
 					return getNextToken();
 				}
 			}
@@ -383,7 +382,7 @@ namespace ProtoScript.Parsers
 						if (nxt == '*')
 						{
 							m_szCursor += 2; // Consume "/*"
-							movePast("*/");  // Base SimpleTokenizer2.movePast for fixed delimiter
+movePast("*/");  // Base Tokenizer.movePast for fixed delimiter
 							continue;
 						}
 					}
