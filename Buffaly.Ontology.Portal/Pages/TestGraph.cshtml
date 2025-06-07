@@ -1,0 +1,59 @@
+@page
+@model TestGraphModel
+@{
+ViewData["Title"] = "Test Graph";
+Layout = "_SimpleLayout";
+}
+
+@section Breadcrumbs {
+	<ol class="breadcrumb">
+		<li><a href="/">Dashboard</a></li>
+	</ol>
+}
+
+@section MainPanelTitle {
+Dashboard
+}
+
+@section Head {
+<script src="https://d3js.org/d3.v7.min.js"></script>
+		<link href="/css/graph_visualizer.css" rel="stylesheet" type="text/css" />
+<style>
+.container {
+display: flex;
+flex-wrap: nowrap;
+max-width: none !important;
+width: 100%;
+padding: 0;
+height: 100vh;
+}
+</style>
+<script type="text/javascript" src="JsonWs/Ontology.Portal.Business.ProtoScriptWorkbench.ashx.js"></script>
+}
+
+@section MainPanelContent {
+<div class="container">
+<div id="graph-container">
+<div id="controls">
+<div id="search-container">
+<input type="text" id="search-input" placeholder="Find/Add Prototype (Name/Code)" />
+<button id="search-button">Add</button>
+</div>
+<ul id="suggestions-list" class="hidden"></ul>
+</div>
+</div>
+
+<div id="info-panel" class="hidden">
+<button id="close-panel-button" class="close-btn">&times;</button>
+<div id="info-content">Select a node to see details.</div>
+</div>
+</div>
+}
+
+@section QuickHelp {
+Use the menu above to navigate through this site. Each page contains a Quick Help, like this one, to help you along.
+}
+
+@section BottomScripts {
+<script src="~/js/testgraph.js"></script>
+}
