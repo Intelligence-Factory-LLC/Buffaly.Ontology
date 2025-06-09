@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/dialog/dialog.css">
 
 <link rel="stylesheet" href="~/css/editor.css">
+<link rel="stylesheet" href="~/css/protoscript-workbench.css">
 </head>
 <body class="flex flex-col h-screen bg-gray-100 text-gray-800 font-sans antialiased">
 
@@ -35,6 +36,7 @@
 <div class="flex-grow flex p-1 gap-1 overflow-hidden">
 <section class="flex-grow flex flex-col bg-white p-1 rounded-md shadow border border-gray-200 min-w-0">
 <textarea id="codeEditor">// Welcome to SemDB IDE! // Load a project or add a file to start. </textarea>
+<input type="text" id="txtFileName" class="hidden">
 </section>
 <aside id="rightPanel" class="w-[320px] flex flex-col bg-white p-3 rounded-md shadow border border-gray-200 gap-2">
 <div class="flex border-b border-gray-300 mb-1">
@@ -42,11 +44,14 @@
 <button data-pane="right" data-tab="symbolsTab" class="tab-button right-tab-button">Symbols</button>
 </div>
 <div id="solutionExplorerTab" class="tab-content right-tab-content active flex flex-col flex-grow gap-2 overflow-hidden">
-<input type="search" id="searchFiles" placeholder="Search files..." class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
-<div id="fileList" class="flex-grow overflow-y-auto text-xs space-y-0.5 pr-1"></div>
+<input type="search" id="txtProjectFileSearch" placeholder="Search files..." class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
+<div id="divProject" class="flex-grow overflow-y-auto text-xs space-y-0.5 pr-1"></div>
+<input type="search" id="txtFileSearch" placeholder="Search recent files..." class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
+<div id="divSolution" class="overflow-y-auto text-xs space-y-0.5 pr-1"></div>
 </div>
-<div id="symbolsTab" class="tab-content right-tab-content flex flex-col flex-grow gap-2 overflow-hidden"> <input type="search" id="searchSymbols" placeholder="Search symbols..." class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
-<div id="symbolList" class="flex-grow overflow-y-auto text-xs space-y-0.5 pr-1"><p class="text-gray-500 text-xs p-1">Select a file to view its symbols.</p></div>
+<div id="symbolsTab" class="tab-content right-tab-content flex flex-col flex-grow gap-2 overflow-hidden"> <input type="search" id="txtSymbolSearch" placeholder="Search symbols..." class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
+<div id="divRecentSymbols" class="overflow-y-auto text-xs space-y-0.5 pr-1"></div>
+<div id="divSymbolTable" class="flex-grow overflow-y-auto text-xs space-y-0.5 pr-1"><p class="text-gray-500 text-xs p-1">Select a file to view its symbols.</p></div>
 </div>
 </aside>
 </div>
@@ -58,21 +63,30 @@
 <button data-pane="bottom" data-tab="consoleContent" class="tab-button bottom-tab-button active">Console</button>
 <button data-pane="bottom" data-tab="chatContent" class="tab-button bottom-tab-button">Chat</button>
 <button id="clearConsoleBtn" class="ml-auto bg-red-500 hover:bg-red-600 text-white px-2 py-0.5 text-xs rounded-md font-medium focus:outline-none focus:ring-1 focus:ring-red-400 mb-1 self-center">Clear Console</button>
+<button id="btnMaximize" class="ml-2 bg-gray-200 hover:bg-gray-300 text-xs px-1 rounded">&#9650;</button>
+<button id="btnHalfize" class="bg-gray-200 hover:bg-gray-300 text-xs px-1 rounded">&#9633;</button>
+<button id="btnMinimize" class="bg-gray-200 hover:bg-gray-300 text-xs px-1 rounded">&#9660;</button>
 </div>
 <div class="flex-grow p-2 overflow-hidden">
 <div id="consoleContent" class="tab-content bottom-tab-content active bottom-panel-tab-content">
-<textarea id="consoleOutput" readonly class="bottom-panel-textarea" placeholder="Console output, command history, and results will appear here..."></textarea>
-<div class="immediate-input-area">
-<input type="text" id="immediateCommandInput" placeholder="Enter command...">
-<button id="runImmediateCmdBtn" class="bg-blue-600 hover:bg-blue-700 text-white rounded-md">Run</button>
-</div>
-</div>
+<textarea id="txtResults2" readonly class="bottom-panel-textarea" placeholder="Console output, command history, and results will appear here..."></textarea>
+            <div class="immediate-input-area flex items-center gap-1">
+                <input type="text" id="txtImmediate" placeholder="Enter command..." class="flex-grow">
+                <button id="runImmediateCmdBtn" class="bg-blue-600 hover:bg-blue-700 text-white rounded-md">Run</button>
+                <span id="txtTaggingProgress" class="ml-2 text-xs text-gray-500"></span>
+            </div>
+            <div id="divImmediateHistory" class="overflow-y-auto text-xs mt-1 max-h-24"></div>
+        </div>
 <div id="chatContent" class="tab-content bottom-tab-content bottom-panel-tab-content"><p class="text-gray-500 text-xs p-2">Chat functionality placeholder.</p></div>
 </div>
 </footer>
 <script src="~/js/editor.js"></script>
+<script src="/JsonWs/ProtoScript.Extensions.ProtoScriptWorkbench.ashx.js?v=2"></script>
+<script src="~/js/protoscript-workbench.js"></script>
 
-<div id="loadProjectModal" class="modal"><div class="modal-content"><div class="modal-header"><span class="close-button" id="closeModalBtn">&times;</span><h2 class="text-lg font-semibold">Load Project</h2></div><div class="py-4"><label for="modalProjectPath" class="block text-sm font-medium text-gray-700 mb-1">Project File Path (.pts)</label><input type="text" id="modalProjectPath" placeholder="C:\path\to\your\project.pts" class="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"><p class="text-xs text-gray-500 mt-1">Enter the full path to your project file.</p></div><div class="modal-footer"><button id="modalCancelLoadBtn" class="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 rounded-md mr-2">Cancel</button><button id="modalConfirmLoadBtn" class="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md">Load</button></div></div></div>
+<div id="loadProjectModal" class="modal"><div class="modal-content"><div class="modal-header"><span class="close-button" id="closeModalBtn">&times;</span><h2 class="text-lg font-semibold">Load Project</h2></div><div class="py-4"><label for="txtSolution" class="block text-sm font-medium text-gray-700 mb-1">Project File Path (.pts)</label><input type="text" id="txtSolution" placeholder="C:\path\to\your\project.pts" class="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"><p class="text-xs text-gray-500 mt-1">Enter the full path to your project file.</p></div><div class="modal-footer"><button id="modalCancelLoadBtn" class="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 rounded-md mr-2">Cancel</button><button id="modalConfirmLoadBtn" class="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md">Load</button></div></div></div>
+
+<div id="addFileModal" class="modal"><div class="modal-content"><div class="modal-header"><span class="close-button" id="closeAddFileModalBtn">&times;</span><h2 class="text-lg font-semibold">Add New File</h2></div><div class="py-4"><label for="newFileName" class="block text-sm font-medium text-gray-700 mb-1">File Name</label><input type="text" id="newFileName" placeholder="Example.pts" class="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"><p id="addFileError" class="text-xs text-red-600 mt-1 hidden">Please provide a valid file name.</p></div><div class="modal-footer"><button id="modalCancelAddFileBtn" class="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 rounded-md mr-2">Cancel</button><button id="modalConfirmAddFileBtn" class="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md">Add File</button></div></div></div>
 
 </body>
 </html>
