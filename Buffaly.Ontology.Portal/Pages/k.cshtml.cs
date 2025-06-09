@@ -191,29 +191,31 @@ namespace Buffaly.Admin.Portal.Pages
 			}
 			catch (Exception err)
 			{
-                if (StringUtil.InString(err.Message, "Session expired")
-                                    || StringUtil.InString(err.InnerException?.Message, "Session expired"))
-                {
-                    return RedirectToPage("/login");
-                }
+				while (err.InnerException != null)
+				{
+					err = err.InnerException;
+				}
+					
+				if (StringUtil.InString(err.Message, "Session expired"))
+				{
+					throw new RooTrax.Common.SessionExpiredException();
+				}
 
-                if (err is kScript3.RuntimeException || err is kScript3.SyntaxException)
-                {
-                    Logs.DebugLog.WriteEvent("kScript Error", $"Output: {this.Output}, Handler: {this.Handler}, Class: {this.Class}");
+				if (err is kScript3.RuntimeException || err is kScript3.SyntaxException)
+				{
+					Logs.DebugLog.WriteEvent("kScript Error", $"Output: {this.Output}, Handler: {this.Handler}, Class: {this.Class}");
 
-                    if (BasicUtilities.Settings.GetBoolOrFalse("ReturnExceptions"))
-                    {
-                        this.ErrorMessage = BuildErrorMessage(err);
-                    }
+					if (BasicUtilities.Settings.GetBoolOrFalse("ReturnExceptions"))
+					{
+						this.ErrorMessage = BuildErrorMessage(err);
+					}
+				}
 
-					Logs.DebugLog.WriteError(err, true);
-                }
-
-                else
-                {
-                    Logs.LogError(err);
-                }
-            }
+				else
+				{
+					Logs.LogError(err);
+				}
+			}
 
 			return Page();
 		}
