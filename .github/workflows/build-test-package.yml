@@ -1,0 +1,114 @@
+name: Build-Test-Package
+
+on:
+  push:
+    branches: [ main, develop, furnari_dev, master ]
+  pull_request:
+    branches: [ main, develop, furnari_dev, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+  pull-requests: write
+
+jobs:
+  build-test-package:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - PROJECT: Buffaly.Ontology.Portal
+            NAME_PREFIX: ontology-portal
+    env:
+      SOLUTION: Ontology/Ontology8.sln
+      ART_ROOT: build
+      PROJECT: ${{ matrix.PROJECT }}
+      NAME_PREFIX: ${{ matrix.NAME_PREFIX }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache NuGet
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          nuget-
+
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - run: dotnet restore $env:SOLUTION
+    - run: dotnet build $env:SOLUTION -c Release --no-restore
+    - name: Run unit tests
+      run: >
+        dotnet test $env:SOLUTION -c Release --no-build
+        --logger "trx;LogFileName=TestResults.trx"
+        --filter "Category!=Integration"
+    - name: Upload TRX
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: '**/TestResults/*.trx'
+        retention-days: 14
+
+    - run: |
+        dotnet publish $env:PROJECT/$env:PROJECT.csproj `
+          -c Release -o $env:ART_ROOT\publish `
+          /p:PublishTrimmed=false
+
+    - run: |
+        xcopy $env:PROJECT\kScripts $env:ART_ROOT\publish\kScripts /E /I /Y
+        if (Test-Path "$env:ART_ROOT\publish\appsettings.Development.json") {
+            Remove-Item "$env:ART_ROOT\publish\appsettings.Development.json"
+        }
+        if (Test-Path "$env:ART_ROOT\publish\appsettings.json") {
+            Rename-Item "$env:ART_ROOT\publish\appsettings.json" "appsettings.base.json.bak"
+        }
+
+    - name: Zip full package
+      run: |
+        Compress-Archive -Path $env:ART_ROOT\publish\* `
+                         -DestinationPath $env:ART_ROOT\$( $env:NAME_PREFIX )_full.zip
+
+    - name: Make lite copy
+      run: |
+        Copy-Item $env:ART_ROOT\publish -Destination $env:ART_ROOT\publish_lite -Recurse
+        Remove-Item  $env:ART_ROOT\publish_lite\wwwroot\assets  -Recurse -ErrorAction SilentlyContinue
+        Remove-Item  $env:ART_ROOT\publish_lite\wwwroot\js      -Recurse -ErrorAction SilentlyContinue
+        Remove-Item  $env:ART_ROOT\publish_lite\wwwroot\images  -Recurse -ErrorAction SilentlyContinue
+        Remove-Item  $env:ART_ROOT\publish_lite\wwwroot\css     -Recurse -ErrorAction SilentlyContinue
+        Compress-Archive -Path $env:ART_ROOT\publish_lite\* `
+                         -DestinationPath $env:ART_ROOT\$( $env:NAME_PREFIX )_lite.zip
+
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.NAME_PREFIX }}-full
+        path: build\${{ env.NAME_PREFIX }}_full.zip
+        retention-days: 14
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.NAME_PREFIX }}-lite
+        path: build\${{ env.NAME_PREFIX }}_lite.zip
+        retention-days: 14
+
+  comment:
+    if: github.event_name == 'pull_request'
+    needs: build-test-package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: artifact-links
+          message: |
+            ## 🔨 Build ready
+
+            * **Portal Full ZIP:** [ontology-portal-full](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            * **Portal Lite ZIP:** [ontology-portal-lite](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            – triggered by ${{ github.actor }}
