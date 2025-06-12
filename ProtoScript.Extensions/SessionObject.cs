@@ -1,5 +1,6 @@
 ﻿using BasicUtilities;
 using Buffaly.NLU;
+using Ontology;
 using RooTrax.Cache;
 using System.Collections.Concurrent;
 

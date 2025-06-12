@@ -81,6 +81,9 @@ namespace ProtoScript.Extensions
 			TemporaryPrototypes.Cache.InsertLogFrequency = 10000;
 
 			session.Enter();
+
+			//TemporaryPrototypes uses a local pointer to the cache that has to be reloaded
+			TemporaryPrototypes.ReloadCache();
 		}
 
 		static private SessionObject CreateSession(string strSessionKey)
@@ -861,14 +864,16 @@ namespace ProtoScript.Extensions
 			SessionObject session = GetOrCreateSession(strSessionKey);
 			Prototype prototype = TemporaryPrototypes.GetTemporaryPrototype(strPrototypeName);
 
-			JsonObject jsonRoot = PrototypeLogging.ToFriendlyJsonObject(prototype);
-
-			JsonArray jsonArray = new JsonArray();
-			foreach (Prototype proto in prototype.GetDescendants())
+			JsonObject ? jsonRoot = PrototypeLogging.ToFriendlyJsonObject(prototype);
+			if (null != jsonRoot)
 			{
-				jsonArray.Add(PrototypeLogging.ToFriendlyJsonObject(proto));
+				JsonArray jsonArray = new JsonArray();
+				foreach (Prototype proto in prototype.GetDescendants())
+				{
+					jsonArray.Add(PrototypeLogging.ToFriendlyJsonObject(proto));
+				}
+				jsonRoot["Descendants"] = jsonArray;
 			}
-			jsonRoot["Descendants"] = jsonArray;
 
 			return jsonRoot;
 		}

@@ -5,7 +5,7 @@ using kScript3;
 using Microsoft.AspNetCore.Authorization;
 using System.Reflection.Metadata;
 
-namespace Buffaly.Admin.Portal.Pages
+namespace Buffaly.Ontology.Portal.Pages
 {
     public class kModel : KScriptPageModel<BaseUserState>
     {

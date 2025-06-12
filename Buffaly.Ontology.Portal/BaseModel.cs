@@ -1,4 +1,4 @@
-﻿namespace Buffaly.SemanticDB.Portal
+﻿namespace Buffaly.Ontology.Portal
 {
     /// <summary>
     /// Shared base class for Razor Page models across Buffaly portals.
@@ -7,6 +7,8 @@
     public class BaseModel : Buffaly.Common.BaseModel
 	{
         protected ISession Session => HttpContext.Session;
+
+		public string ? Logo { get; set; }
     }
 }
 

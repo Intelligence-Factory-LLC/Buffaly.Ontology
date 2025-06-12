@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RooTrax.Common;
 
-namespace Buffaly.Admin.Portal.Pages
+namespace Buffaly.Ontology.Portal.Pages
 {
 	public class IndexModel : PageModel
 	{
@@ -27,10 +27,10 @@ namespace Buffaly.Admin.Portal.Pages
 			}
 		}
 
-                public string GetSidebarMenu(kScript3.kScriptControl oHandler)
-                {
-                        string rootDir = oHandler.GetRootDir() ?? string.Empty;
-                        return oHandler.EvaluateFile(FileUtil.BuildPath(rootDir, "Administrator\\LeftMenu.ks.html")) ?? string.Empty;
-                }
+		public string GetSidebarMenu(kScript3.kScriptControl oHandler)
+		{
+			string rootDir = oHandler.GetRootDir() ?? string.Empty;
+			return oHandler.EvaluateFile(FileUtil.BuildPath(rootDir, "Administrator\\LeftMenu.ks.html")) ?? string.Empty;
+		}
 	}
 }

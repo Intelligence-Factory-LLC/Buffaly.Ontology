@@ -51,6 +51,17 @@ namespace Ontology
 			_listLocal.Value = null;
 		}
 
+
+		public static void ReloadCache()
+		{
+			//This does not clear the cache, but loads the local copy from the 
+			//cache managers again. This is useful after we load a session
+			_cacheLocal.Value = null;
+			_listCacheLocal.Value = null;
+			_listLocal.Value = null;
+		}
+
+
 		public static int GetCount()
 		{
 			return Cache.Count;

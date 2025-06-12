@@ -1,0 +1,351 @@
+/* Basic styling */
+body {
+	margin: 0;
+	overflow: hidden;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	background: #f8f9fa;
+	color: #212529;
+	display: flex;
+	height: 100vh;
+}
+
+#graph-container {
+	flex-grow: 1;
+	position: relative;
+	height: 100%;
+	background-color: #f8f9fa; /* Ensure background for zoom interaction */
+}
+
+svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+	cursor: grab;
+	/* background-color is on #graph-container now */
+}
+
+	svg.grabbing {
+		cursor: grabbing;
+	}
+
+/* Controls Styling */
+#controls {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	background: rgba(255, 255, 255, 0.95);
+	padding: 10px;
+	border-radius: 6px;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+	z-index: 10;
+	display: flex;
+	gap: 8px;
+	align-items: flex-start;
+	flex-direction: column;
+	max-width: 300px;
+}
+
+#search-container {
+	display: flex;
+	width: 100%;
+	gap: 8px;
+}
+
+#controls input[type="text"] {
+	padding: 6px 8px;
+	border: 1px solid #ced4da;
+	border-radius: 4px;
+	font-size: 13px;
+	flex-grow: 1;
+	box-sizing: border-box;
+}
+
+#controls button {
+	padding: 6px 10px;
+	font-size: 13px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	flex-shrink: 0;
+}
+
+	#controls button:hover {
+		background-color: #0056b3;
+	}
+
+	#controls button:disabled {
+		background-color: #adb5bd;
+		cursor: not-allowed;
+	}
+
+/* Autocomplete Suggestions Styling */
+#suggestions-list {
+	list-style: none;
+	margin: 4px 0 0 0;
+	padding: 0;
+	background-color: #fff;
+	border: 1px solid #ced4da;
+	border-radius: 4px;
+	max-height: 180px;
+	overflow-y: auto;
+	width: 100%;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	box-sizing: border-box;
+}
+
+	#suggestions-list li {
+		padding: 7px 10px;
+		font-size: 12.5px;
+		cursor: pointer;
+		border-bottom: 1px solid #eee;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+		#suggestions-list li:last-child {
+			border-bottom: none;
+		}
+
+		#suggestions-list li:hover {
+			background-color: #e9ecef;
+		}
+
+		#suggestions-list li.selected {
+			background-color: #007bff;
+			color: white;
+		}
+
+.hidden {
+	display: none !important;
+}
+
+/* Info Panel Styling */
+#info-panel {
+	width: 320px; /* Slightly wider for more content */
+	flex-shrink: 0;
+	background: #ffffff;
+	border-left: 1px solid #dee2e6;
+	padding: 20px;
+	box-shadow: -3px 0 8px rgba(0,0,0,0.07);
+	overflow-y: auto;
+	height: 100%;
+	transition: width 0.3s ease, padding 0.3s ease, border 0.3s ease, opacity 0.3s ease;
+	box-sizing: border-box;
+	position: relative;
+	opacity: 1;
+}
+
+	#info-panel.hidden {
+		width: 0;
+		padding: 0 0;
+		border-left: none;
+		overflow: hidden;
+		opacity: 0;
+	}
+
+	#info-panel h3 {
+		margin-top: 0;
+		margin-bottom: 12px;
+		font-size: 17px;
+		color: #343a40;
+		border-bottom: 1px solid #e0e0e0;
+		padding-bottom: 8px;
+		word-break: break-all;
+	}
+
+	#info-panel p, #info-panel div.property-item {
+		font-size: 13.5px;
+		line-height: 1.6;
+		margin-bottom: 10px;
+		word-wrap: break-word;
+	}
+
+	#info-panel strong {
+		color: #495057;
+	}
+
+	#info-panel .close-btn {
+		position: absolute;
+		top: 8px;
+		right: 12px;
+		background: none;
+		border: none;
+		font-size: 24px;
+		cursor: pointer;
+		color: #adb5bd;
+		z-index: 1;
+		padding: 5px;
+		line-height: 1;
+	}
+
+		#info-panel .close-btn:hover {
+			color: #6c757d;
+		}
+
+.ai-summary-container {
+	margin-top: 15px;
+	padding-top: 10px;
+	border-top: 1px dashed #ced4da;
+}
+
+	.ai-summary-container h4 {
+		margin-top: 0;
+		margin-bottom: 8px;
+		font-size: 14px;
+		color: #007bff;
+	}
+
+	.ai-summary-container p {
+		font-size: 13px;
+		font-style: italic;
+		color: #495057;
+	}
+
+#summarize-ai-button {
+	background-color: #28a745; /* Green */
+	color: white;
+	border: none;
+	padding: 8px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+	margin-top: 10px;
+	transition: background-color 0.2s ease;
+}
+
+	#summarize-ai-button:hover {
+		background-color: #218838;
+	}
+
+	#summarize-ai-button:disabled {
+		background-color: #6c757d;
+		cursor: not-allowed;
+	}
+
+
+/* Node styling */
+.node {
+	cursor: pointer;
+}
+
+	.node rect.node-bg {
+		fill: #ffffff;
+		stroke-width: 1.5px;
+		transition: fill 0.4s ease, stroke 0.4s ease, stroke-width 0.3s ease;
+		rx: 5px;
+		ry: 5px;
+		filter: drop-shadow(0px 1.5px 2.5px rgba(0,0,0,0.12));
+	}
+
+	.node rect.node-title-bar {
+		stroke: none;
+		transition: fill 0.4s ease;
+		rx: 5px;
+		ry: 5px;
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	.node text {
+		pointer-events: none;
+		font-family: inherit;
+	}
+
+		.node text.node-name {
+			font-weight: 500;
+			font-size: 11px;
+			transition: fill 0.4s ease;
+		}
+
+		.node text.node-code {
+			fill: #495057;
+			font-size: 10px;
+		}
+
+		.node text.node-desc {
+			fill: #6c757d;
+			font-size: 10px;
+		}
+
+		.node text.node-indicator {
+			font-size: 9.5px;
+			font-style: italic;
+			fill: #0056b3;
+			text-anchor: end;
+			display: none;
+		}
+
+	.node.is-fetching text.node-indicator {
+		display: block;
+	}
+
+	.node.is-fetching rect.node-bg {
+		animation: pulse-border-subtle 1.5s infinite ease-in-out;
+	}
+
+.ancestor-path rect.node-bg {
+	stroke: #0056b3 !important;
+	stroke-width: 2.5px !important;
+	animation: none;
+}
+
+@keyframes pulse-border-subtle {
+	0% {
+		stroke-width: 1.5px;
+	}
+
+	50% {
+		stroke-width: 2.5px;
+		stroke: #6c757d;
+	}
+
+	100% {
+		stroke-width: 1.5px;
+	}
+}
+
+/* Link styling */
+.link path {
+	stroke: #adb5bd;
+	stroke-opacity: 0.65;
+	stroke-width: 1.5px;
+	fill: none;
+	transition: stroke 0.3s ease, stroke-opacity 0.3s ease, stroke-width 0.3s ease;
+	marker-end: url(#arrowhead);
+}
+
+.link text {
+	font-size: 9.5px;
+	fill: #606a72;
+	text-anchor: middle;
+	pointer-events: none;
+	stroke: #f8f9fa;
+	stroke-width: 3.5px;
+	paint-order: stroke;
+}
+
+.ancestor-path.link path {
+	stroke: #0056b3;
+	stroke-opacity: 0.95;
+	stroke-width: 2.2px;
+	marker-end: url(#arrowhead-highlight);
+}
+
+.ancestor-path.link text {
+	fill: #0056b3;
+	font-weight: bold;
+}
+
+/* Marker Styling */
+#arrowhead path {
+	fill: #adb5bd;
+}
+
+#arrowhead-highlight path {
+	fill: #0056b3;
+}
+

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
 using Buffaly.Common;
-namespace Buffaly.Admin.Portal.Pages
+namespace Buffaly.Ontology.Portal.Pages
 {
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
