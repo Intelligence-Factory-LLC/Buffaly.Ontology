@@ -52,7 +52,7 @@ namespace Ontology.Utils
 			this.clearQuotes(); //treat them special 
 			this.clearSymbols();
 
-			this.m_setSymbols = new Set<char>(new char[] { '[', '=', '(', ')' });
+			new Set<char>(new char[] { '[', '=', '(', ')' }).ForEach(x => this.insertSymbol(x));
 		}
 
 		new public string peekNextToken()

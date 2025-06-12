@@ -1,8 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProtoScript.Interpretter;
 using Ontology.Simulation;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Ontology.Tests

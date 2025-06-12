@@ -105,7 +105,12 @@
 			
 		<%})
 	})
-	
+
+	(function MainPanelColor
+	{
+		(return (Metadata.GetStringOrDefault MainPanelColor bg-primary))
+	})	
+
 	(function MainPanelContent
 	{
 		(returnex{%>
@@ -113,13 +118,14 @@
 			<div class="row">
 				<div class="col-12">
 				  <div class="card">
-				      <div class="card-header hidden">
-				          <h2 class="card-title">Add <%FriendlyObjectName%></h2>
-				          
+				      <div class="card-header bg-soft-primary px-3 py-2">
+				         
+				            <div class="d-flex justify-content-between align-items-end">
+							      <h4 class="mb-0 text-dark">Create <%FriendlyObjectName%></h4>
+							  </div>
 				      </div>
 				      <div class="card-body" style="border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-bottom-left-radius: 0px;" id="div<%ObjectName%>">
 						
-						<h3 class="card-title">Create <%FriendlyObjectName%></h3>
 						<p>Create the <%FriendlyObjectName%> below and click "Save" when done making changes.</p>
 						<br>
 						
@@ -127,13 +133,8 @@
 				      
 				      	
 				      </div>
-				      <div class="card-footer">
-						    <div class="row mt-3">
-                                <div class="col-12 text-center">
+				      <div class="card-footer bg-transparent text-center">
 									<%CommandButtons%>
-                                </div>
-                            </div>
-
 				      </div>
 				  </div>
 					
@@ -150,7 +151,7 @@
 	(function CommandButtons
 	{
 		(returnex{%>
-			<button id="btnUpdate<%ObjectName%>" value="Create <%FriendlyObjectName%>" onclick="OnUpdate<%ObjectName%>()" class="Save btn btn-success m-1  waves-effect waves-light "><i class="fe-check-circle me-1"></i> Create</button>
+			<button id="btnUpdate<%ObjectName%>" value="Create <%FriendlyObjectName%>" onclick="OnUpdate<%ObjectName%>()" class="Save btn btn-success m-1 waves-effect waves-light"><i class="fe-check-circle me-1"></i> Create</button>
 			<button id="btnCancel<%ObjectName%>" value="Cancel" onclick="OnCancel<%ObjectName%>()" class="Cancel btn btn-light waves-effect waves-light m-1"><i class="fe-x me-1"></i> Cancel</button>
 		<%})
 	})
@@ -248,4 +249,5 @@
 	})
 }%>
 	
+
 

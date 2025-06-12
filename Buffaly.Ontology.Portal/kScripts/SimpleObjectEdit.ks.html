@@ -1,4 +1,4 @@
-<%class SimpleObjectEditPage
+﻿<%class SimpleObjectEditPage
 {
 	(declare Metadata
 		{
@@ -131,54 +131,52 @@
 	{
 		(returnex{%>
 			<div class="hidden" id="divInlineWarning"></div>	
-			<div class="row">
-				<div class="col-12">
-				  <div class="card">
-				      <div class="card-body" id="div<%ObjectName%>">
+<div class="row">
+    <div class="col-12">
+        <div class="card">
 
-					   <%ifneq (MainPanelTabs) ""{%>
-							<div class="float-sm-end mb-2 mb-sm-0">
-								<div class="row g-2">
-									<div class="col-auto">
-										<a href="tickets-list.html" class="btn btn-sm btn-link"><i class="mdi mdi-keyboard-backspace"></i> Back</a>
-									</div>
-									<div class="col-auto">
-   										<%MainPanelTabs%>
-									</div>
-								</div>
-							</div> 
-						<%}%>
+            <!-- ░░ Header ░░ -->
+            <div class="card-header bg-danger px-3 py-2">
+                <div class="d-flex justify-content-between align-items-end">
 
-						<h3 class="mb-3 mt-0 font-18">Edit <%FriendlyObjectName%></h3>
+                    <h4 class="mb-0 text-dark">Edit <%FriendlyObjectName%></h4>
 
-						<div class="clerfix"></div>
-						
-			
-						
-						<p>Edit the <%FriendlyObjectName%> below and click "Save" when done making changes.</p>
-						<br>
-						
-						<%EditPanel%>
-				      
-				      	<div class="row mt-3">
-				      		<div class="col-12 text-center">
-			      				<%CommandButtons%>
-				      		</div>
-				      	</div>
-				      
-				      </div>
-				  </div>
-				</div>
-			
-				<%GetQuickHelpControls (QuickHelp) (AllowEditQuickHelp)%>
-				
-			</div>
+                    <%ifneq (MainPanelTabs) ""{%>
+                        <div class="d-none d-sm-block">
+                            <%MainPanelTabs%>
+                        </div>
+                    <%}%>
+
+                </div>
+            </div>
+
+            <!-- ░░ Body ░░ -->
+            <div class="card-body" style="border-radius: 0;" id="div<%ObjectName%>">
+
+                <p>Edit the <%FriendlyObjectName%> below and click&nbsp;“Save” when done making changes.</p>
+                <br>
+
+                <%EditPanel%>
+
+            </div>
+
+            <!-- ░░ Footer ░░ -->
+            <div class="card-footer bg-transparent text-center">
+                <%CommandButtons%>
+            </div>
+
+        </div>
+    </div>
+
+    <%GetQuickHelpControls (QuickHelp) (AllowEditQuickHelp)%>
+</div>
+
 			
 		<%})
 	})
 
 	
-	(function AllowEditQuickHelp { (return false) })
+	(function AllowEditQuickHelp { (return (UserState.Permission.AllowEditQuickHelp)) })
 
 	(function CommandButtons
 	{
@@ -212,10 +210,13 @@
 		(returnex{%>
 			<script type="text/javascript" src="/JsonWs/<%Metadata.BusinessNamespace%>.<%ObjectsName%>.ashx.js?v=<%JsVersion%>"></script>
 
-
 			<script language="javascript" type="text/javascript">
 			var i<%ObjectName%>ID = <%ObjectID%>;
 			var o<%ObjectName%> = <%ToJSON (Object) {DataObject:true}%>;
+			var iObjectID = i<%ObjectName%>ID;
+			var ObjectName = "<%ObjectName%>";
+			var ObjectsName = "<%ObjectsName%>";
+			var strUserName = "<%UserState.get_UserName%>";
 			</script>
 			<script language="javascript" type="text/javascript">
 				Page.AddOnload(function() {
@@ -273,7 +274,6 @@
 
 						<%UpdateMethodName%>(oArgs, function() {
 						    UserMessages.Display('The <%FriendlyObjectName%> was successfully updated', "Success");
-
 						    Page.Redirect("<%DetailsUrl%>", { <%ObjectName%>ID: i<%ObjectName%>ID });
 						});
 					}
@@ -290,6 +290,44 @@
 				}
 			</script>
 		
+              <script type="text/javascript" src="/JsonWs/FairPath.Messaging.Leases.ashx.js?v=<%JsVersion%>"></script>
+              <script type="text/javascript">
+				  Page.AddOnload(function () {
+
+					  Leases.AquireLease2(strUserName, GetSessionID(), ObjectName, iObjectID, "Edit", function (leases) {
+						  leases.forEach(x => { DisplayLease(x) });
+					  });
+				  });
+
+				  function DisplayLease(lease) {
+
+					  if (lease.User == strUserName)
+						  return;
+
+					  let bEditing = (lease.LeaseType == "Edit");
+					  let sDescription=lease.User+" is "+(bEditing? "editing":"viewing")+" this same "+lease.ObjectName;
+
+					  if (!StringUtil.InString(_$("divInlineWarning").innerHTML, sDescription)) {
+						  let oDiv=$$$(["div", { "class": "alert "+(bEditing? "alert-danger":"alert-info") }, [
+							  ["strong", "Another User is "+(bEditing? "Editing":"Viewing")],
+							  ["p", sDescription]
+						  ]]);
+
+						  _$("divInlineWarning").appendChild(oDiv);
+					  }
+
+					  _$("divInlineWarning").removeClass("hidden");
+				  }
+
+				 function RemoveLease(lease) {
+
+					Leases.GetActiveLeases(ObjectName, iObjectID, function (leases) {
+						_$("divInlineWarning").innerHTML = "";
+						leases.forEach(x => { DisplayLease(x) });
+					});							
+				}
+                </script>
+
 			<%AdditionalScripts%>	
 		<%})
 	})

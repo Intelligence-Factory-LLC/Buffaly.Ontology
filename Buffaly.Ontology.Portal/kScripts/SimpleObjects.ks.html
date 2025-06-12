@@ -204,27 +204,27 @@
 		
 						<%MainPanelText%>
 
-						<div class="clerfix"></div>
-                        	<div class="dataTables_wrapper">
-                        	
-                        		<div class="row">
-                        			<div class="col-xs-6">
-										<input type="text" id="txtSearchTerm" class="Focus InputSearch form-control " placeholder="<%SearchByString%>"/> 
-									</div>
-								</div>
-							    
-<div class="SelectControls Hidden row" style="padding-top: 10px;">
-    <div class="col-12">
-        <span class="SelectedCount">0</span> Rows Selected.
-        <button value="" class="SelectPage btn btn-primary-alt mb-2">
-            <i class="fa fa-hand-o-down"></i> Select Page
-        </button>
-        <button value="Select All" class="SelectAll btn btn-primary-alt  mb-2 d-none">Select All</button>
-        <button value="Cancel" class="Cancel btn btn-primary-alt  mb-2">
-            <i class="fa fa-times"></i> Cancel
-        </button>
-    </div>
-</div>
+				<div class="clerfix"></div>
+				<div class="dataTables_wrapper">
+
+					<div class="row">
+						<div class="col-6">
+							<input type="text" id="txtSearchTerm" class="Focus InputSearch form-control " placeholder="<%SearchByString%>" />
+						</div>
+					</div>
+
+					<div class="SelectControls Hidden row" style="padding-top: 10px;">
+						<div class="col-12">
+							<span class="SelectedCount">0</span> Rows Selected.
+							<button value="" class="SelectPage btn btn-primary-alt mb-2">
+								<i class="fa fa-hand-o-down"></i> Select Page
+							</button>
+							<button value="Select All" class="SelectAll btn btn-primary-alt  mb-2 d-none">Select All</button>
+							<button value="Cancel" class="Cancel btn btn-primary-alt  mb-2">
+								<i class="fa fa-times"></i> Cancel
+							</button>
+						</div>
+					</div>
 
 			<%SearchOptions%>
 							<div class="row">
@@ -307,30 +307,33 @@
 
 	(declare GridHtmlMethod GetGridHtml)
 	(declare GridCountMethod GetGridCount)
-	
+	(declare GridExtraParams "{}")
+	(declare GridJsonWsUrl "")
+
 	(function GridInitializer
 	{
-		(returnex{%>
-        var searchValue = '', sortColumn = '<%ObjectName%>ID', sortAscending = false;
-        ControlUtil.GetControl('txtSearchTerm').value = searchValue;
+		(ifeq (GridJsonWsUrl) ""
+		{
+			(GridJsonWsUrl (eval {%>/JsonWs/<%Metadata.UINamespace%>.<%ObjectsName%>Admin.ashx<%}))
+		})
 
+		(returnex{%>
         var oGrid = new JsonWsGrid4();
         Page.<%ObjectsName%>Grid = oGrid;
         Page.Grids.Insert("<%ObjectsName%>", oGrid);
         oGrid.JsonWsGridMethod = "<%GridHtmlMethod%>";
-		oGrid.AllowPageSizeEditing = true;		
-        oGrid.SortAscending = sortAscending;
-		oGrid.sort = sortColumn;
+		oGrid.AllowPageSizeEditing = true;
         oGrid.JsonWsCountMethod = "<%GridCountMethod%>";
+		oGrid.ExtraParams = <%GridExtraParams%>;
         oGrid.ContentControlID = "div<%ObjectsName%>";
-        oGrid.JsonWsUrl = '/JsonWs/<%Metadata.UINamespace%>.<%ObjectsName%>Admin.ashx';
+        oGrid.JsonWsUrl = '<%GridJsonWsUrl%>';
         oGrid.SearchControlID = 'txtSearchTerm';
         oGrid.OnRowClick = OnClick<%ObjectName%>;
         oGrid.EmptyDataTemplateID = "div<%ObjectsName%>Empty";
         oGrid.StartRefreshing();
-		oGrid.OnComplete = function() { 
+		oGrid.OnComplete = function() {
 			OnFormatGrid("div<%ObjectsName%>");
-		};		
+		};
 		oGrid.OnFilterInput = function(sInput)
 		{
 			return StringUtil.ReplaceAll(sInput, /\[/, "[[]");
@@ -383,29 +386,6 @@
 				}
 
             function OnClick<%ObjectName%>(i<%ObjectName%>ID, e, el, bCtrl) {
-                var search = '', sortColumn = '', sortAscending = '', sendFilter = false;
-                if(!StringUtil.IsEmpty(Page.<%ObjectsName%>Grid.search))
-                {
-                    search = Page.<%ObjectsName%>Grid.search;
-                    sendFilter = true;
-                }                    
-
-                if(!StringUtil.IsEmpty(Page.<%ObjectsName%>Grid.sort))
-                {
-                    sortColumn = Page.<%ObjectsName%>Grid.sort;
-                    sendFilter = true;
-                }
-
-                if(!StringUtil.IsEmpty(Page.<%ObjectsName%>Grid.SortAscending))
-                {
-                    sortAscending = Page.<%ObjectsName%>Grid.SortAscending
-                    sendFilter = true;
-                }
-                if(sendFilter)
-                    new LocalStorage().set("<%FriendlyObjectsName%>/<%ObjectsName%>Grid", {Search: search, SortColumn: sortColumn,  SortAscending : sortAscending });
-                else
-                    new LocalStorage().remove("<%FriendlyObjectsName%>/<%ObjectsName%>Grid");
-
                 Page.Redirect("<%DetailsUrl%>", { <%ObjectName%>ID: i<%ObjectName%>ID }, bCtrl ? "_blank" : "_self");
 
                 
@@ -538,7 +518,7 @@
 	(function BulkImportExportControls
 	{
 		(returnex{%>
-			<script type="text/javascript" language="javascript">
+		<script type="text/javascript" language="javascript">
 
 			async function OnExport() {
 				let lstSelected = Page.<%ObjectsName%>GridSelector.m_setSelected.ToArray();
@@ -591,13 +571,13 @@
 			</script>
 
 
-<div class="modal fade" id="divImport" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-md">
-		<div class="modal-content">
-			<div class="modal-header bg-light">
-				<h4 class="modal-title">Import</h4>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
+		<div class="modal fade" id="divImport" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-md">
+				<div class="modal-content">
+					<div class="modal-header bg-light">
+                                                <h5 class="modal-title">Import</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
 
 
 			<div class="modal-body">
@@ -616,46 +596,46 @@
 				</div>
 
 
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
-				<button type="button" id="" class="btn btn-primary" onclick="OnImportFinish()">Save</button>
-			</div>
+					</div>
+					<div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						<button type="button" id="" class="btn btn-primary" onclick="OnImportFinish()">Save</button>
+					</div>
 
 
+				</div>
+			</div>
 		</div>
-	</div>
-</div>
 
-<div class="modal fade" id="divExport" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-md">
-    <div class="modal-content">
-      <div class="modal-header bg-light">
-        <h4 class="modal-title">Export</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <p>Copy the rows below</p>
-        </div>
-        <div class="form-group">
-          <label class="col-sm-3 control-label InputLabel mb-2">Rows</label>
-          <textarea class="form-control" id="txtExportRows" kcs:FieldName="TagName"></textarea>
-        </div>
-        <div class="text-end mt-2">
-          <button type="button" class="btn btn-outline-primary" id="btnCopyExportRows" onclick="OnCopyExport()">
-            <i class="fas fa-copy"></i> Copy to Clipboard
-          </button>
-          <span id="copyFeedback" class="ms-2 text-success" style="display:none;">Copied!</span>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Done</button>
-      </div>
-    </div>
-  </div>
-</div>
-<script>
+		<div class="modal fade" id="divExport" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-md">
+				<div class="modal-content">
+					<div class="modal-header bg-light">
+                                                <h5 class="modal-title">Export</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<p>Copy the rows below</p>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label InputLabel mb-2">Rows</label>
+							<textarea class="form-control" id="txtExportRows" kcs:FieldName="TagName"></textarea>
+						</div>
+						<div class="text-end mt-2">
+							<button type="button" class="btn btn-outline-primary" id="btnCopyExportRows" onclick="OnCopyExport()">
+								<i class="fas fa-copy"></i> Copy to Clipboard
+							</button>
+							<span id="copyFeedback" class="ms-2 text-success" style="display:none;">Copied!</span>
+						</div>
+					</div>
+					<div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
   function OnCopyExport() {
     var textArea = document.getElementById('txtExportRows');
     var text = textArea.value;
@@ -688,8 +668,9 @@
       }
     }
   }
-</script>
+		</script>
 
 		<%})
-	})
-}%>
+		})
+		}%>
+

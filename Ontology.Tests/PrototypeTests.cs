@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ProtoScript.Interpretter;
-using ProtoScript.Interpretter.Interpretting;
+﻿using ProtoScript.Interpretter;
 using ProtoScript.Interpretter.Symbols;
 
 namespace Ontology.Tests

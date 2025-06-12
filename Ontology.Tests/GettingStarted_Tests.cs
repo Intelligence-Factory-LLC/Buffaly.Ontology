@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Buffaly.NLU;
-using Buffaly.NLU.Tagger.Nodes;
-using Ontology.Simulation;
 using ProtoScript.Extensions;
 
 namespace Ontology.Tests

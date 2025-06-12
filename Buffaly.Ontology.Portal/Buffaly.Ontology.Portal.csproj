@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <Compile Remove="kScripts\ProtoScript\**" />
+    <Compile Remove="Middelware\**" />
     <Content Remove="kScripts\ProtoScript\**" />
+    <Content Remove="Middelware\**" />
     <EmbeddedResource Remove="kScripts\ProtoScript\**" />
+    <EmbeddedResource Remove="Middelware\**" />
     <None Remove="kScripts\ProtoScript\**" />
+    <None Remove="Middelware\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,7 +57,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Middelware\" />
     <Folder Include="wwwroot\JsonWS\APIs\" />
     <Folder Include="wwwroot\js\plugins\marked\" />
   </ItemGroup>

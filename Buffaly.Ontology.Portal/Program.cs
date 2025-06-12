@@ -2,15 +2,24 @@ using BasicUtilities;
 using Buffaly.Common;
 using Microsoft.AspNetCore.HttpOverrides;
 using RooTrax.Common;
-using System.Reflection;
 using WebAppUtilities;
-using ProtoScript.Extensions;
 
 public class Program
 {
 	public static async Task Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
+
+		var configurationBuilder = new ConfigurationBuilder();
+		configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+		var config = configurationBuilder.Build();
+
+		BasicUtilities.Settings.SetAppSettings(config);
+		ConfigureLogs(config);
+		SetConnectionString(config);
+		ConfigureRooTraxState(config);
+
+		MiddlewareDebugOptions.Enabled = true;
 
 		// Add services to the container.
 		builder.Services.AddHttpContextAccessor();
@@ -42,24 +51,14 @@ public class Program
 
 		app.UseExceptionHandler("/Error");
 
-		var configurationBuilder = new ConfigurationBuilder();
-		configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-		var config = configurationBuilder.Build();
-
-		Logs.LogSettings? logSettings = config.GetSection("LogSettings").Get<Logs.LogSettings>();
-		if (null == logSettings)
-			throw new Exception("Could not load configuration: LogSettings");
-
-		Logs.Config(logSettings);
-
 		try
 		{
+			Buffaly.Common.BaseUserState.Configure(app.Services.GetRequiredService<IHttpContextAccessor>());
 
 			RooTraxStateSettings? rooTraxStateSettings = config.GetSection("RooTraxStateSettings").Get<RooTraxStateSettings>();
 			if (null == rooTraxStateSettings)
 				throw new Exception("Could not load configuration: RooTraxStateSettings");
 
-			Buffaly.SemanticDB.UI.RooTraxState.Configure(rooTraxStateSettings);
 
 			JsonWsOptions jsonWsOptions = config.GetSection("JsonWs").Get<JsonWsOptions>() ?? new JsonWsOptions();
 
@@ -85,7 +84,7 @@ public class Program
 
 			app.UseSession();
 
-			JsonWsHandlerService.RegisterJsonWs(app, strJsonWsRoot, jsonWsOptions);
+			MapJsonWs(app, jsonWsOptions, strJsonWsRoot);
 
 			// Register the RewriteOptionsService
 			app.MapGet("/protoscript", ctx =>
@@ -97,10 +96,6 @@ public class Program
 				return Task.CompletedTask;
 			});
 
-			IConfigurationSection configurationSection =
-				config.GetSection("AppSettings");
-
-			Settings.SetAppSettings(config);
 
 			app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
 			{
@@ -131,44 +126,41 @@ public class Program
 		}
 
 	}
-	private static void MapAPIs(IEndpointRouteBuilder endpoints, JsonWsOptions jsonWsOptions, string strJsonWsRoot)
+
+	private static void MapJsonWs(WebApplication app, JsonWsOptions jsonWsOptions, string strJsonWsRoot)
 	{
-		foreach (string strFile in Directory.GetFiles(strJsonWsRoot, "*.ashx"))
-		{
-			string strContents = FileUtil.ReadFile(strFile);
-
-			JsonObject jsonObject = new JsonObject(strContents);
-
-			string strAssembly = jsonObject.GetStringOrNull("Assembly") ?? throw new Exception("Assembly not specified in : " + strFile);
-			string strType = jsonObject.GetStringOrNull("Type") ?? throw new Exception("Type not specified in : " + strFile);
-
-			Assembly assembly = AssemblyManager.Load(strAssembly);
-			Type type = assembly.GetType(strType) ?? throw new Exception("Could not get Type: " + strType + " from assembly " + strAssembly);
-
-			// Use ActivatorUtilities to create the instance with DI support
-			object? obj = ActivatorUtilities.CreateInstance(endpoints.ServiceProvider, type);
-			if (obj == null)
-				throw new Exception("Could not create instance of " + strType);
-
-			JsonWs jsonWs = (JsonWs)obj;
-			jsonWs.SetOptions(jsonWsOptions);
-
-			// Map API routes
-                        foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
-                        {
-                                string ns = type.Namespace ?? string.Empty;
-                                string strUrl = "/api/" + ns.ToLowerInvariant() + "/" + GetUrlSafeName(type.Name) + "/" + GetUrlSafeName(method.Name);
-				// Map the API route with authorization
-				endpoints.Map(strUrl, async (HttpContext context) =>
-				{
-					await jsonWs.ProcessAPIRequestAsync(context, method);
-				}); // Require authorization for API routes
-			}
-		}
+		JsonWsHandlerService.RegisterJsonWs(app, strJsonWsRoot, jsonWsOptions, x => { return true; });
 	}
 
-	static private string GetUrlSafeName(string strName)
+	private static void MapAPIs(IEndpointRouteBuilder endpoints, JsonWsOptions jsonWsOptions, string strJsonWsRoot)
 	{
-		return string.Join("-", StringUtil.SplitUppercaseWords(strName).Select(x => x.ToLower()).ToArray());
+		JsonWsHandlerService.RegisterApis(endpoints, strJsonWsRoot, jsonWsOptions);
+	}
+
+
+	private static void ConfigureRooTraxState(IConfigurationRoot config)
+	{
+		RooTraxStateSettings? rooTraxStateSettings = config.GetSection("RooTraxStateSettings").Get<RooTraxStateSettings>();
+		if (null == rooTraxStateSettings)
+			throw new Exception("Could not load configuration: RooTraxStateSettings");
+
+		if (!StringUtil.IsEmpty(rooTraxStateSettings.RooTraxConnect))
+			rooTraxStateSettings.RooTraxConnect = config.GetConnectionStringOrFail(rooTraxStateSettings.RooTraxConnect);
+
+		RooTrax.Common.RooTraxState.Configure(rooTraxStateSettings);
+		Buffaly.SemanticDB.UI.RooTraxState.Configure(rooTraxStateSettings);
+	}
+
+	private static void ConfigureLogs(IConfigurationRoot config)
+	{
+		Logs.LogSettings? logSettings = config.GetSection("LogSettings").Get<Logs.LogSettings>();
+		if (null == logSettings)
+			throw new Exception("Could not load configuration: LogSettings");
+
+		Logs.Config(logSettings);
+	}
+
+	private static void SetConnectionString(IConfigurationRoot config)
+	{
 	}
 }

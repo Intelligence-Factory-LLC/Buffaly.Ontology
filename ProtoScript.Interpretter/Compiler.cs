@@ -9,7 +9,6 @@ using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Symbols;
 using ProtoScript.Parsers;
 using System.Collections.Concurrent;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace ProtoScript.Interpretter
 {
