@@ -31,7 +31,7 @@
 			catch (Exception err)
 			{
 				if (!Settings.BestCaseExpressions)
-					throw err;
+throw;
 
 				result.Info.IsIncomplete = true;
 			}

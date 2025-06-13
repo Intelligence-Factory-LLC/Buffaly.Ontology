@@ -82,7 +82,7 @@ namespace ProtoScript.Interpretter
 					BlockedOn = statement.Info;
 					Wait();
 				}
-				throw err;
+throw;
 			}
 		}
 
