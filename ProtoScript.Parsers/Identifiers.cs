@@ -113,7 +113,7 @@ namespace ProtoScript.Parsers
 			catch (Exception err)
 			{
 				if (!Settings.BestCaseExpressions)
-					throw err;
+throw;
 			}
 				
 			return strTok.ToString();

@@ -511,7 +511,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				Parsers.ProtoScriptParsingException ex = new Parsers.ProtoScriptParsingException("", 0, "");
 				ex.Explanation = "File does not exist: " + err.Message;
 				ex.File = strFile;
-				throw ex;
+throw;
 			}
 		}
 
