@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Buffaly.NLU;
 using ProtoScript.Extensions;
+using System;
+using System.IO;
 
 namespace Ontology.Tests
 {
@@ -32,12 +34,14 @@ namespace Ontology.Tests
 
 		public static string GetProjectHello()
 		{
-			return @"C:\dev\ai\Ontology8\Buffaly.Ontology.Portal\wwwroot\projects\hello.pts";
+		string path = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Buffaly.Ontology.Portal", "wwwroot", "projects", "hello.pts");
+		return Path.GetFullPath(path);
 		}
 
 		public static string GetProjectSimpsons()
 		{
-			return @"C:\dev\ai\Ontology8\Buffaly.Ontology.Portal\wwwroot\projects\Simpsons.pts";
+		string path = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Buffaly.Ontology.Portal", "wwwroot", "projects", "Simpsons.pts");
+		return Path.GetFullPath(path);
 		}
 
 
