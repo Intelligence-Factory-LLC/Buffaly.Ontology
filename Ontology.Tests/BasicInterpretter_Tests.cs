@@ -3,6 +3,8 @@ using Buffaly.NLU;
 using Buffaly.NLU.Tagger.Nodes;
 using Ontology.Simulation;
 using ProtoScript.Extensions;
+using System;
+using System.IO;
 
 namespace Ontology.Tests
 {
@@ -33,18 +35,24 @@ namespace Ontology.Tests
 			TemporaryPrototypes.Cache.InsertLogFrequency = 10000;
 		}
 
-		public static ProtoScriptTagger GetProjectTagger(bool bAllowPrecompiled = false)
-		{
-			UnderstandUtil.TaggingSettings settings = new UnderstandUtil.TaggingSettings();
-			settings.Project = GetProject();
-			settings.MaxIterations = 100;
-			settings.AllowPrecompiled = bAllowPrecompiled;
+public static ProtoScriptTagger GetProjectTagger(bool bAllowPrecompiled = false)
+{
+UnderstandUtil.TaggingSettings settings = new UnderstandUtil.TaggingSettings();
+settings.Project = GetProject();
+settings.MaxIterations = 100;
+settings.AllowPrecompiled = bAllowPrecompiled;
 
-			return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
+return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
+}
+
+		private static string GetPortalProject(string file)
+		{
+		string path = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Buffaly.Ontology.Portal", "wwwroot", "projects", file);
+		return Path.GetFullPath(path);
 		}
 		public static string GetProjectSmall()
 		{
-			return @"C:\dev\ai\Ontology\ProtoScript.Tests\Medical\ProjectSmall8.pts";
+		return GetPortalProject("ProjectSmall8.pts");
 		}
 
 		public static ProtoScriptTagger GetProjectSmallTagger()
@@ -55,22 +63,24 @@ namespace Ontology.Tests
 			settings.MaxIterations = 100;
 			return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
 		}
-
+		
 		public static string GetProject()
 		{
-			return @"C:\dev\ai\Ontology\ProtoScript.Tests\Medical\Project.pts";
+		return GetPortalProject("Project.pts");
 		}
 
 		public static ProtoScriptTagger GetSnoMedOnlyProjectTagger()
 		{
 			UnderstandUtil.TaggingSettings settings = new UnderstandUtil.TaggingSettings();
 
-			settings.Project = @"C:\dev\ai\Ontology\ProtoScript.Tests\Medical\ProjectSnoMedOnly.pts";
+			settings.Project = GetPortalProject("ProjectSnoMedOnly.pts");
 
 			return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
 		}
 
 		[TestMethod]
+		[TestCategory("Integration")]
+		[TestProperty("Category", "Integration")]
 		public void Test_TagImmediate()
 		{
 			ProtoScriptTagger tagger = GetProjectSmallTagger();
@@ -85,6 +95,8 @@ namespace Ontology.Tests
 		}
 
 		[TestMethod]
+		[TestCategory("Integration")]
+		[TestProperty("Category", "Integration")]
 		public void Test_BenchmarkSpeed()
 		{
 			ProtoScriptWorkbench.TaggingSettings settings = new ProtoScriptWorkbench.TaggingSettings();
@@ -101,6 +113,8 @@ namespace Ontology.Tests
 
 
 		[TestMethod]
+		[TestCategory("Integration")]
+		[TestProperty("Category", "Integration")]
 		public void Test_InterpretImmediate()
 		{
 			ProtoScriptWorkbench.TaggingSettings settings = new ProtoScriptWorkbench.TaggingSettings();
