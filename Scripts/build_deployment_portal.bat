@@ -22,7 +22,7 @@ dotnet publish -c Release %SOURCE_DIR% -o %DEPLOY_DIR%Site
 
 :kScripts
 
-xcopy /y /e "%SOURCE_DIR%\kScripts\*.*" "%DEPLOY_DIR%Site\kScripts\"
+xcopy /y /e "%SOURCE_DIR%\wwwroot\kScripts\*.*" "%DEPLOY_DIR%Site\kScripts\"
 
 ren "%DEPLOY_DIR%Site\appsettings.json"  "appsettings.json.back"
 
