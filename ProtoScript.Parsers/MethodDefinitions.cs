@@ -260,7 +260,7 @@
 					return lstStatements;
 				}
 
-				throw err;
+throw;
 			}
 
 			method.Info.StopStatement(tok.getCursor());

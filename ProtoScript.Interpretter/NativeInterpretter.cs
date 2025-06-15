@@ -331,7 +331,7 @@ namespace ProtoScript.Interpretter
 					}
 				}
 				
-				throw err;
+throw;
 			}
 		}
 
@@ -1601,7 +1601,7 @@ namespace ProtoScript.Interpretter
 				if (err.Message == "Parameter is null")
 					err.Info = lstParameters[err.Info.StartingOffset].Info;
 
-				throw err;
+throw;
 			}
 		}
 

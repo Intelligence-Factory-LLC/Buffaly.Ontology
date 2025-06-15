@@ -54,7 +54,7 @@
 			catch (Exception err)
 			{
 				if (!Settings.BestCaseExpressions)
-					throw err;
+throw;
 			}
 
 

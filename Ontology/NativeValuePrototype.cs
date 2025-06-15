@@ -455,7 +455,7 @@ namespace Ontology
 					prototype = null;
 
 				else
-					throw err;
+throw;
 			}
 
 			return prototype;
