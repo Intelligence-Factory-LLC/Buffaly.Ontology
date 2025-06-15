@@ -17,7 +17,6 @@ public class Program
 		BasicUtilities.Settings.SetAppSettings(config);
 		ConfigureLogs(config);
 		SetConnectionString(config);
-		ConfigureRooTraxState(config);
 
 		MiddlewareDebugOptions.Enabled = true;
 
@@ -38,8 +37,11 @@ public class Program
 		builder.Services.AddDistributedMemoryCache();
 
         var app = builder.Build();
-        // Make ProtoScriptWorkbench aware of wwwroot for relative project paths
-        ProtoScript.Extensions.ProtoScriptWorkbench.SetWebRoot(app.Environment.WebRootPath);
+
+		ConfigureRooTraxState(config, app.Environment.WebRootPath);
+
+		// Make ProtoScriptWorkbench aware of wwwroot for relative project paths
+		ProtoScript.Extensions.ProtoScriptWorkbench.SetWebRoot(app.Environment.WebRootPath);
 
 		// Configure the HTTP request pipeline.
 		if (!app.Environment.IsDevelopment())
@@ -129,16 +131,16 @@ public class Program
 
 	private static void MapJsonWs(WebApplication app, JsonWsOptions jsonWsOptions, string strJsonWsRoot)
 	{
-		JsonWsHandlerService.RegisterJsonWs(app, strJsonWsRoot, jsonWsOptions, x => { return true; });
+		JsonWsHandlerService.RegisterJsonWs(app, jsonWsOptions, x => { return true; });
 	}
 
 	private static void MapAPIs(IEndpointRouteBuilder endpoints, JsonWsOptions jsonWsOptions, string strJsonWsRoot)
 	{
-		JsonWsHandlerService.RegisterApis(endpoints, strJsonWsRoot, jsonWsOptions);
+		JsonWsHandlerService.RegisterApis(endpoints, jsonWsOptions);
 	}
 
 
-	private static void ConfigureRooTraxState(IConfigurationRoot config)
+	private static void ConfigureRooTraxState(IConfigurationRoot config, string strWebRoot)
 	{
 		RooTraxStateSettings? rooTraxStateSettings = config.GetSection("RooTraxStateSettings").Get<RooTraxStateSettings>();
 		if (null == rooTraxStateSettings)
@@ -146,6 +148,9 @@ public class Program
 
 		if (!StringUtil.IsEmpty(rooTraxStateSettings.RooTraxConnect))
 			rooTraxStateSettings.RooTraxConnect = config.GetConnectionStringOrFail(rooTraxStateSettings.RooTraxConnect);
+
+		string relative = rooTraxStateSettings.kScriptRootDir?.TrimStart('\\', '/') ?? string.Empty;
+		rooTraxStateSettings.kScriptRootDir = Path.Combine(strWebRoot, relative);
 
 		RooTrax.Common.RooTraxState.Configure(rooTraxStateSettings);
 		Buffaly.SemanticDB.UI.RooTraxState.Configure(rooTraxStateSettings);
