@@ -7,13 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="kScripts\ProtoScript\**" />
+    <Compile Remove="wwwroot\kScripts\ProtoScript\**" />
     <Compile Remove="Middelware\**" />
-    <Content Remove="kScripts\ProtoScript\**" />
+    <Content Remove="wwwroot\kScripts\ProtoScript\**" />
     <Content Remove="Middelware\**" />
-    <EmbeddedResource Remove="kScripts\ProtoScript\**" />
+    <EmbeddedResource Remove="wwwroot\kScripts\ProtoScript\**" />
     <EmbeddedResource Remove="Middelware\**" />
-    <None Remove="kScripts\ProtoScript\**" />
+    <None Remove="wwwroot\kScripts\ProtoScript\**" />
     <None Remove="Middelware\**" />
   </ItemGroup>
 
@@ -59,6 +59,24 @@
   <ItemGroup>
     <Folder Include="wwwroot\JsonWS\APIs\" />
     <Folder Include="wwwroot\js\plugins\marked\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\kScripts\Administrator\FileMenu.ks.html" />
+    <None Include="wwwroot\kScripts\Administrator\LeftMenu.ks.html" />
+    <None Include="wwwroot\kScripts\application.ks" />
+    <None Include="wwwroot\kScripts\common3.ks" />
+    <None Include="wwwroot\kScripts\common_ui.ks" />
+    <None Include="wwwroot\kScripts\ProtoScriptWorkbench\ProtoScript.PageLayouts.sql" />
+    <None Include="wwwroot\kScripts\ProtoScriptWorkbench\ProtoScript.Workbench.Controls.ks.html" />
+    <None Include="wwwroot\kScripts\ProtoScriptWorkbench\ProtoScript.Workbench.ks.html" />
+    <None Include="wwwroot\kScripts\references-generated.ks" />
+    <None Include="wwwroot\kScripts\Simple.ks.html" />
+    <None Include="wwwroot\kScripts\SimpleApiHarness.ks.html" />
+    <None Include="wwwroot\kScripts\SimpleObjectDetails.ks.html" />
+    <None Include="wwwroot\kScripts\SimpleObjectEdit.ks.html" />
+    <None Include="wwwroot\kScripts\SimpleObjectInsert.ks.html" />
+    <None Include="wwwroot\kScripts\SimpleObjects.ks.html" />
   </ItemGroup>
 
   <ItemGroup>
