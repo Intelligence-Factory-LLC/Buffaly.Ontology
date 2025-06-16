@@ -79,14 +79,10 @@ public class Program
 				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 			});
 
-			string? strJsonWsRoot = config.GetSection("JsonWs:JsonWsRoot").Value;
-
-			if (null == strJsonWsRoot)
-				throw new Exception("appSettings:JsonWs:JsonWsRoot is null");
 
 			app.UseSession();
 
-			MapJsonWs(app, jsonWsOptions, strJsonWsRoot);
+			MapJsonWs(app, jsonWsOptions);
 
 			// Register the RewriteOptionsService
 			app.MapGet("/protoscript", ctx =>
@@ -113,7 +109,7 @@ public class Program
 				appBuilder.UseEndpoints(endpoints =>
 				{
 					// Map all /api routes
-					MapAPIs(endpoints, jsonWsOptions, strJsonWsRoot);
+					MapAPIs(endpoints, jsonWsOptions);
 
 				});
 
@@ -129,12 +125,12 @@ public class Program
 
 	}
 
-	private static void MapJsonWs(WebApplication app, JsonWsOptions jsonWsOptions, string strJsonWsRoot)
+	private static void MapJsonWs(WebApplication app, JsonWsOptions jsonWsOptions)
 	{
 		JsonWsHandlerService.RegisterJsonWs(app, jsonWsOptions, x => { return true; });
 	}
 
-	private static void MapAPIs(IEndpointRouteBuilder endpoints, JsonWsOptions jsonWsOptions, string strJsonWsRoot)
+	private static void MapAPIs(IEndpointRouteBuilder endpoints, JsonWsOptions jsonWsOptions)
 	{
 		JsonWsHandlerService.RegisterApis(endpoints, jsonWsOptions);
 	}
