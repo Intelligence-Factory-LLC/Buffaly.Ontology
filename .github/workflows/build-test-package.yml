@@ -61,7 +61,7 @@ jobs:
           /p:PublishTrimmed=false
 
     - run: |
-        xcopy $env:PROJECT\kScripts $env:ART_ROOT\publish\kScripts /E /I /Y
+        xcopy $env:PROJECT\wwwroot\kScripts $env:ART_ROOT\publish\kScripts /E /I /Y
         if (Test-Path "$env:ART_ROOT\publish\appsettings.Development.json") {
             Remove-Item "$env:ART_ROOT\publish\appsettings.Development.json"
         }
