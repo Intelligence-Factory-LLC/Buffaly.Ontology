@@ -263,16 +263,20 @@
 	}
 
 	Page.AddOnload(x => {
-
-		let txtChatInput = _$('txtChatInput');
-		txtChatInput.addEventListener('keydown', function (event) {
-			if (event.ctrlKey && event.key === 'Enter') {
-				OnChatSend();
-			}
-		});
-
-		Page.Tabs["divTabIconsChat"] = {};
-		Page.Tabs["divTabIconsOriginal"] = {};
+	
+	let txtChatInput = _$("txtChatInput");
+	txtChatInput.addEventListener('keydown', function (event) {
+	if (event.ctrlKey && event.key === 'Enter') {
+	OnChatSend();
+	}
+	});
+	
+	if (!Page.Tabs) {
+	Page.Tabs = {};
+	}
+	
+	Page.Tabs["divTabIconsChat"] = {};
+	Page.Tabs["divTabIconsOriginal"] = {};
 
 		//> add OnLoad functions for each tab to show themself and hide the other
 		Page.Tabs['divTabIconsOriginal'].OnLoad = function () {
