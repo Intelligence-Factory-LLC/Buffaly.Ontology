@@ -257,6 +257,7 @@ namespace ProtoScript.Extensions
 
 		static public List<Diagnostic> CompileCodeWithProject(string strCode, string strProjectName)
 		{
+			strProjectName = EnsureAbsolutePath(strProjectName);
 			SessionObject session = GetOrCreateSession(strProjectName);
 
 			List<Diagnostic> lstDiagnostics = new List<Diagnostic>();
@@ -530,7 +531,7 @@ namespace ProtoScript.Extensions
 		{
 			JsonSerializers.RegisterSerializer(typeof(TagImmediateResult), new NestedJsonSerializer<TagImmediateResult>());
 
-			taggingSettings.SessionKey = strProject;
+			taggingSettings.SessionKey = EnsureAbsolutePath(strProject);
 			SessionObject session = GetOrCreateSession(taggingSettings.SessionKey);
 
 			TagImmediateResult result = new TagImmediateResult();
