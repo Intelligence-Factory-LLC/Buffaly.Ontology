@@ -1,11 +1,12 @@
-Page.LocalSettings =
+	Page.LocalSettings =
 {
-	Solution: "C:\\dev\\ai\\Ontology8\\Buffaly.Ontology.Portal\\wwwroot\\projects\\Simpsons.pts"
-}
+	Solution: "projects/Simpsons.pts"
+	}
 
 Page.AddOnload(function () {
 	ProtoScriptWorkbench.InterpretImmediate(Page.LocalSettings.Solution, "SimpsonsOntology.Homer", {}, function () {
-		UserMessages.DisplayNow("Ready", "Success");
+	projectInput.property("value", Page.LocalSettings.Solution);
+	UserMessages.DisplayNow("Ready", "Success");
 	})
 })
 
@@ -533,6 +534,8 @@ const nodeGroup = container.append("g").attr("class", "nodes");
 const infoPanel = d3.select("#info-panel");
 const infoContent = d3.select("#info-content");
 const closePanelButton = d3.select("#close-panel-button");
+const projectInput = d3.select("#project-input");
+const loadProjectButton = d3.select("#load-project-button");
 const searchInput = d3.select("#search-input");
 const searchButton = d3.select("#search-button");
 const suggestionsList = d3.select("#suggestions-list");
@@ -674,6 +677,19 @@ async function initializeGraph() {
 }
 
 searchButton.on("click", () => { addNodeByNameOrId(searchInput.property("value")); suggestionsList.html("").classed("hidden", true); searchInput.node().blur(); });
+loadProjectButton.on("click", () => {
+	Page.LocalSettings.Solution = projectInput.property("value");
+	ProtoScriptWorkbench.InterpretImmediate(Page.LocalSettings.Solution, "SimpsonsOntology.Homer", {}, () => {
+	initializeGraph();
+	UserMessages.DisplayNow("Project Loaded", "Success");
+	});
+});
+projectInput.on("keydown", (event) => {
+	if (event.key === "Enter") {
+		event.preventDefault();
+	loadProjectButton.dispatch("click");
+}
+});
 searchInput.on("input", handleSearchInput);
 searchInput.on("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addNodeByNameOrId(event.target.value); suggestionsList.html("").classed("hidden", true); searchInput.node().blur(); } else if (event.key === "Escape") { suggestionsList.html("").classed("hidden", true); searchInput.node().blur(); } });
 closePanelButton.on("click", () => { infoPanel.classed("hidden", true); focusNode = null; updateGraphWidth(); update(); });

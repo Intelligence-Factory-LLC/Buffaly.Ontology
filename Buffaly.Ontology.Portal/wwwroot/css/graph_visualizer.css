@@ -46,6 +46,12 @@ svg {
 }
 
 #search-container {
+        display: flex;
+        width: 100%;
+        gap: 8px;
+}
+
+#project-container {
 	display: flex;
 	width: 100%;
 	gap: 8px;
