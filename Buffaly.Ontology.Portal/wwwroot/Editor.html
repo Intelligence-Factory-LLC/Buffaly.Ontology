@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>SemDB IDE</title>
+<title>ProtoScript Editor</title>
 
 	<!-- Tailwind for modern styling -->
 	<script src="https://cdn.tailwindcss.com"></script>
@@ -118,7 +118,7 @@
 	<div class="flex-grow flex p-1 gap-1 overflow-hidden">
 		<!-- Center code editor section -->
 		<section class="flex-grow flex flex-col bg-white p-1 rounded-md shadow border border-gray-200 min-w-0">
-			<textarea id="codeEditor">// Welcome to SemDB IDE! // Load a project or add a file to start.</textarea>
+<textarea id="codeEditor">// Welcome to ProtoScript Editor! // Load a project or add a file to start.</textarea>
 			<input type="text" id="txtFileName" class="hidden">
 		</section>
 
@@ -127,25 +127,31 @@
 				<button data-pane="right" data-tab="tab-solution" class="tab-button right-tab-button active">
 					Solution Explorer
 				</button>
-				<button data-pane="right" data-tab="tab-symbols" class="tab-button right-tab-button">
-					Symbols
+				<button data-pane="right" data-tab="tab-history" class="tab-button right-tab-button">
+					Recent Files
 				</button>
+					<button data-pane="right" data-tab="tab-symbols" class="tab-button right-tab-button">
+				Symbols
+					</button>
 			</div>
 
-			<!-- Solution Explorer tab -->
-			<div id="tab-solution" class="tab-content right-tab-content active flex flex-col flex-grow gap-2 overflow-hidden">
-				<input type="search"
-					   id="txtProjectFileSearch"
-					   placeholder="Search files..."
-					   class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500" />
-				<div id="divProject" class="flex-grow overflow-y-auto text-xs space-y-0.5 pr-1"></div>
+<!-- Solution Explorer tab -->
+<div id="tab-solution" class="tab-content right-tab-content active flex flex-col flex-grow gap-2 overflow-hidden">
+<input type="search"
+id="txtProjectFileSearch"
+placeholder="Search files..."
+class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500" />
+<div id="divProject" class="flex-grow overflow-y-auto text-xs space-y-0.5 pr-1"></div>
+</div>
 
-				<input type="search"
-					   id="txtFileSearch"
-					   placeholder="Search recent files..."
-					   class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500" />
-				<div id="divSolution" class="overflow-y-auto text-xs space-y-0.5 pr-1"></div>
-			</div>
+<!-- Recent files tab -->
+<div id="tab-history" class="tab-content right-tab-content flex flex-col flex-grow gap-2 overflow-hidden">
+<input type="search"
+id="txtFileSearch"
+placeholder="Search recent files..."
+class="w-full bg-gray-50 border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500" />
+<div id="divSolution" class="overflow-y-auto text-xs space-y-0.5 pr-1"></div>
+</div>
 
 			<!-- Symbols tab -->
 			<div id="tab-symbols" class="tab-content right-tab-content flex flex-col flex-grow gap-2 overflow-hidden">

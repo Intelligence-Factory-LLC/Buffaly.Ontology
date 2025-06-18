@@ -54,8 +54,8 @@ let currentFileSymbols = [];
 // Initialization
 // ───────────────────────────────────────────────────────────
 function updateTitle() {
-	document.title = `SemDB IDE - ${currentProjectName}`;
-	headerProjectName.textContent = `- ${currentProjectName}`;
+        document.title = `ProtoScript Editor - ${currentProjectName}`;
+        headerProjectName.textContent = `- ${currentProjectName}`;
 }
 updateTitle();
 
@@ -103,12 +103,15 @@ function addFileToHistory(file) {
 }
 
 function bindFileHistory() {
-	if (!divSolution) return;
-	divSolution.innerHTML = "";
-	LocalSettings.FileHistory.forEach(item => {
-		const div = createFileItem(item.File);
-		divSolution.appendChild(div);
-	});
+        if (!divSolution) return;
+        divSolution.innerHTML = "";
+        const root = LocalSettings.Solution
+                ? LocalSettings.Solution.substring(0, LocalSettings.Solution.lastIndexOf("\\"))
+                : "";
+        LocalSettings.FileHistory.forEach(item => {
+                const div = createFileItem(item.File, getRelativePath(root, item.File));
+                divSolution.appendChild(div);
+        });
 }
 
 function bindImmediateHistory() {
@@ -342,7 +345,7 @@ document.querySelectorAll(".tab-button")
 		);
 	}));
 
-switchTab("right", "solutionExplorerTab");
+switchTab("right", "tab-solution");
 switchTab("bottom", "consoleContent");
 
 // ───────────────────────────────────────────────────────────
@@ -636,9 +639,9 @@ function NavigateTo(info, symbolName) {
 // Searches & navigation via keyboard
 // ───────────────────────────────────────────────────────────
 function startSymbolSearch() {
-	switchTab("right", "symbolsTab");
-	searchSymbolsInput.value = "";
-	searchSymbolsInput.focus();
+        switchTab("right", "tab-symbols");
+        searchSymbolsInput.value = "";
+        searchSymbolsInput.focus();
 }
 
 function selectNextSymbol() {
@@ -665,10 +668,10 @@ function navigateToSelectedSymbol() {
 }
 
 function startProjectSearch() {
-	switchTab("right", "solutionExplorerTab");
-	searchFilesInput.value = "";
-	filterProjectFiles();
-	searchFilesInput.focus();
+        switchTab("right", "tab-solution");
+        searchFilesInput.value = "";
+        filterProjectFiles();
+        searchFilesInput.focus();
 }
 function selectNextProjectFile() {
 	if (selectedProjectFileIdx < filteredProjectFiles.length - 1) selectedProjectFileIdx++;
