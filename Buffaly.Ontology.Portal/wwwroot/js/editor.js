@@ -360,77 +360,42 @@ function highlightActiveFile(selectedItem) {
 // ───────────────────────────────────────────────────────────
 // Symbol parsing & rendering
 // ───────────────────────────────────────────────────────────
-function parseAndDisplaySymbols(fileName, codeContent) {
+async function parseAndDisplaySymbols(fileName) {
 	currentFileSymbols = [];
 	symbolList.innerHTML = "";
-	const fnRe = /function\s+([a-zA-Z0-9_]+)\s*\(/g;
-	const varRe = /(?:var|let|const)\s+([a-zA-Z0-9_]+)/g;
-	let match;
 
-	// Title
-	const title = document.createElement("p");
-	title.className = "text-xs text-gray-500 px-1 pt-1 pb-0.5 font-semibold";
-	title.textContent = `Symbols in ${fileName.split(/[\\/]/).pop()}:`;
-	symbolList.appendChild(title);
+	const allSymbols = await new Promise(r =>
+	ProtoScriptWorkbench.GetSymbols(LocalSettings.Solution, r)
+	);
 
-	// Functions
-	while ((match = fnRe.exec(codeContent)) !== null) {
-		const pos = editor.posFromIndex(match.index);
-		currentFileSymbols.push({
-			name: match[1], type: "function", line: pos.line + 1
-		});
-	}
-	// Variables
-	while ((match = varRe.exec(codeContent)) !== null) {
-		const name = match[1];
-		if (!["var", "let", "const"].includes(name)) {
-			const pos = editor.posFromIndex(match.index);
-			currentFileSymbols.push({
-				name, type: "variable", line: pos.line + 1
-			});
-		}
-	}
-	// Extras for Base and Articles
-	if (fileName.includes("Base.pts")) {
-		["BaseObject", "InitializeSystem"].forEach(fn => {
-			const idx = codeContent.indexOf(fn);
-			if (idx !== -1) {
-				const pos = editor.posFromIndex(idx);
-				currentFileSymbols.push({
-					name: fn, type: fn === "BaseObject" ? "class" : "method", line: pos.line + 1
-				});
-			}
-		});
-	}
-	if (fileName.includes("Articles.pts")) {
-		["Article", "fetchContent", "displayArticle"].forEach(fn => {
-			const idx = codeContent.indexOf(fn);
-			if (idx !== -1) {
-				const pos = editor.posFromIndex(idx);
-				currentFileSymbols.push({
-					name: fn, type: fn === "Article" ? "class" : "method", line: pos.line + 1
-				});
-			}
-		});
+	if (allSymbols && allSymbols.length > 0) {
+	currentFileSymbols = allSymbols
+	.filter(s => s.Info &&
+	s.Info.File.toLowerCase() === fileName.toLowerCase())
+	.map(s => {
+	const line = editor.posFromIndex(s.Info.StartingOffset).line + 1;
+	const type = s.SymbolType === "PrototypeDeclaration" ? "prototype" : "function";
+	return { name: s.SymbolName, type, line };
+	});
 	}
 
 	if (currentFileSymbols.length === 0) {
-		const msg = document.createElement("p");
-		msg.className = "text-gray-500 text-xs p-1";
-		msg.textContent = "No symbols found in this file.";
-		symbolList.appendChild(msg);
+	const msg = document.createElement("p");
+	msg.className = "text-gray-500 text-xs p-1";
+	msg.textContent = "No symbols found in this file.";
+	symbolList.appendChild(msg);
 	} else {
-		renderSymbolList(currentFileSymbols);
+	renderSymbolList(currentFileSymbols);
 	}
 }
 
 function getSymbolIcon(type) {
 	switch (type) {
-		case "function": return `<svg viewBox="0 0 16 16" fill="#805AD5" class="symbol-icon"><path d="M4 14V2h5.5l3.5 3.5V14H4zm1-1h7V6H9V3H5v10zM6.5 9H8V7.5h2V9h1.5v1H10v1.5H8V13H6.5v-1.5H5V10h1.5V9z"/></svg>`;
-		case "variable": return `<svg viewBox="0 0 16 16" fill="#3182CE" class="symbol-icon"><path d="M4 2v12h8V2H4zm1 1h6v2L8 7l-3-2V3zm0 5l3 2 3-2v5H5V8z"/></svg>`;
-		case "class": return `<svg viewBox="0 0 16 16" fill="#DD6B20" class="symbol-icon"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 014.606 8.036L5.964 3.964A5.466 5.466 0 018 2.5zM3.964 12.036L10.036 5.964A5.5 5.5 0 013.964 12.036z"/></svg>`;
-		case "method": return `<svg viewBox="0 0 16 16" fill="#319795" class="symbol-icon"><path d="M3 3h10v1H3V3zm0 2h10v1H3V5zm0 3h4v1H3V8zm0 2h4v1H3v-1zm5-2h5v1H8V8zm0 2h5v1H8v-1zM3 13h10v1H3v-1z"/></svg>`;
-		default: return `<svg viewBox="0 0 16 16" fill="#718096" class="symbol-icon"><circle cx="8" cy="8" r="3"/></svg>`;
+	case "function": return `<svg viewBox="0 0 16 16" fill="#805AD5" class="symbol-icon"><path d="M4 14V2h5.5l3.5 3.5V14H4zm1-1h7V6H9V3H5v10zM6.5 9H8V7.5h2V9h1.5v1H10v1.5H8V13H6.5v-1.5H5V10h1.5V9z"/></svg>`;
+	case "variable": return `<svg viewBox="0 0 16 16" fill="#3182CE" class="symbol-icon"><path d="M4 2v12h8V2H4zm1 1h6v2L8 7l-3-2V3zm0 5l3 2 3-2v5H5V8z"/></svg>`;
+	case "class": return `<svg viewBox="0 0 16 16" fill="#DD6B20" class="symbol-icon"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 014.606 8.036L5.964 3.964A5.466 5.466 0 018 2.5zM3.964 12.036L10.036 5.964A5.5 5.5 0 013.964 12.036z"/></svg>`;
+	case "method": return `<svg viewBox="0 0 16 16" fill="#319795" class="symbol-icon"><path d="M3 3h10v1H3V3zm0 2h10v1H3V5zm0 3h4v1H3V8zm0 2h4v1H3v-1zm5-2h5v1H8V8zm0 2h5v1H8v-1zM3 13h10v1H3v-1z"/></svg>`;
+	default: return `<svg viewBox="0 0 16 16" fill="#718096" class="symbol-icon"><circle cx="8" cy="8" r="3"/></svg>`;
 	}
 }
 
@@ -440,29 +405,29 @@ function renderSymbolList(list) {
 	selectedSymbolIdx = -1;
 
 	if (list.length === 0) {
-		const msg = document.createElement("p");
-		msg.className = "text-gray-500 text-xs p-1 no-symbols-message";
-		msg.textContent = "No symbols to display.";
-		symbolList.appendChild(msg);
-		return;
+	const msg = document.createElement("p");
+	msg.className = "text-gray-500 text-xs p-1 no-symbols-message";
+	msg.textContent = "No symbols to display.";
+	symbolList.appendChild(msg);
+	return;
 	}
 
 	list.forEach(sym => {
-		const item = document.createElement("div");
-		item.className = "symbol-item flex items-center p-1 text-xs cursor-pointer";
-		item.innerHTML =
-			getSymbolIcon(sym.type) +
-			`<span class="ml-1">${sym.name}</span>` +
-			`<span class="ml-auto text-gray-400 text-xxs">L:${sym.line}</span>`;
-		item.onclick = () => {
-			appendToConsole(`Symbol clicked: ${sym.name}`, "DEBUG");
-			if (sym.line > 0) {
-				editor.setCursor({ line: sym.line - 1, ch: 0 });
-				editor.focus();
-				const lh = editor.getLineHandle(sym.line - 1);
-				editor.addLineClass(lh, "background", "bg-yellow-200");
-				setTimeout(() => editor.removeLineClass(lh, "background", "bg-yellow-200"), 1500);
-			}
+	const item = document.createElement("div");
+	item.className = "symbol-item flex items-center p-1 text-xs cursor-pointer";
+	item.innerHTML =
+	getSymbolIcon(sym.type) +
+	`<span class="ml-1">${sym.name}</span>` +
+	`<span class="ml-auto text-gray-400 text-xxs">L:${sym.line}</span>`;
+	item.onclick = () => {
+	appendToConsole(`Symbol clicked: ${sym.name}`, "DEBUG");
+	if (sym.line > 0) {
+	editor.setCursor({ line: sym.line - 1, ch: 0 });
+	editor.focus();
+	const lh = editor.getLineHandle(sym.line - 1);
+	editor.addLineClass(lh, "background", "bg-yellow-200");
+	setTimeout(() => editor.removeLineClass(lh, "background", "bg-yellow-200"), 1500);
+	}
 		};
 		symbolList.appendChild(item);
 	});
@@ -509,13 +474,13 @@ async function OnLoadProject() {
 async function OnLoadFile() {
 	const file = document.getElementById("txtFileName").value;
 	if (!isCurrentFileSaved() &&
-		!confirm("You have unsaved changes, continue?")) return;
+	!confirm("You have unsaved changes, continue?")) return;
 	const content = await new Promise(r =>
-		ProtoScriptWorkbench.LoadFile(LocalSettings.Solution, file, r)
+	ProtoScriptWorkbench.LoadFile(LocalSettings.Solution, file, r)
 	);
 	editor.setValue(content);
 	sLastSaved = content;
-	parseAndDisplaySymbols(file, content);
+	await parseAndDisplaySymbols(file);
 	LocalSettings.File = file;
 	addFileToHistory(file);
 	bindFileHistory();
