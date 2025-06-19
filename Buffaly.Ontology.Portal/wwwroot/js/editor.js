@@ -861,6 +861,15 @@ function ShowTab(tabId) {
 	if (button) button.classList.add("active");
 
 	// show the requested pane
-	const content = document.getElementById(tabId);
-	if (content) content.classList.add("active");
+        const content = document.getElementById(tabId);
+        if (content) content.classList.add("active");
 }
+
+window.addEventListener("error", e => {
+appendToConsole(e.message, "ERROR");
+});
+
+window.addEventListener("unhandledrejection", e => {
+const msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+appendToConsole(msg, "ERROR");
+});

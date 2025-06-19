@@ -153,12 +153,12 @@ async function GetWebRoot() {
 
 function BindSolutionHistory() {
 	// history -------------------------------------------------------------
-	const ulHist = ["ul", { class: "list-group" }];
+       const ulHist = ["ul", { class: "list-group space-y-1" }];
 
 	Page.LocalSettings.SolutionHistory.each(function (item) {
 		ulHist.push([
 			"li",
-			{ class: "list-group-item list-group-item-action" },
+                       { class: "list-group-item list-group-item-action p-2" },
 			[
 				"a",
 				{
@@ -176,12 +176,12 @@ function BindSolutionHistory() {
 
 	// examples ------------------------------------------------------------
 	const examples = ["projects\\hello.pts", "projects\\Simpsons.pts"];
-	const ulEx = ["ul", { class: "list-group" }];
+       const ulEx = ["ul", { class: "list-group space-y-1" }];
 
 	examples.forEach(p =>
 		ulEx.push([
 			"li",
-			{ class: "list-group-item list-group-item-action" },
+                       { class: "list-group-item list-group-item-action p-2" },
 			[
 				"a",
 				{
