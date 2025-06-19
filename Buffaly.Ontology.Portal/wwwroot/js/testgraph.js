@@ -3,12 +3,15 @@
 	Solution: "projects/Simpsons.pts"
 	}
 
-Page.AddOnload(function () {
+	Page.AddOnload(function () {
+	ProtoScriptWorkbench.InterpretImmediate.onErrorReceived = (err) => {
+	UserMessages.DisplayNow(err.Error || JSON.stringify(err), "Error");
+	};
 	ProtoScriptWorkbench.InterpretImmediate(Page.LocalSettings.Solution, "SimpsonsOntology.Homer", {}, function () {
 	projectInput.property("value", Page.LocalSettings.Solution);
 	UserMessages.DisplayNow("Ready", "Success");
-	})
-})
+	});
+	});
 
 function searchPrototypes(searchTerm) {
 	console.log(`API: Searching for prototypes containing: "${searchTerm}"`);
@@ -679,11 +682,14 @@ async function initializeGraph() {
 searchButton.on("click", () => { addNodeByNameOrId(searchInput.property("value")); suggestionsList.html("").classed("hidden", true); searchInput.node().blur(); });
 loadProjectButton.on("click", () => {
 	Page.LocalSettings.Solution = projectInput.property("value");
+	ProtoScriptWorkbench.InterpretImmediate.onErrorReceived = (err) => {
+	UserMessages.DisplayNow(err.Error || JSON.stringify(err), "Error");
+	};
 	ProtoScriptWorkbench.InterpretImmediate(Page.LocalSettings.Solution, "SimpsonsOntology.Homer", {}, () => {
 	initializeGraph();
 	UserMessages.DisplayNow("Project Loaded", "Success");
 	});
-});
+	});
 projectInput.on("keydown", (event) => {
 	if (event.key === "Enter") {
 		event.preventDefault();
