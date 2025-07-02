@@ -1,39 +1,35 @@
-﻿@{
-    var vmodel = new Buffaly.Admin.Portal.Pages.Shared._TopBarModel();
-}
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
+<head>
 
-        <meta charset="utf-8" />
-        <title>@ViewContext.ViewData["Title"]</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta content="ProtoScript Portal" name="description" />
-        <meta name="author" content="intelligence Factory" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <!-- App favicon -->
-        <link rel="shortcut icon" href="~/images/favicon.ico">
-
-        @RenderSection("Styles", false)
+	<meta charset="utf-8" />
+	<title>@ViewContext.ViewData["Title"]</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="@AppSettings.Description" />
+	<meta name="author" content="Intelligence Factory" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<!-- App favicon -->
+	<link rel="shortcut icon" href="~/images/favicon.ico">
+	@RenderSection("Styles", false)
 
     <link href="~/lib/jquery-toast-plugin/jquery.toast.min.css" rel="stylesheet" type="text/css" />
 
-        <!-- Bootstrap css -->
-        <link href="~/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <!-- App css -->
-        <link href="~/css/app.min.css" rel="stylesheet" type="text/css" id="app-style"/>
-        <!-- icons -->
-        <link href="~/css/icons.min.css" rel="stylesheet" type="text/css" />
-        <!-- Head js -->
-        <script src="~/js/head.js"></script>
+	<!-- Bootstrap css -->
+	<link href="~/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<!-- App css -->
+	<link href="~/css/app.css" rel="stylesheet" type="text/css" id="app-style" />
+	<!-- icons -->
+	<link href="~/css/icons.min.css" rel="stylesheet" type="text/css" />
+	<!-- Head js -->
+	<script src="~/js/head.js"></script>
 
 
-	<link href="~/css/styles.css" rel="stylesheet" type="text/css" />
+	<link href="~/custom_css/styles.css" rel="stylesheet" type="text/css" />
 
 
-        <!--kcs js-->
-    <script src="//static.buffa.ly/js/global.js"></script>
+	<!--kcs js-->
+	<script src="//static.buffa.ly/js/global.js"></script>
 	<script src="//static.buffa.ly/js/LocalStorage2.js"></script>
 	<script src="//static.buffa.ly/js/moremoo4.js?v=2"></script>
 	<script src="//static.buffa.ly/js/JsonMethod.js?v=2"></script>
@@ -45,12 +41,16 @@
 	<script src="//static.buffa.ly/js/moment.min.js"></script>
 	<script src="//static.buffa.ly/js/DateUtil.js"></script>
 	<script src="//static.buffa.ly/js/form_validation.js"></script>
+
 	<script src="//static.buffa.ly/js/MasterPage.js"></script>
 
-    <link href="~/css/site.css" rel="stylesheet" type="text/css" />
+	<link href="~/custom_css/site.css" rel="stylesheet" type="text/css" />
 	<script src="~/js/plugins/tinymce/tinymce.min.js"></script>
 
-
+	<script type="text/javascript">
+		Globals.ReturnExceptions = true;
+		Globals.ErrorReportingUrl = "/JsonWs/Buffaly.Common.ErrorReporting.ashx";
+	</script>
 
 	<script type="text/javascript" src="~/js/plugins/codemirror/lib/codemirror.js"></script>
 	<link rel="stylesheet" href="~/js/plugins/codemirror/lib/codemirror.css">
@@ -58,144 +58,232 @@
 	<script src="/js/plugins/codemirror/mode/xml/xml.js"></script>
 	<script src="/js/plugins/codemirror/mode/css/css.js"></script>
 	<script src="/js/plugins/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-	<script src="/js/plugins/codemirror/mode/markdown/markdown.js"></script>
-	<script src="/js/plugins/marked/marked.min.js"></script>
 
-
-    <style>
-        .CodeMirror {
-            border: 1px solid #eee;
-            height: auto;
-        }
-    </style>
+	<style>
+		.CodeMirror {
+			border: 1px solid #eee;
+			height: auto;
+		}
+	</style>
 
 	@RenderSection("Head", false)
 
-    </head>
+</head>
 
-    <!-- body start -->
-    <body data-layout-mode="default" data-theme="light" data-layout-width="fluid" data-topbar-color="light" data-menu-position="fixed" data-leftbar-color="light" data-leftbar-size='default' data-sidebar-user='false'>
+<!-- body start -->
+<body data-layout-mode="default" data-theme="light" data-layout-width="fluid" data-topbar-color="light" data-menu-position="fixed" data-leftbar-color="light" data-leftbar-size='default' data-sidebar-user='false'>
 
-        <!-- Begin page -->
-        <div id="wrapper">
+	<!-- Begin page -->
+	<div id="wrapper">
 
 
-        <partial model="vmodel" name="_TopBar"></partial>
 		<div class="navbar-custom" id="topbar">
-    <div class="container-fluid">
-        <ul class="list-unstyled topnav-menu float-end mb-0">
+			<div class="container-fluid">
+				<ul class="list-unstyled topnav-menu float-end mb-0">
+					@if (AppSettings.IsAgentChatEnabled) 
+            {
+                <li class="dropdown d-none d-lg-inline-block">
+					<a class="nav-link dropdown-toggle arrow-none waves-effect waves-light" href="#" onclick="toggleChatSidebar(event)">
+						<i class="fe-message-square noti-icon"></i>
+					</a>
+				</li>
+					}
+            <li class="dropdown d-none d-lg-inline-block">
+				<a class="nav-link dropdown-toggle arrow-none waves-effect waves-light" data-toggle="fullscreen" href="#">
+					<i class="fe-maximize noti-icon"></i>
+				</a>
+			</li>
 
-          
+					<li class="dropdown d-none d-lg-inline-block topbar-dropdown">@RenderSection("ShortcutsMenu", false)
+					</li>
+
+					<li class="dropdown d-none d-lg-inline-block topbar-dropdown">
+						<a class="nav-link dropdown-toggle arrow-none waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+							<img src="~/images/flags/us.jpg" alt="user-image" height="16">
+						</a>
+						<div class="dropdown-menu dropdown-menu-end">
 
 
- 
-        </ul>
+							<!-- item-->
+							<a href="javascript:void(0);" class="dropdown-item">
+								<img src="~/images/flags/brazil.svg" alt="user-image" class="me-1" height="12">
+								<span class="align-middle">Portuguese</span>
+							</a>
 
-        <!-- LOGO -->
-        <div class="logo-box">
-            <a href="/" class="logo logo-dark text-center">
-                <span class="logo-sm">
-                    <img src="~/images/logo-sm.png" alt="" height="22">
-               
-                </span>
-                <span class="logo-lg">
-                    <img src="@Model.Logo" alt="" height="50">
-               
-                </span>
-            </a>
+							<!-- item-->
+							<a href="javascript:void(0);" class="dropdown-item">
+								<img src="~/images/flags/spain.jpg" alt="user-image" class="me-1" height="12">
+								<span class="align-middle">Spanish</span>
+							</a>
 
-            <a href="/" class="logo logo-light text-center">
-                <span class="logo-sm">
-                    <img src="~/images/logo-sm.png" alt="" height="22">
-                </span>
-                <span class="logo-lg">
-                    <img src="~/images/logo-light.png" alt="" height="20">
-                </span>
-            </a>
-        </div>
 
-		@RenderSection("FileMenu", false)
 
-        <div class="clearfix"></div>
-    </div>
-</div>
+						</div>
+					</li>
 
-<div class="left-side-menu" id="sidebar">
 
-    <div class="h-100" data-simplebar>
 
-        <!-- User box -->
-        
+					<li class="dropdown notification-list topbar-dropdown">@RenderSection("UserMenu", false)
+					</li>
 
-        <div id="sidebar-menu">
-		@RenderSection("SidebarMenu", false)
+
+				</ul>
+
+				<!-- LOGO -->
+				<div class="logo-box">
+					<a href="/" class="logo logo-dark text-center">
+						<span class="logo-sm">
+							<img src="@AppSettings.LogoUrlSmall" alt="" height="22">
+						</span>
+						<span class="logo-lg">
+							<img src="@AppSettings.LogoUrl" alt="" height="50">
+						</span>
+					</a>
+
+					<a href="/" class="logo logo-light text-center">
+						<span class="logo-sm">
+							<img src="@AppSettings.LogoUrlSmall" alt="" height="22">
+						</span>
+						<span class="logo-lg">
+							<img src="@AppSettings.LogoUrl" alt="" height="20">
+						</span>
+					</a>
+				</div>
+
+				<ul class="list-unstyled topnav-menu topnav-menu-left m-0">
+					<li>
+						<button class="button-menu-mobile waves-effect waves-light">
+							<i class="fe-menu"></i>
+						</button>
+					</li>
+
+					<li>
+						<!-- Mobile menu toggle (Horizontal Layout)-->
+						<a class="navbar-toggle nav-link" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+							<div class="lines">
+								<span></span>
+								<span></span>
+								<span></span>
+							</div>
+						</a>
+						<!-- End mobile menu toggle-->
+					</li>
+
+					<li class="dropdown d-none d-xl-block">@RenderSection("FileMenu", false)
+
+					</li>
+
+
+				</ul>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+
+		@if (AppSettings.IsAgentChatEnabled)
+{
+    @RenderSection("ChatSidebar", required: false)
+}
+else
+{
+    IgnoreSection("ChatSidebar");
+}
+
+
+		<script type="text/javascript">
+
+	function ToggleQuickHelpOn() {
+		new LocalStorage().set("ShowQuickHelp", true);
+		if (typeof ShowQuickHelp !== 'undefined') {
+			ShowQuickHelp();
+		}
+
+	}
+	function ToggleQuickHelpOff() {
+		new LocalStorage().set("ShowQuickHelp", false);
+		Page.Reload();
+
+	}
+		</script>
+
+
+		<div class="left-side-menu" id="sidebar">
+
+			<div class="h-100" data-simplebar>
+
+				<!-- User box -->
+
+
+				<div id="sidebar-menu">
+					@RenderSection("SidebarMenu", false)
 		@if (!IsSectionDefined("SidebarMenu"))
 		{
 			<p>Default content for sidebar menu</p>
-		}
-        </div>
+					}
+				</div>
 
-        <div class="clearfix"></div>
+				<div class="clearfix"></div>
 
-    </div>
-    <!-- Sidebar -left -->
+			</div>
+			<!-- Sidebar -left -->
 
-</div>
+		</div>
 
 
-            <div class="content-page">
- 
-            <div class="content">
-                <!-- Start Content-->
-                <div class="container-fluid">
+		<div class="content-page">
 
-                    <!-- start page title -->
-                    <div class="row" id="divPageTitle">
-                        <div class="col-12">
-                            <div class="page-title-box">
-                                <div class="page-title-right">
-                                    @RenderSection("Breadcrumbs", false)
+			<div class="content">
+				<!-- Start Content-->
+				<div class="container-fluid">
+
+					<!-- start page title -->
+					<div class="row" id="divPageTitle">
+						<div class="col-12">
+							<div class="page-title-box">
+								<div class="page-title-right">
+									@RenderSection("Breadcrumbs", false)
 								</div>
-                                <h4 class="page-title">@RenderSection("MainPanelTitle", false)</h4>
+								<h4 class="page-title">@RenderSection("MainPanelTitle", false)</h4>
 								@RenderSection("MainPanelTitleOptions", false)
-                            </div>
-                        </div>
-                    </div>
-                    <!-- end page title -->
+							</div>
+						</div>
+					</div>
+					<!-- end page title -->
 					@RenderSection("ErrorMessage", false)
                     <div class="row">
-                        <div class="col-12">
-                            @RenderSection("MainPanelContent", false)
-                        </div> <!-- end col-->
-                    </div>
-                    <!-- end row-->
+						<div class="col-12">
+							@RenderSection("MainPanelContent", false)
+						</div>
+						<!-- end col-->
+					</div>
+					<!-- end row-->
 
-                </div>
-                <!-- container -->
-            </div>
+				</div>
+				<!-- container -->
+			</div>
 
-                <partial name="_Footer"></partial>
+			<partial name="_Footer"></partial>
 
-            </div>
-
-
-        </div>
-        <!-- END wrapper -->
+		</div>
 
 
-        <!-- Vendor js -->
-        <script src="~/js/vendor.min.js"></script>
+	</div>
+	<!-- END wrapper -->
 
 
-        @RenderSection("scripts", false)
+
+	<!-- Vendor js -->
+	<script src="~/js/vendor.min.js"></script>
+
+
+	@RenderSection("scripts", false)
         <!-- App js-->
-        <script src="~/js/app.min.js"></script>
-        <script src="~/lib/jquery-toast-plugin/jquery.toast.min.js"></script>
+	<script src="~/js/app.min.js"></script>
+	<script src="~/lib/jquery-toast-plugin/jquery.toast.min.js"></script>
 
 
-        @RenderSection("BottomScripts", false)
+	@RenderSection("BottomScripts", false)
 
 
 
-    </body>
+</body>
 </html>

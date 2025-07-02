@@ -2096,7 +2096,7 @@ body[data-leftbar-size=condensed] .left-side-menu #sidebar-menu > ul ul li:hover
   position: absolute;
   width: 190px;
 }
-body[data-leftbar-size=condensed] .left-side-menu #sidebar-menu > ul ul li > a span.float-end {
+body[data-leftbar-size=condensed] .left-side-menu #sidebar-menu > ul ul li > a span.pull-right {
   position: absolute;
   right: 20px;
   top: 12px;
@@ -7469,10 +7469,10 @@ div.hopscotch-bubble .hopscotch-content {
   -webkit-box-shadow: 0 0 0 2px rgba(40, 146, 253, 0.5);
           box-shadow: 0 0 0 2px rgba(40, 146, 253, 0.5);
 }
-.responsive-table-plugin .btn-group.float-end {
+.responsive-table-plugin .btn-group.pull-right {
   float: right;
 }
-.responsive-table-plugin .btn-group.float-end .dropdown-menu {
+.responsive-table-plugin .btn-group.pull-right .dropdown-menu {
   left: auto;
   right: 0;
 }

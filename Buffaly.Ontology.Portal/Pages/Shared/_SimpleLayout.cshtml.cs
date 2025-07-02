@@ -1,4 +1,4 @@
-﻿namespace Buffaly.Admin.Portal.Pages.Shared
+﻿namespace Portal.Pages.Shared
 {
 	public class _SimpleLayoutModel
 	{
@@ -13,6 +13,14 @@
 			get
 			{
 				return "/images/bf_logo-v2.png";
+			}
+		}
+
+		public bool IsAgentChatEnabled
+		{
+			get
+			{
+				return false;
 			}
 		}
 	}

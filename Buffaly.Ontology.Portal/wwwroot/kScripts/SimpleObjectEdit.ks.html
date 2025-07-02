@@ -176,7 +176,7 @@
 	})
 
 	
-	(function AllowEditQuickHelp { (return (UserState.Permission.AllowEditQuickHelp)) })
+	(function AllowEditQuickHelp { (return (UserState.Permission?.AllowEditQuickHelp)) })
 
 	(function CommandButtons
 	{
@@ -290,7 +290,8 @@
 				}
 			</script>
 		
-              <script type="text/javascript" src="/JsonWs/FairPath.Messaging.Leases.ashx.js?v=<%JsVersion%>"></script>
+			<%if (Application.EnableLeases){%>			
+              <script type="text/javascript" src="/JsonWs/<%Application.LeasesClass%>.ashx.js?v=<%JsVersion%>"></script>
               <script type="text/javascript">
 				  Page.AddOnload(function () {
 
@@ -327,6 +328,7 @@
 					});							
 				}
                 </script>
+			<%}%>
 
 			<%AdditionalScripts%>	
 		<%})

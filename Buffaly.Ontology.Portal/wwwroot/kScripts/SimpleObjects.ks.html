@@ -251,7 +251,7 @@
 		<%})
 	})
 
-	(function AllowEditQuickHelp { (return (UserState.Permission.AllowEditQuickHelp)) })
+	(function AllowEditQuickHelp { (return (UserState.Permission?.AllowEditQuickHelp)) })
 
 	(function CommandButtons
 	{
@@ -330,6 +330,8 @@
         oGrid.SearchControlID = 'txtSearchTerm';
         oGrid.OnRowClick = OnClick<%ObjectName%>;
         oGrid.EmptyDataTemplateID = "div<%ObjectsName%>Empty";
+		oGrid.m_ObjectsName = "<%ObjectsName%>";
+		oGrid.fromHistory();		
         oGrid.StartRefreshing();
 		oGrid.OnComplete = function() {
 			OnFormatGrid("div<%ObjectsName%>");

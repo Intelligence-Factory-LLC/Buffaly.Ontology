@@ -1,7 +1,4 @@
-﻿@model Buffaly.Admin.Portal.Pages.Shared._TopBarModel;
-
-
-<!-- Chat Sidebar -->
+﻿<!-- Chat Sidebar -->
 <div id="chatSidebar" class="chat-sidebar hidden" tabindex="-1">
 	<!-- Top Bar Container -->
 	<div class="d-flex justify-content-between align-items-center p-2 border-bottom" style="flex-shrink: 0; background:#343a40">
@@ -42,23 +39,6 @@
 
 
 
-<link href="~/css/automation.css" rel="stylesheet" />
+<link href="~/custom_css/automation.css" rel="stylesheet" />
 <script type="text/javascript" src="js/plugins/marked/marked.min.js"></script>
-
-<script type="text/javascript">
-
-	function ToggleQuickHelpOn() {
-		new LocalStorage().set("ShowQuickHelp", true);
-		if (typeof ShowQuickHelp !== 'undefined') {
-			ShowQuickHelp();
-		}
-
-	}
-	function ToggleQuickHelpOff() {
-		new LocalStorage().set("ShowQuickHelp", false);
-		Page.Reload();
-
-	}
-
-
-</script>
+<script type="text/javascript" src="js/automation_chat.js?v=2"></script>

@@ -1,13 +1,17 @@
-﻿<footer class="footer">
+﻿@using System.Reflection
+@{
+    var buildDate = System.IO.File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
+}
+<footer class="footer">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">
-				<img src="~/images/bf_logo-v2.png" style="height:30px"/>
+                                <img src="@AppSettings.LogoUrl" style="height:30px"/>
 				
             </div>
             <div class="col-md-6">
                 <div class="text-md-end footer-links d-none d-sm-block" style="margin-top:5px;">
-                                        <span class="Year">2025</span> &copy; <a href="https://intelligencefactory.ai">Intelligence Factory</a>
+                    <span class="Year">2025</span> &copy; <a href="https://intelligencefactory.ai">Intelligence Factory</a> - <span class="BuildDate">@buildDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
                 </div>
             </div>
         </div>

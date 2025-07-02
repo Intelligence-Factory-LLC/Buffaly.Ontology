@@ -1,29 +1,38 @@
-using BasicUtilities;
 using Buffaly.Common;
 using Buffaly.Common.Models;
+using Buffaly.UI;
 using kScript3;
 using Microsoft.AspNetCore.Authorization;
-using System.Reflection.Metadata;
 
-namespace Buffaly.Ontology.Portal.Pages
+namespace Portal.Pages
 {
+    [Authorize]
     public class kModel : KScriptPageModel<BaseUserState>
     {
         public kModel() : base()
         {
-			this.m_bEnableContent = false;
         }
 
-        protected override BaseUserState UserState => BaseUserState.Current;
+        protected override BaseUserState UserState => new BaseUserState(HttpContext);
 
-        protected override string? GetSidebarMenu(kScriptControl oHandler)
-        {
-            return oHandler.EvaluateFile(FileUtil.BuildPath(oHandler.GetRootDir(), "Administrator\\LeftMenu.ks.html"));
-        }
-
-		protected override string GetFileMenu(kScriptControl handler)
+		protected override kScriptControl GetKScript()
 		{
-			return handler.EvaluateFile(FileUtil.BuildPath(handler.GetRootDir(), "Administrator\\FileMenu.ks.html"));
+			return RooTraxState.kScriptControl;
 		}
-    }
+		public string RoleName
+		{
+			get
+			{
+				return "Administrator";
+			}
+		}
+
+		public string UserName 		
+		{
+			get
+			{
+				return "Administrator";
+			}
+		}
+	}
 }

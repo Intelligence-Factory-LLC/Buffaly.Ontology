@@ -1,16 +1,15 @@
-
 <%class SimpleObjectDetailsPage
 {
 	(declare UseShortButtonNames true)
-	
+
 	(declare Metadata
 		{
 			ObjectName : "",
 			ObjectsName : "",
-			
+
 			FriendlyObjectName : "",
 			FriendlyObjectsName : "",
-			
+
 			ObjectsUrl : "",
 			DetailsUrl : "",
 			EditUrl : "",
@@ -20,52 +19,52 @@
 			BusinessNamespace: ""
 		}
 	)
-	
+
 	(function MetadataFile File
 	{
 		(Metadata (json (include (File))))
 	})
-		
+
 	(function ObjectName
 	{
 		(return (Metadata.ObjectName))
 	})
-	
+
 	(function ObjectsName
 	{
 		(return (Metadata.ObjectsName))
 	})
-	
+
 	(function FriendlyObjectName
 	{
 		(return (Metadata.FriendlyObjectName))
 	})
-	
+
 	(function FriendlyObjectsName
 	{
 		(return (Metadata.FriendlyObjectsName))
 	})
-	
-	(function ObjectsUrl 
+
+	(function ObjectsUrl
 	{
 		(return (Metadata.ObjectsUrl))
 	})
 
-	(function DetailsUrl 
+	(function DetailsUrl
 	{
 		(return (Metadata.DetailsUrl))
 	})
 
-	(function InsertUrl 
+	(function InsertUrl
 	{
 		(return (Metadata.InsertUrl))
 	})
-	
-	(function EditUrl 
+
+	(function EditUrl
 	{
 		(return (Metadata.EditUrl))
-	})	
-	
+	})
+
 	(function BusinessNamespace
 	{
 		(return (Metadata.BusinessNamespace))
@@ -80,20 +79,20 @@
 	{
 		(return (Request.GetStringOrNull (concat (ObjectName) ID)))
 	})
-	
+
 	(function Object
 	{
-		(declare oObj ((concat (ObjectsName) .Get (ObjectName)) (ObjectID)))	
+		(declare oObj ((concat (ObjectsName) .Get (ObjectName)) (ObjectID)))
 		(ifeq (oObj) "" { (env.log (concat "Could not find " (ObjectName) " with ID of " (ObjectID))) })
 		(return (oObj))
 	})
-	
+
     (function DoesObjectExist
 	{
 		(return (neq (Object) ""))
 	})
 
-	(function ObjectTitle 
+	(function ObjectTitle
 	{
 
 		(returnex{%>
@@ -108,13 +107,13 @@
 		<%})
 	})
 
-	(function Title 
+	(function Title
 	{
 		(returnex{%>
 			<%ObjectTitle%> - <%Application.Title%>
 		<%})
 	})
-	
+
 	(function DetailsPanel
 	{
 		(return ((concat (ObjectsName) Admin.GetDetails) (ObjectID)))
@@ -128,25 +127,25 @@
 	(function QuickHelp
 	{
 		(returnex{%>
-            <h4 class="font-13 text-muted text-uppercase">About This Page :</h4>
-            <p class="mb-3">
-                The page shows the details for a single <%FriendlyObjectName%>.
-            </p>
-    
-            <h4 class="font-13 text-muted text-uppercase mb-1">Edit :</h4>
-            <p class="mb-3">Edit the information by clicking the button "Edit"</p>
-    
-            <h4 class="font-13 text-muted text-uppercase mb-1">Add :</h4>
-            <p class="mb-3">Add a new <%FriendlyObjectName%> by clicking the button "Create"</p>
-    
-            <h4 class="font-13 text-muted text-uppercase mb-1">Return :</h4>
-            <p class="mb-3"> Return the list of <%FriendlyObjectsName%> by clicking the link above.</p>
-    
+<h4 class="font-13 text-muted text-uppercase">About This Page :</h4>
+<p class="mb-3">
+	The page shows the details for a single <%FriendlyObjectName%>.
+</p>
 
-    
+<h4 class="font-13 text-muted text-uppercase mb-1">Edit :</h4>
+<p class="mb-3">Edit the information by clicking the button "Edit"</p>
+
+<h4 class="font-13 text-muted text-uppercase mb-1">Add :</h4>
+<p class="mb-3">Add a new <%FriendlyObjectName%> by clicking the button "Create"</p>
+
+<h4 class="font-13 text-muted text-uppercase mb-1">Return :</h4>
+<p class="mb-3"> Return the list of <%FriendlyObjectsName%> by clicking the link above.</p>
+
+
+
 		<%})
 	})
-	
+
 	(function MainPanelTitle
 	{
 		(returnex{%>
@@ -157,53 +156,53 @@
 	(function MainPanelTitleOptions
 	{
 		(returnex{%>
-            <div class="btn-toolbar">
-                <%CommandButtons%>
-            </div>
+<div class="btn-toolbar">
+	<%CommandButtons%>
+</div>
         <%})
 	})
-	
+
 	(function Breadcrumbs
 	{
 		(returnex{%>
-			<ol class="breadcrumb m-0">
-				<li  class="breadcrumb-item"><a href="/">Main</a></li>
-				<%ifneq (Metadata.ObjectsUrl) ""{%>
-				<li  class="breadcrumb-item"><a onclick="OnObjectsTitleClick()" href="#"><%FriendlyObjectsName%></a></li>
-				<%}%>
-				<li  class="breadcrumb-item">
-					<%if (Metadata.ContainsKey NaturalKey){%>
-                        <%if (DoesObjectExist){%>
-                            <%declare oObj (Object)%>
-                            <%oObj.get (Metadata.NaturalKey)%>
-                        <%}%>
-					<%}{%>
-						<%FriendlyObjectName%> # <%ObjectID%>
-					<%}%>
-				</li>
-			</ol>
+<ol class="breadcrumb m-0">
+	<li class="breadcrumb-item"><a href="/">Main</a></li>
+	<%ifneq (Metadata.ObjectsUrl) ""{%>
+	<li class="breadcrumb-item"><a onclick="OnObjectsTitleClick()" href="#"><%FriendlyObjectsName%></a></li>
+	<%}%>
+	<li class="breadcrumb-item">
+		<%if (Metadata.ContainsKey NaturalKey){%>
+		<%if (DoesObjectExist){%>
+		<%declare oObj (Object)%>
+		<%oObj.get (Metadata.NaturalKey)%>
+		<%}%>
+		<%}{%>
+		<%FriendlyObjectName%> # <%ObjectID%>
+		<%}%>
+	</li>
+</ol>
 
-			<script type="text/javascript">
+<script type="text/javascript">
 				function OnObjectsTitleClick() {
 					var oValues = new LocalStorage().get("<%FriendlyObjectsName%>/<%ObjectsName%>Grid")
 					if (oValues)
 						Page.Redirect("<%ObjectsUrl%>" + "#search");
 					else
 						Page.Redirect("<%ObjectsUrl%>");
-				}  
-			</script>
+				}
+</script>
 		<%})
-	})	
-	
+	})
+
 	(function MainPanelTabs
 	{
 		(returnex{%>
-		<ul class="nav nav-tabs">
-			<li class="nav-item"><a href="<%DetailsUrl%>?<%ObjectName%>ID=<%ObjectID%>" class="nav-link active"><%FriendlyObjectName%></a></li>
-		</ul>	
+<ul class="nav nav-tabs">
+	<li class="nav-item"><a href="<%DetailsUrl%>?<%ObjectName%>ID=<%ObjectID%>" class="nav-link active"><%FriendlyObjectName%></a></li>
+</ul>
 		<%})
 	})
-	
+
 	(function MainPanelColor
 	{
 		(return (Metadata.GetStringOrDefault MainPanelColor bg-primary))
@@ -212,56 +211,56 @@
 	(function MainPanelContent
 	{
 		(returnex{%>
-		
+
             <%if (DoesObjectExist){%>
-		<div class="hidden alert alert-info" id="divInlineWarning">		
-		</div>
-			    <div class="row">
-				    <div class="col-12">
-<div class="card shadow-sm">
-
-    <!-- unified header: title on the left, tabs (if any) on the right -->
-    <div class="card-header <%MainPanelColor%> px-3 py-2">
-        <div class="d-flex justify-content-between align-items-end">
-
-            <!-- object title -->
-            <h4 class="mb-0 text-white"><%ObjectTitle%></h4>
-
-            <!-- optional tab strip -->
-            <%ifneq (MainPanelTabs) ""{%>
-            <ul class="nav nav-tabs card-header-tabs">
-                <%MainPanelTabs%>
-            </ul>
-            <%}%>
-
-        </div>
-    </div>
-
-    <!-- body -->
-    <div class="card-body">
-        <div class="row">
-            <%DetailsPanel%>
-        </div>
-    </div>
-
-    <!-- footer with command buttons -->
-    <div class="card-footer bg-transparent text-center">
-        <%CommandButtons%>
-    </div>
+<div class="hidden alert alert-info" id="divInlineWarning">
 </div>
+<div class="row">
+	<div class="col-12">
+		<div class="card shadow-sm">
 
-						<%DetailsTabs%>                                                
-			        </div>
+			<!-- unified header: title on the left, tabs (if any) on the right -->
+			<div class="card-header <%MainPanelColor%> px-3 py-2">
+				<div class="d-flex justify-content-between align-items-end">
 
-					<%GetQuickHelpControls (QuickHelp) (AllowEditQuickHelp)%>
-                </div>
+					<!-- object title -->
+					<h4 class="mb-0 text-white"><%ObjectTitle%></h4>
+
+					<!-- optional tab strip -->
+					<%ifneq (MainPanelTabs) ""{%>
+					<ul class="nav nav-tabs card-header-tabs">
+						<%MainPanelTabs%>
+					</ul>
+					<%}%>
+
+				</div>
+			</div>
+
+			<!-- body -->
+			<div class="card-body">
+				<div class="row">
+					<%DetailsPanel%>
+				</div>
+			</div>
+
+			<!-- footer with command buttons -->
+			<div class="card-footer bg-transparent text-center">
+				<%CommandButtons%>
+			</div>
+		</div>
+
+		<%DetailsTabs%>
+	</div>
+
+	<%GetQuickHelpControls (QuickHelp) (AllowEditQuickHelp)%>
+</div>
             <%}{%>
                 <%FriendlyObjectName%> does not exist
             <%}%>
 		<%})
 	})
 
-	(function AllowEditQuickHelp { (return (UserState.Permission.AllowEditQuickHelp)) })
+	(function AllowEditQuickHelp { (return (UserState.Permission?.AllowEditQuickHelp)) })
 	(declare AllowDuplicate (Application.AllowDuplicate))
     (declare AllowDelete false)
     (declare AllowIterators true)
@@ -289,10 +288,10 @@
 
             <%if (AllowIterators){%>
 <span class="spanIteratorControls">
-<button style="margin-left: 20px;" value="" onclick="OnPrevious()" class="btn btn-light waves-effect waves-light m-1"><i class="fa fa-backward"></i> Previous<%ifnot (UseShortButtonNames) {%>  <%FriendlyObjectName%><%}%></button>
+	<button style="margin-left: 20px;" value="" onclick="OnPrevious()" class="btn btn-light waves-effect waves-light m-1"><i class="fa fa-backward"></i> Previous<%ifnot (UseShortButtonNames) {%>  <%FriendlyObjectName%><%}%></button>
 	<span class="spanIterator" style="vertical-align:middle;"></span>
-<button value="" onclick="OnNext()" class="btn btn-light waves-effect waves-light m-1"><i class="fa fa-forward"></i> Next<%ifnot (UseShortButtonNames) {%>  <%FriendlyObjectName%><%}%></button>
-	</span>
+	<button value="" onclick="OnNext()" class="btn btn-light waves-effect waves-light m-1"><i class="fa fa-forward"></i> Next<%ifnot (UseShortButtonNames) {%>  <%FriendlyObjectName%><%}%></button>
+</span>
             <%}%>
 
 		<%})
@@ -302,8 +301,8 @@
 	{
 		(return "")
 	})
-	
-	
+
+
 	(function AdditionalScripts
 	{
 		(return "")
@@ -312,22 +311,22 @@
 	(function JsObjectInitializers
 	{
 		(returnex{%>
-			<script language="javascript" type="text/javascript">
+<script language="javascript" type="text/javascript">
 				var i<%ObjectName%>ID = Page.QueryString().GetValue("<%ObjectName%>ID");
 				var iObjectID = i<%ObjectName%>ID;
 				var ObjectName = "<%ObjectName%>";
 				var ObjectsName = "<%ObjectsName%>";
 				var strUserName = "<%UserState.UserName%>";
-			</script>
+</script>
 		<%})
 	})
 
 	(function LeaseInitializer
 	{
 		(returnex{%>
-			<script type="text/javascript" src="/JsonWs/<%Application.LeasesClass%>.ashx.js?v=<%JsVersion%>"></script>
+<script type="text/javascript" src="/JsonWs/<%Application.LeasesClass%>.ashx.js?v=<%JsVersion%>"></script>
 
-			<script type="text/javascript">
+<script type="text/javascript">
 				Page.AddOnload(function () {
 
 					Leases.AquireLease(strUserName, ObjectName, iObjectID, "View", function (leases) {
@@ -350,7 +349,7 @@
 					_$("divInlineWarning").appendChild(oDiv);
 					_$("divInlineWarning").removeClass("hidden");
 				}
-			</script>
+</script>
 		<%})
 	})
 
@@ -358,7 +357,7 @@
 	{
 		(returnex{%>
 
-                <script type="text/javascript">
+<script type="text/javascript">
                     Page.AddOnload(function () {
 
                         var oRecent = new LocalStorage().get("<%ObjectsName%>");
@@ -390,18 +389,18 @@
 						if (!GridIterators.OnNextIterator(ObjectsName))
 							UserMessages.DisplayNow("End of list", "Info");
 					}
-                </script>
+</script>
 		<%})
 	})
 
 	(function TabInitializer
 	{
 		(returnex{%>
-		<script type="text/javascript">
+<script type="text/javascript">
 
 			if (!Page.Tabs) {
 				Page.Tabs={};
-			}; 
+			};
 
 			function SaveTab(id)
 			{
@@ -440,7 +439,7 @@
 						bActivated=true;
 
 						SaveTab(activeId);
-					}					
+					}
 				}*/
 
 				if (!bActivated){
@@ -451,15 +450,15 @@
 				}
 			})
 
-		</script>
+</script>
 		<%})
 	})
-	
+
 	(function BottomScripts
 	{
 		(returnex{%>
             <%if (DoesObjectExist){%>
-                <script type="text/javascript" src="/JsonWs/<%Metadata.BusinessNamespace%>.<%ObjectsName%>.ashx.js?v=<%JsVersion%>"></script>
+<script type="text/javascript" src="/JsonWs/<%Metadata.BusinessNamespace%>.<%ObjectsName%>.ashx.js?v=<%JsVersion%>"></script>
 
 
                 <%JsObjectInitializers%>
@@ -467,7 +466,7 @@
 				<%if (Application.EnableLeases) { (LeaseInitializer) }%>
 				<%TabInitializer%>
 
-                <script language="javascript" type="text/javascript">
+<script language="javascript" type="text/javascript">
 				    function OnEdit() {
 					    Page.Redirect("<%EditUrl%>", { <%ObjectName%>ID: i<%ObjectName%>ID });
 				    }
@@ -500,11 +499,11 @@
 						oDiv.parentElement.children[0].className = "col-8";
 					}
 
-                </script>
+</script>
 
 			    <%AdditionalScripts%>
             <%}%>
-				
+
 		<%})
 	})
 
@@ -539,42 +538,42 @@
 			<%if (Options.AllowSearch){%>
 <!---- search / action bar – neatly wrapped and styled -->
 <div class="pb-1 mb-1">
-    <div class="row g-2 align-items-center">
+	<div class="row g-2 align-items-center">
 
-        <!-- search box with icon -->
-        <div class="col-lg-6">
-            <div class="input-group">
-                <span class="input-group-text bg-white">
-                    <i class="fa fa-search text-muted"></i>
-                </span>
-                <input type="text"
-                       class="form-control"
-                       placeholder="Search <%Options.RelatedObjectsFriendlyName%>..."
-                       id="txt<%Options.RelatedObjectsName%>Search"/>
-            </div>
-        </div>
+		<!-- search box with icon -->
+		<div class="col-lg-6">
+			<div class="input-group">
+				<span class="input-group-text bg-white">
+					<i class="fa fa-search text-muted"></i>
+				</span>
+				<input type="text"
+					   class="form-control"
+					   placeholder="Search <%Options.RelatedObjectsFriendlyName%>..."
+					   id="txt<%Options.RelatedObjectsName%>Search" />
+			</div>
+		</div>
 
-        <!-- right-aligned buttons (if any) -->
-        <div class="col-lg-6 text-lg-end">
-            <%Options.Insert%>
-        </div>
-    </div>
+		<!-- right-aligned buttons (if any) -->
+		<div class="col-lg-6 text-lg-end">
+			<%Options.Insert%>
+		</div>
+	</div>
 </div>
 		<%}%>
 
 <!---- data zone – your grid will be injected here by JS -->
 <div class="table-responsive" id="div<%Options.RelatedObjectsName%>">
-    Loading…
+	Loading…
 </div>
 
 <!---- prettier empty state -->
 <div id="div<%Options.RelatedObjectsName%>Empty"
-     class="EmptyDataTemplate Hidden mt-3">
-    <div class="card border-0">
-        <div class="card-body text-center text-dark py-4">
-            No <%Options.RelatedObjectsFriendlyName%> found.
-        </div>
-    </div>
+	 class="EmptyDataTemplate Hidden mt-3">
+	<div class="card border-0">
+		<div class="card-body text-center text-dark py-4">
+			No <%Options.RelatedObjectsFriendlyName%> found.
+		</div>
+	</div>
 </div>
 
 		<%})
@@ -590,55 +589,55 @@
 			<%ifneq (oTabs.length) 0{%>
 <!-- kScript-driven tab card (Bootstrap 5) -->
 <style>
-    /* give the whole header a dark background */
-    .card-header.bg-dark {
-        background-color: #212529;   /* Bootstrap’s $dark */
-    }
+	/* give the whole header a dark background */
+	.card-header.bg-dark {
+		background-color: #212529; /* Bootstrap’s $dark */
+	}
 
-    /* brighter text for inactive tabs, but keep borders invisible */
-    .nav-tabs-dark .nav-link:not(.active) {
-        color: rgba(255,255,255,.8);      /* visible on dark bg */
-        border-color: transparent;        /* keep the “tab” look */
-    }
+	/* brighter text for inactive tabs, but keep borders invisible */
+	.nav-tabs-dark .nav-link:not(.active) {
+		color: rgba(255,255,255,.8); /* visible on dark bg */
+		border-color: transparent; /* keep the “tab” look */
+	}
 
-    .nav-tabs-dark .nav-link:not(.active):hover,
-    .nav-tabs-dark .nav-link:not(.active):focus {
-        color: #fff;                     /* full-white on hover */
-    }
+		.nav-tabs-dark .nav-link:not(.active):hover,
+		.nav-tabs-dark .nav-link:not(.active):focus {
+			color: #fff; /* full-white on hover */
+		}
 </style>
 <div class="card shadow-sm bg-white">
 
-    <!-- header: white background + wrap-able tab bar -->
-    <div class="card-header bg-primary px-3 pt-1 border-0">
+	<!-- header: white background + wrap-able tab bar -->
+	<div class="card-header bg-primary px-3 pt-1 border-0">
 
-        <ul id="divBottomTabs"
-            class="nav nav-tabs nav-tabs-dark card-header-tabs flex-wrap gap-1"
-            role="tablist">
+		<ul id="divBottomTabs"
+			class="nav nav-tabs nav-tabs-dark card-header-tabs flex-wrap gap-1"
+			role="tablist">
 
-            <%oTabs.each oTab{%>
-            <li class="nav-item" id="li-<%oTab.ControlID%>" role="presentation">
-                <a href="#<%oTab.ControlID%>"
-                   data-bs-toggle="tab"
-                   onclick="SaveTab('<%oTab.ControlID%>')"
-                   class="nav-link px-2 <%if (oTab.contains bActive) active%>">
-                    <%oTab.Title%>
-                </a>
-            </li>
-            <%}%>
+			<%oTabs.each oTab{%>
+			<li class="nav-item" id="li-<%oTab.ControlID%>" role="presentation">
+				<a href="#<%oTab.ControlID%>"
+				   data-bs-toggle="tab"
+				   onclick="SaveTab('<%oTab.ControlID%>')"
+				   class="nav-link px-2 <%if (oTab.contains bActive) active%>">
+					<%oTab.Title%>
+				</a>
+			</li>
+			<%}%>
 
-        </ul>
-    </div>
+		</ul>
+	</div>
 
-    <!-- tab-pane container -->
-    <div class="card-body tab-content px-2">
-        <%oTabs.each oTab{%>
-        <div id="<%oTab.ControlID%>"
-             class="tab-pane fade <%if (oTab.contains bActive){%>show active<%}%>"
-             role="tabpanel">
-            <%oTab.Content%>
-        </div>
-        <%}%>
-    </div> <!-- /.card-body -->
+	<!-- tab-pane container -->
+	<div class="card-body tab-content px-2">
+		<%oTabs.each oTab{%>
+		<div id="<%oTab.ControlID%>"
+			 class="tab-pane fade <%if (oTab.contains bActive){%>show active<%}%>"
+			 role="tabpanel">
+			<%oTab.Content%>
+		</div>
+		<%}%>
+	</div> <!-- /.card-body -->
 
 </div>
 
@@ -653,20 +652,20 @@
 		})
 
 		(returnex{%>
-		<div class="tab-container tab-success tabs-padding" >
-				<ul class="nav nav-tabs" role="tablist">
-					<%oTabs.each oTab{%>
-					<li class="nav-item" id="li-<%oTab.ControlID%>" role="tab"><a href="#<%oTab.ControlID%>" data-bs-toggle="tab" class="nav-link <%if (oTab.contains bActive) active%>" onclick="SaveTab('<%oTab.ControlID%>')"><%oTab.Title%></a></li>
-					<%}%>
-				</ul>
-				<div class="tab-content card-body">	
-					<%oTabs.each oTab{%>	
-						<div class="tab-pane <%if (oTab.contains bActive) active%>" id="<%oTab.ControlID%>" role="tabpanel">		
-						<%oTab.Content%>
-						</div>
-					<%}%>
-				</div>
-			</div>
+<div class="tab-container tab-success tabs-padding">
+	<ul class="nav nav-tabs" role="tablist">
+		<%oTabs.each oTab{%>
+		<li class="nav-item" id="li-<%oTab.ControlID%>" role="tab"><a href="#<%oTab.ControlID%>" data-bs-toggle="tab" class="nav-link <%if (oTab.contains bActive) active%>" onclick="SaveTab('<%oTab.ControlID%>')"><%oTab.Title%></a></li>
+		<%}%>
+	</ul>
+	<div class="tab-content card-body">
+		<%oTabs.each oTab{%>
+		<div class="tab-pane <%if (oTab.contains bActive) active%>" id="<%oTab.ControlID%>" role="tabpanel">
+			<%oTab.Content%>
+		</div>
+		<%}%>
+	</div>
+</div>
 		<%})
 	})
 
@@ -701,9 +700,9 @@
 		{
 			(oConfig.set AllowClick true)
 		})
-			 
-		(declare oRelatedMeta (json (include (oConfig.MetaFile))))		
-			 
+
+		(declare oRelatedMeta (json (include (oConfig.MetaFile))))
+
 		(ifnot (oConfig.contains SortColumn)
 		{
 			 (oConfig.set SortColumn (concat (oRelatedMeta.ObjectName) ID))
@@ -713,10 +712,10 @@
 		{
 			(oConfig.set ExtraParams (evalex{%>{ <%oConfig.ObjectIDName%>: <%ObjectID%> }<%}))
 		})
- 
+
 
 		(returnex{%>
-			<script type="text/javascript" language="javascript">
+<script type="text/javascript" language="javascript">
 
 				function On<%RelatedObjectsName%>Click(i<%RelatedObjectsName%>ID, e, el, bCtrl) {
 					Page.Redirect("<%oRelatedMeta.DetailsUrl%>", { <%oRelatedMeta.ObjectName%>ID: i<%RelatedObjectsName%>ID }, bCtrl ? "_blank" : "_self");
@@ -754,8 +753,8 @@
 					if (ObjectUtil.HasValue(Page.Grids.<%RelatedObjectsName%>Grid)) {
 						Page.Grids.<%RelatedObjectsName%>Grid.StartRefreshing();
 					}
-				}  
-			</script>
+				}
+</script>
 
 
 		<%})
@@ -765,29 +764,29 @@
 	{
 		(returnex{%>
 
-	<div class="modal fade" id="<%options.ID%>" tabindex="-1">
-		<div class="modal-dialog modal-xl">
-			<div class="modal-content">
-						   <div class="modal-header">
-								   <h5 class="modal-title"><%options.Title%></h5>
-								   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						   </div>
+<div class="modal fade" id="<%options.ID%>" tabindex="-1">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title"><%options.Title%></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
 
-				<div class="modal-body" id="">
-					<%evalex (options.Content)%>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary m-1" onclick="<%options.SaveMethod%>">Save</button>
+			<div class="modal-body" id="">
+				<%evalex (options.Content)%>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary m-1" onclick="<%options.SaveMethod%>">Save</button>
 
-					<button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Close</button>
-				
-				</div>
+				<button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Close</button>
+
 			</div>
 		</div>
 	</div>
+</div>
 
 		<%})
 	})
 }%>
-	
+
 

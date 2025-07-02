@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RooTrax.Common;
 
-namespace Buffaly.Ontology.Portal.Pages
+namespace Portal.Pages
 {
 	public class IndexModel : PageModel
 	{

@@ -36,6 +36,9 @@
     <Reference Include="Buffaly.SemanticDB.UI">
       <HintPath>..\lib\Buffaly.SemanticDB.UI.dll</HintPath>
     </Reference>
+    <Reference Include="Buffaly.UI">
+      <HintPath>..\..\..\Buffaly.Ontology.Private\lib\Buffaly.UI.dll</HintPath>
+    </Reference>
     <Reference Include="kScript">
       <HintPath>..\lib\kScript.dll</HintPath>
     </Reference>
