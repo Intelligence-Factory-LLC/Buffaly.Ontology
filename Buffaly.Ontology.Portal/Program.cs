@@ -112,7 +112,6 @@ public class Program
 					MapAPIs(endpoints, jsonWsOptions);
 
 				});
-
 			});
 
 			app.MapRazorPages();
