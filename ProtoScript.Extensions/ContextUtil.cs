@@ -220,7 +220,7 @@ namespace ProtoScript.Extensions
 		{
 			List<Statement> lstContext = new List<Statement>();
 
-			PrototypeDefinition prototypeDefinition = file.PrototypeDefinitions.FirstOrDefault(x => x.Info.IsInside(iOffset));
+			PrototypeDefinition? prototypeDefinition = file.PrototypeDefinitions.FirstOrDefault(x => x.Info.IsInside(iOffset));
 
 			if (null != prototypeDefinition)
 			{
@@ -229,7 +229,7 @@ namespace ProtoScript.Extensions
 
 			else
 			{
-				Statement statement = file.Statements.FirstOrDefault(x => x.Info.IsInside(iOffset));
+				Statement? statement = file.Statements.FirstOrDefault(x => x.Info.IsInside(iOffset));
 				if (null != statement)
 				{
 					lstContext = GetContextAtCursor(statement, iOffset);

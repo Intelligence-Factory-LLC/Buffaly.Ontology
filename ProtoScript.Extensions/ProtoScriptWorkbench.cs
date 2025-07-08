@@ -708,7 +708,7 @@ namespace ProtoScript.Extensions
 			{
 				jsonObject["Iterations"] = session.Tagger.CurrentIterations;
 
-				Buffaly.NLU.Tagger.BaseFunctionNode node2 = session.Tagger.TaggingNode.Possibilities.OrderByDescending(x => x.Value).FirstOrDefault() as Buffaly.NLU.Tagger.BaseFunctionNode;
+				Buffaly.NLU.Tagger.BaseFunctionNode? node2 = session.Tagger.TaggingNode.Possibilities.OrderByDescending(x => x.Value).FirstOrDefault() as Buffaly.NLU.Tagger.BaseFunctionNode;
 
 				if (null != node2 && null != node2.Source)
 					jsonObject["CurrentInterpretation"] = PrototypeLogging.ToFriendlyString(node2.Source).ToString();

@@ -57,7 +57,7 @@ namespace Buffaly.NLU.Tagger
 		public ControllerNode AddPossibility(ControllerNode node)
 		{
 			//TODO: Implement EqualTo for the BaseNode
-			ControllerNode nodeExisting = this.Possibilities.FirstOrDefault(x => x == node);
+ControllerNode? nodeExisting = this.Possibilities.FirstOrDefault(x => x == node);
 			if (null == nodeExisting)
 			{
 				this.Possibilities.Add(node);
@@ -127,7 +127,7 @@ namespace Buffaly.NLU.Tagger
 		public ControllerNode SelectNextPossibility()
 		{
 			//no random
-			ControllerNode node = this.Possibilities.OrderByDescending(x => x.CurrentValue).FirstOrDefault();
+ControllerNode? node = this.Possibilities.OrderByDescending(x => x.CurrentValue).FirstOrDefault();
 			if (node == null)
 				return null;
 
