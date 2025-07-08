@@ -112,7 +112,7 @@ Collection collection = sequence.GetChildren();		//this calls the GetChildren me
 
 ";
 
-			ProtoScript.File file = context.Compiler.Files.FirstOrDefault(x => StringUtil.EqualNoCase(x.Info.FullName, context.ProtoScriptFile.FileName));
+			ProtoScript.File? file = context.Compiler.Files.FirstOrDefault(x => StringUtil.EqualNoCase(x.Info.FullName, context.ProtoScriptFile.FileName));
 			if (null == file)
 			{
 				Logs.DebugLog.WriteEvent("Compiled File Not Found", context.ProtoScriptFile.FileName);

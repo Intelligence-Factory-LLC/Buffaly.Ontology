@@ -93,7 +93,7 @@ namespace Buffaly.NLU
 			if (null == lexeme || lexeme.LexemePrototypes.Count == 0)
 				return null;
 
-			Prototype protoRelated = lexeme.LexemePrototypes.FirstOrDefault(x => Prototypes.TypeOf(x.Key, "BaseObject")).Key;
+			Prototype? protoRelated = lexeme.LexemePrototypes.FirstOrDefault(x => Prototypes.TypeOf(x.Key, "BaseObject")).Key;
 
 			if (null == protoRelated)
 				protoRelated = lexeme.LexemePrototypes.FirstOrDefault(x => Prototypes.TypeOf(x.Key, "Token")).Key;
@@ -115,7 +115,7 @@ namespace Buffaly.NLU
 		//>Consolidate the two previous methods by extracting a common third method taking rowLexeme
 		public static Prototype GetRelatedEntityAsObjectOrTokenOrDefault(TemporaryLexeme rowLexeme)
 		{
-			Prototype protoRelated = rowLexeme.LexemePrototypes.FirstOrDefault(x => Prototypes.TypeOf(x.Key, "BaseObject")).Key;
+			Prototype? protoRelated = rowLexeme.LexemePrototypes.FirstOrDefault(x => Prototypes.TypeOf(x.Key, "BaseObject")).Key;
 
 			if (null == protoRelated)
 				protoRelated = rowLexeme.LexemePrototypes.FirstOrDefault(x => Prototypes.TypeOf(x.Key, "Token")).Key;

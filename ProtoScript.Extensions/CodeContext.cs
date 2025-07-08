@@ -82,7 +82,7 @@ namespace ProtoScript.Extensions
 			//symbols.EnterScope(this.CSharpFile.Scope);
 			List<ProtoScript.Statement> lstStatements = new List<Statement>();
 
-			ProtoScript.File file = this.Compiler.Files.FirstOrDefault(x => StringUtil.EqualNoCase(x.Info.FullName, this.ProtoScriptFile.FileName));
+			ProtoScript.File? file = this.Compiler.Files.FirstOrDefault(x => StringUtil.EqualNoCase(x.Info.FullName, this.ProtoScriptFile.FileName));
 			if (null == file)
 			{
 				Logs.DebugLog.WriteEvent("Compiled File Not Found", this.ProtoScriptFile.FileName);
