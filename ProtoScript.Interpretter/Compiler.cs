@@ -1124,14 +1124,16 @@ throw;
 					FieldTypeInfo infoField = GetFieldInfo(prototypeTypeInfo, strPropertyName);
 					if (null != infoField)
 					{
-						return new PrototypeFieldReference()
-						{
-							Left = compiledLeft,
-							Right = new GetGlobalStack() { Index = infoField.Index, InferredType = infoField.FieldInfo, Info = op.Right.Info },
-							InferredType = infoField.FieldInfo,
-							FieldInfo = infoField,
-							Info = op.Info
-						};
+PrototypeFieldReference res = new PrototypeFieldReference()
+{
+Left = compiledLeft,
+Right = new GetGlobalStack() { Index = infoField.Index, InferredType = infoField.FieldInfo, Info = op.Right.Info },
+InferredType = infoField.FieldInfo,
+FieldInfo = infoField,
+Info = op.Info
+};
+res.IsNullConditional = op.Value == "?.";
+return res;
 					}
 
 
@@ -1190,9 +1192,15 @@ throw;
 				Compiled.Expression objCur = compiledLeft;
 				//Try as a .NET property 
 				{
-					Compiled.Expression ? memberInfo = GetDotNetMemberReference(op.Info, strPropertyName, objCur);
-					if (null != memberInfo)
-						return memberInfo;
+Compiled.Expression ? memberInfo = GetDotNetMemberReference(op.Info, strPropertyName, objCur);
+if (null != memberInfo)
+{
+if (memberInfo is DotNetFieldReference df)
+df.IsNullConditional = op.Value == "?.";
+else if (memberInfo is DotNetPropertyReference dp)
+dp.IsNullConditional = op.Value == "?.";
+return memberInfo;
+}
 				}
 
 				this.AddDiagnostic(new Diagnostic($"Could not find property {strPropertyName}"), null, op);
@@ -1200,9 +1208,10 @@ throw;
 			}
 			else if (op.Right is MethodEvaluation)
 			{
-				Compiled.Expression compiledRight = CompileMethodEvaluationInternal(op.Right as MethodEvaluation, compiledLeft);
-
-				return compiledRight;
+Compiled.Expression compiledRight = CompileMethodEvaluationInternal(op.Right as MethodEvaluation, compiledLeft);
+if (compiledRight is DotNetMethodEvaluation dme)
+dme.IsNullConditional = op.Value == "?.";
+return compiledRight;
 			}
 			else if (op.Right is BinaryOperator && (op.Right as BinaryOperator).Value == ".")
 			{
