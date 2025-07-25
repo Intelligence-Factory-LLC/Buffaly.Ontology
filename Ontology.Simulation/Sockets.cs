@@ -33,7 +33,7 @@
 
 		public void Respond(int iMessageID, Prototype prototype)
 		{
-			Message message = null;
+			Message? message = null;
 
 			lock (m_Lock)
 			{

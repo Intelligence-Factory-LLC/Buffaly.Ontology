@@ -112,7 +112,7 @@ namespace ProtoScript.Interpretter
 			PrototypeTypeInfo ? prototypeTypeInfo = GetPrototypeTypeInfo(prototype);
 			if (null != prototypeTypeInfo)
 			{
-				FunctionRuntimeInfo functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
+FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
 				return functionRuntimeInfo;
 			}
 
@@ -126,7 +126,7 @@ namespace ProtoScript.Interpretter
 			PrototypeTypeInfo? prototypeTypeInfo = GetPrototypeTypeInfo(prototype);
 			if (null != prototypeTypeInfo)
 			{
-				FunctionRuntimeInfo functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
+FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
 				if (null != functionRuntimeInfo)
 				{
 					RunConstructor(functionRuntimeInfo, new List<Compiled.Expression>(), protoThis);
@@ -322,7 +322,7 @@ namespace ProtoScript.Interpretter
 
 				if (null != statement.Info)
 				{
-					File file = this.Compiler.Files.FirstOrDefault(x => x.Info?.FullName == statement.Info?.File);
+File? file = this.Compiler.Files.FirstOrDefault(x => x.Info?.FullName == statement.Info?.File);
 					if (null != file)
 					{
 						string strStatement = file.RawCode.Substring(statement.Info.StartingOffset, statement.Info.Length);
