@@ -66,7 +66,7 @@ namespace Ontology.Tests
 		{
 			ProtoScriptTagger tagger = GetProjectSmallTagger();
 
-			string strCode = "D51.9";
+			string strCode = "I10";
 
 			Prototype ? protoCode = tagger.Interpretter.RunMethodAsPrototype(null, "GetICDCodeByCode", new List<object> { strCode });
 			if (null != protoCode)

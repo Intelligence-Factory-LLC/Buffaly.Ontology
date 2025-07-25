@@ -677,6 +677,9 @@ namespace ProtoScript.Extensions
 				result.Error = err.Message;
 			}
 
+			//Temporary until we fix AsyncLocal issues with the cache
+			result.ResultPrototype = null;
+
 			return result;
 		}
 
