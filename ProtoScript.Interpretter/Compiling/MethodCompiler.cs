@@ -166,12 +166,13 @@ namespace ProtoScript.Interpretter.Compiling
 
 
 
-					DotNetMethodEvaluation dotNetMethodEval = new DotNetMethodEvaluation();
-					dotNetMethodEval.Info = methodEval.Info;
-					dotNetMethodEval.Method = method;
-					dotNetMethodEval.Parameters = lstParameters;
-					dotNetMethodEval.Object = expression;
-					dotNetMethodEval.InferredType = new TypeInfo(method.ReturnType);
+DotNetMethodEvaluation dotNetMethodEval = new DotNetMethodEvaluation();
+dotNetMethodEval.Info = methodEval.Info;
+dotNetMethodEval.Method = method;
+dotNetMethodEval.Parameters = lstParameters;
+dotNetMethodEval.Object = expression;
+dotNetMethodEval.InferredType = new TypeInfo(method.ReturnType);
+dotNetMethodEval.IsNullConditional = methodEval.IsNullConditional;
 
 					return dotNetMethodEval;
 				}

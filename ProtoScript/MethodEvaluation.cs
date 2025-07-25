@@ -2,10 +2,11 @@
 
 namespace ProtoScript
 {
-	public class MethodEvaluation : Expression
-	{
-		public string MethodName;
-		public List<Expression> Parameters = new List<Expression>();
+public class MethodEvaluation : Expression
+{
+public string MethodName;
+public List<Expression> Parameters = new List<Expression>();
+public bool IsNullConditional;
 
 		public MethodEvaluation()
 		{

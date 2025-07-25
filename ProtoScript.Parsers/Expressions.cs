@@ -377,7 +377,7 @@ throw;
 					//N20220428-01
 					ProtoScript.Identifier identifier = ProtoScript.Parsers.Identifiers.ParseAsIdentifier(tok);
 
-					if (tok.peekNextToken() == ".")
+					if (tok.peekNextToken() == "." || tok.peekNextToken() == "?.")
 						return ParseDotOperators(tok, identifier);
 
 //					ProtoScript.Identifier identifier = new ProtoScript.Identifier(ProtoScript.Parsers.Identifiers.ParseMultiple(tok));
@@ -387,57 +387,53 @@ throw;
 			throw new ProtoScriptParsingException("Unable to parse term");
 		}
 
-		static public Expression ParseDotOperators(Parsers.Tokenizer tok, Expression termLeft)
-		{
-			List<Expression> terms = new List<Expression>() { termLeft };
+static public Expression ParseDotOperators(Parsers.Tokenizer tok, Expression termLeft)
+{
+List<Expression> terms = new List<Expression>() { termLeft };
+List<string> ops = new List<string>();
 
-			int iCursor = tok.getCursor();
-			
+int iCursor = tok.getCursor();
 
-			do
-			{
-				tok.MustBeNext(".");
+do
+{
+string tokDot = tok.getNextToken();
+if (tokDot != "." && tokDot != "?.")
+throw new ProtoScriptParsingException(tok.getString(), tok.getCursor(), ". or ?.");
+ops.Add(tokDot);
 
+int iStart = tok.getCursor();
+Identifier identifier = Identifiers.ParseAsIdentifier(tok);
 
-				{
-					int iStart = tok.getCursor();
+if (tok.peekNextToken() == "(" || tok.peekNextToken() == "<")
+{
+tok.setCursor(iStart);
+terms.Add(MethodEvaluations.Parse(tok));
+}
+else
+{
+terms.Add(identifier);
+}
 
-					Identifier identifier = Identifiers.ParseAsIdentifier(tok);
+if (tok.peekNextToken() == "[")
+{
+tok.MustBeNext("[");
+IndexOperator opIndex = new IndexOperator();
+//Only allow one parameter (no [1, 3] )
+opIndex.Right = ProtoScript.Parsers.Expressions.Parse(tok);
+tok.MustBeNext("]");
+terms.Add(opIndex);
+}
 
-					if (tok.peekNextToken() == "(" || tok.peekNextToken() == "<")
-					{
-						tok.setCursor(iStart);
-						terms.Add(MethodEvaluations.Parse(tok));
-					}
+}
+while (tok.peekNextToken() == "." || tok.peekNextToken() == "?.");
 
-					else
-					{
-						terms.Add(identifier);
-					}
-				}
-
-				if (tok.peekNextToken() == "[")
-				{
-					tok.MustBeNext("[");
-					IndexOperator opIndex = new IndexOperator();
-
-					//Only allow one parameter (no [1, 3] )
-					opIndex.Right = ProtoScript.Parsers.Expressions.Parse(tok);
-
-					tok.MustBeNext("]");
-
-					terms.Add(opIndex);
-				}
-				
-			}
-			while (tok.peekNextToken() == ".");
-
-			BinaryOperator op = new BinaryOperator(".");
+                        BinaryOperator op = new BinaryOperator(ops[0]);
 			op.Info.StartStatement(iCursor);
 			op.Info.File = Files.CurrentFile;
 			op.Info.StopStatement(tok.getCursor());
 			
-			for (int i = 0; i < terms.Count; i++)
+                        int iOp = 1;
+                        for (int i = 0; i < terms.Count; i++)
 			{
 				Expression term = terms[i];
 
@@ -457,7 +453,7 @@ throw;
 
 				else
 				{
-					BinaryOperator opNew = new BinaryOperator(".");
+BinaryOperator opNew = new BinaryOperator(ops[iOp++]);
 					opNew.Info = op.Info;
 					opNew.Left = op;
 					opNew.Right = term;

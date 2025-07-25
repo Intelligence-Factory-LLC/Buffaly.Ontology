@@ -1243,10 +1243,17 @@ throw;
 			throw new RuntimeException("Cannot assign value", statementParsingInfo);
 		}
 	
-		public object Evaluate(PrototypeFieldReference exp)
-		{
-			object oLeft = Evaluate(exp.Left);
-			object oRight = Evaluate(exp.Right);
+               public object Evaluate(PrototypeFieldReference exp)
+               {
+                       object oLeft = Evaluate(exp.Left);
+                       if (exp.IsNullConditional)
+                       {
+                               if (oLeft is ValueRuntimeInfo val)
+                                       oLeft = val.Value;
+                               if (oLeft == null)
+                                       return null;
+                       }
+                       object oRight = Evaluate(exp.Right);
 
 			Prototype prototype = GetAsPrototype(oLeft);
 
@@ -1785,21 +1792,35 @@ throw;
 			return null;
 		}
 
-		public object Evaluate(DotNetFieldReference exp)
-		{
-			object obj = Evaluate(exp.Object);
-			if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
-			else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
+public object Evaluate(DotNetFieldReference exp)
+{
+object obj = Evaluate(exp.Object);
+if (exp.IsNullConditional)
+{
+if (obj is ValueRuntimeInfo val)
+obj = val.Value;
+if (obj == null)
+return null;
+}
+if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
+else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
 
 			var getter = ReflectionCache.GetGetter(exp.Field);   // cached delegate
 			return getter(obj);                                  // no reflection
 		}
 
-		public object Evaluate(DotNetPropertyReference exp)
-		{
-			object obj = Evaluate(exp.Object);
-			if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
-			else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
+public object Evaluate(DotNetPropertyReference exp)
+{
+object obj = Evaluate(exp.Object);
+if (exp.IsNullConditional)
+{
+if (obj is ValueRuntimeInfo val)
+obj = val.Value;
+if (obj == null)
+return null;
+}
+if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
+else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
 
 			var getter = ReflectionCache.GetGetter(exp.Property); // cached delegate
 			return getter(obj);
@@ -1807,14 +1828,36 @@ throw;
 
 		virtual public object Evaluate(DotNetMethodEvaluation exp)
 		{
-			int iParamCount = exp.Parameters.Count;
-			List<object> lstParameters = new List<object>(iParamCount);
+int iParamCount = exp.Parameters.Count;
+List<object> lstParameters = new List<object>(iParamCount);
 
-			System.Reflection.ParameterInfo[] infoParams = exp.Method.GetParameters();
+System.Reflection.ParameterInfo[] infoParams = exp.Method.GetParameters();
 
-			for (int i = 0; i < iParamCount; i++)
-			{
-				Compiled.Expression expParam = exp.Parameters[i];
+bool bSaved = AllowLazyPropertyInitialization;
+object obj;
+try
+{
+AllowLazyPropertyInitialization = true;
+obj = Evaluate(exp.Object);
+}
+finally
+{
+AllowLazyPropertyInitialization = bSaved;
+}
+
+if (exp.IsNullConditional)
+{
+if (obj is ValueRuntimeInfo val)
+obj = val.Value;
+else if (obj is PrototypeTypeInfo pti)
+obj = pti.Prototype;
+if (obj == null && !exp.Method.IsStatic)
+return null;
+}
+
+for (int i = 0; i < iParamCount; i++)
+{
+Compiled.Expression expParam = exp.Parameters[i];
 
 				if (expParam is LambdaOperator lambdaOperator)
 				{
@@ -1839,25 +1882,10 @@ throw;
 				
 				}
 			}
-
-			//We are calling a .NET method, therefore we have to force lazy initialization 
-			bool bSaved = AllowLazyPropertyInitialization;
-			object obj;
-			try
-			{
-				AllowLazyPropertyInitialization = true;
-				obj = Evaluate(exp.Object);
-			}
-			finally
-			{ 
-				AllowLazyPropertyInitialization = bSaved; 
-			}
-
-			if (obj is ValueRuntimeInfo valueRuntimeInfo1)
+				if (obj is ValueRuntimeInfo valueRuntimeInfo1)
 				obj = valueRuntimeInfo1.Value;
-			else if (obj is PrototypeTypeInfo prototypeTypeInfo)
+				else if (obj is PrototypeTypeInfo prototypeTypeInfo)
 				obj = prototypeTypeInfo.Prototype;
-
 
 			if (null == obj && !exp.Method.IsStatic)
 			{

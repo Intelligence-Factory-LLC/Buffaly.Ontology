@@ -144,7 +144,7 @@ namespace ProtoScript.Parsers
 			else
 			{
 				ToString(op.Left);
-				if (op.Value == ".")
+if (op.Value == "." || op.Value == "?.")
 					Write(op.Value);
 				else
 					Write(" " + op.Value + " ");
