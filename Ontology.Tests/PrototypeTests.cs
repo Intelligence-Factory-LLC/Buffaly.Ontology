@@ -1,4 +1,5 @@
-﻿using ProtoScript.Interpretter;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ProtoScript.Interpretter;
 using ProtoScript.Interpretter.Symbols;
 
 namespace Ontology.Tests
@@ -217,8 +218,31 @@ prototype CollectionContainer
 			Prototype ? oRes3 = interpretter.RunMethodAsObject("CollectionContainer", "TestFunction_3", new List<object>()) as Prototype;
 			Assert.IsNotNull(oRes3, "TestFunction_3 should return a Prototype object");
 			Assert.IsTrue(oRes3.TypeOf("Object"), "TestFunction_3 should return a Object");
+		}
 
+		[TestMethod]
+		public void Test_MethodCachingIssue()
+		{
+			string strCode = @"
+function main() : int
+{
+	String str = ""123"";
+	return str.GetStringValue().Length; //This should not throw an exception
+}
 
+";
+
+			ProtoScript.File file = ProtoScript.Parsers.Files.ParseFileContents(strCode);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			ProtoScript.Interpretter.Compiled.File fileCompiled = compiler.Compile(file);
+			SymbolTable symbols = compiler.Symbols;
+			NativeInterpretter interpretter = new NativeInterpretter(compiler);
+			interpretter.Evaluate(fileCompiled);
+			object? oRes = interpretter.RunMethodAsObject(null, "main", new List<object>());
+			Assert.IsTrue(oRes is int, "main() should return an integer value");
+			int length = (int)oRes;
+			Assert.IsTrue(length == 3, "Length of '123' should be 3");
 
 
 		}

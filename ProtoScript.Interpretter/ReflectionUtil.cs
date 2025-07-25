@@ -40,6 +40,9 @@ namespace ProtoScript.Interpretter
 											string strMethodName,
 											IReadOnlyList<System.Type> lstParameters)
 		{
+			if (lstParameters == null || lstParameters.Any(p => p == null))
+				throw new ArgumentNullException(nameof(lstParameters), "Parameter types cannot be null.");
+
 			//──── 1. try exact match on normalised parameter list ────────────
 			var normalised = lstParameters.Select(Normalise).ToArray();
 

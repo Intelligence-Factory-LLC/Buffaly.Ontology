@@ -574,7 +574,7 @@ namespace ProtoScript.Extensions
 					session.Tagger = tagger;
 				}
 
-				object obj = null;
+				object? obj = null;
 
 				ProtoScript.Expression statementImmediate = ProtoScript.Parsers.Expressions.Parse(strImmediate);
 				ProtoScript.Interpretter.Compiled.Expression compiledImmediate = tagger.Compiler.Compile(statementImmediate);
@@ -628,12 +628,11 @@ namespace ProtoScript.Extensions
 
 					else
 					{
-						Prototype protoValue = tagger.Interpretter.GetOrConvertToPrototype(obj);
+						Prototype? protoValue = tagger.Interpretter.GetOrConvertToPrototype(obj);
 						if (null == protoValue)
 						{
-							if (obj is ValueRuntimeInfo)
+							if (obj is ValueRuntimeInfo info)
 							{
-								ValueRuntimeInfo info = obj as ValueRuntimeInfo;
 								result.Result = info.Value == null ? "null" : info.Value.ToString();
 							}
 							else
@@ -661,7 +660,7 @@ namespace ProtoScript.Extensions
 				result.Error = err.Message;
 				result.ErrorStatement = err.Info;
 
-				Exception innerErr = err.InnerException;
+				Exception? innerErr = err.InnerException;
 				while (null != innerErr)
 				{
 					result.Error = innerErr.Message + " - " + result.Error;
@@ -685,10 +684,10 @@ namespace ProtoScript.Extensions
 
 		public class TagImmediateResult
 		{
-			public string Result = null;
-			public string Error = null;
-			public StatementParsingInfo ErrorStatement = null;
-			public Prototype ResultPrototype = null;
+			public string ? Result = null;
+			public string ? Error = null;
+			public StatementParsingInfo ? ErrorStatement = null;
+			public Prototype ? ResultPrototype = null;
 		}
 
 		static public void StopTagging(string strSessionKey)

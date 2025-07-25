@@ -247,7 +247,9 @@ namespace ProtoScript.Interpretter.Compiling
 					if (fieldDefinition.Annotations.Count == 0)
 						continue;
 
-					lstStatements.AddRange(CompileFieldAnnotations(fieldDefinition, infoThis, compiler));
+					List<Compiled.Statement> annotations = CompileFieldAnnotations(fieldDefinition, infoThis, compiler);
+					if (null != annotations)
+						lstStatements.AddRange(annotations);
 				}
 			}
 			finally
@@ -358,7 +360,13 @@ namespace ProtoScript.Interpretter.Compiling
 
 				//If the type and the field name are the same it will use the field name for both values. Manually 
 				//get the field's type. 
-				GetGlobalStack op = functionEvaluation.Parameters[2] as GetGlobalStack;
+				GetGlobalStack ? op = functionEvaluation.Parameters[2] as GetGlobalStack;
+				if (null == op)
+				{
+					compiler.AddDiagnostic(new Diagnostic("Annotation field type is not a GetGlobalStack"), fieldDef, null);
+					return null;
+				}
+
 				TypeInfo infoFieldType = compiler.Symbols.GetGlobalScope().GetSymbol(strFieldType) as TypeInfo;
 				op.Index = infoFieldType.Index;
 				op.InferredType = infoFieldType;

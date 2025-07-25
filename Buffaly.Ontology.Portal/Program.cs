@@ -1,6 +1,7 @@
 using BasicUtilities;
 using Buffaly.Common;
 using Microsoft.AspNetCore.HttpOverrides;
+using Ontology;
 using RooTrax.Common;
 using WebAppUtilities;
 
@@ -64,6 +65,7 @@ public class Program
 
 			JsonWsOptions jsonWsOptions = config.GetSection("JsonWs").Get<JsonWsOptions>() ?? new JsonWsOptions();
 
+			JsonSerializers.RegisterSerializer(typeof(Prototype), new PrototypeJsonSerializer());
 
 			app.UseHttpsRedirection();
 

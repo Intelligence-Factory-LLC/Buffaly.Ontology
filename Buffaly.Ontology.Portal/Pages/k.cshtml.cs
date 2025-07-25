@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Portal.Pages
 {
-    [Authorize]
-    public class kModel : KScriptPageModel<BaseUserState>
+	    public class kModel : KScriptPageModel<BaseUserState>
     {
         public kModel() : base()
         {

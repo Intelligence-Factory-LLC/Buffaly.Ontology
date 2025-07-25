@@ -5,6 +5,7 @@ using Ontology.Simulation;
 using ProtoScript.Extensions;
 using System;
 using System.IO;
+using BasicUtilities;
 
 namespace Ontology.Tests
 {
@@ -35,24 +36,26 @@ namespace Ontology.Tests
 			TemporaryPrototypes.Cache.InsertLogFrequency = 10000;
 		}
 
-public static ProtoScriptTagger GetProjectTagger(bool bAllowPrecompiled = false)
-{
-UnderstandUtil.TaggingSettings settings = new UnderstandUtil.TaggingSettings();
-settings.Project = GetProject();
-settings.MaxIterations = 100;
-settings.AllowPrecompiled = bAllowPrecompiled;
+		public static ProtoScriptTagger GetProjectTagger(bool bAllowPrecompiled = false)
+		{
+			UnderstandUtil.TaggingSettings settings = new UnderstandUtil.TaggingSettings();
+			settings.Project = GetProject();
+			settings.MaxIterations = 100;
+			settings.AllowPrecompiled = bAllowPrecompiled;
 
-return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
-}
+			return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
+		}
 
 		private static string GetPortalProject(string file)
 		{
-		string path = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Buffaly.Ontology.Portal", "wwwroot", "projects", file);
-		return Path.GetFullPath(path);
+			//string path = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Buffaly.Ontology.Portal", "wwwroot", "projects", file);
+
+			string path = Path.Combine("C:\\dev\\ai\\ontology\\ProtoScript.Tests\\Medical", file);
+			return Path.GetFullPath(path);
 		}
 		public static string GetProjectSmall()
 		{
-		return GetPortalProject("ProjectSmall8.pts");
+			return GetPortalProject("ProjectSmall8.pts");
 		}
 
 		public static ProtoScriptTagger GetProjectSmallTagger()
@@ -63,10 +66,10 @@ return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
 			settings.MaxIterations = 100;
 			return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
 		}
-		
+
 		public static string GetProject()
 		{
-		return GetPortalProject("Project.pts");
+			return GetPortalProject("Project.pts");
 		}
 
 		public static ProtoScriptTagger GetSnoMedOnlyProjectTagger()
@@ -124,7 +127,7 @@ return UnderstandUtil.GetAndInitializeProtoScriptTagger(settings);
 			settings.AllowPrecompiled = false;
 			settings.EnableDatabase = false;
 
-			var res = ProtoScriptWorkbench.InterpretImmediate(settings.Project, "ICD10CM.A00)", settings);
+			var res = ProtoScriptWorkbench.InterpretImmediate(settings.Project, "SpecialityCapabilities.GetByICD10(ICD10CM.D51_9)", settings);
 			var res2 = ProtoScriptWorkbench.InterpretImmediate(settings.Project, "ICD10CM.A00)", settings);
 
 		}

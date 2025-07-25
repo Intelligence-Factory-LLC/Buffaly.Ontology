@@ -1005,15 +1005,17 @@ throw;
 			return SimpleInterpretter.GetAsPrototype(obj);
 		}
 
-		public Prototype ? GetOrConvertToPrototype(object oValue)
+		public Prototype ? GetOrConvertToPrototype(object ? oValue)
 		{
+			if (null == oValue)
+				return null;
+
 			Prototype ? protoValue =  SimpleInterpretter.GetAsPrototype(oValue);
 
 			if (null == protoValue)
 			{
-				if (oValue is ValueRuntimeInfo)
-					oValue = (oValue as ValueRuntimeInfo).Value;
-
+				if (oValue is ValueRuntimeInfo val)
+					oValue = val.Value;
 				if (oValue is string str)
 					protoValue = StringWrapper.ToPrototype(str);
 				else if (oValue is int i)
@@ -1048,9 +1050,8 @@ throw;
 			object left = EvaluateAsSet(exp.Left);
 			object right = Evaluate(exp.Right);
 
-			if (left is FieldSetterInfo)
+			if (left is FieldSetterInfo refField)
 			{
-				FieldSetterInfo refField = left as FieldSetterInfo;
 				right = MakeAssignable(right, exp.Left.InferredType, exp.Info);
 				if (null == right)
 					refField.Prototype.Properties[refField.Property.PrototypeID] = null;
@@ -1062,10 +1063,8 @@ throw;
 
 			}
 
-			else if (left is ValueRuntimeInfo)
+			else if (left is ValueRuntimeInfo infoValue)
 			{
-				ValueRuntimeInfo infoValue = left as ValueRuntimeInfo;
-
 				right = MakeAssignable(right, exp.Left.InferredType, exp.Info);
 
 				infoValue.Value = right;
@@ -1154,13 +1153,22 @@ throw;
 			if (value is string str)
 			{
 				if (typeInfo.Type == typeof(StringWrapper))
-					return StringWrapper.ToPrototype(str);
+					return new StringWrapper(str);
 
 				else if (typeInfo is PrototypeTypeInfo && Prototypes.AreShallowEqual((typeInfo as PrototypeTypeInfo).Prototype, System_String.Prototype))
-					return StringWrapper.ToPrototype(str);
+					return new StringWrapper(str);
 
 				else if (typeInfo.Type == typeof(Prototype))
-					return StringWrapper.ToPrototype(str);
+					return new StringWrapper(str);
+
+				//if (typeInfo.Type == typeof(StringWrapper))
+				//	return StringWrapper.ToPrototype(str);
+
+				//else if (typeInfo is PrototypeTypeInfo && Prototypes.AreShallowEqual((typeInfo as PrototypeTypeInfo).Prototype, System_String.Prototype))
+				//	return StringWrapper.ToPrototype(str);
+
+				//else if (typeInfo.Type == typeof(Prototype))
+				//	return StringWrapper.ToPrototype(str);
 			}
 
 			else if (value is int)
@@ -1634,7 +1642,7 @@ throw;
 			return scope;
 		}
 
-		public Prototype ? RunMethodAsPrototype(Prototype protoInstance, string strMethodName, List<object> lstParameters)
+		public Prototype ? RunMethodAsPrototype(Prototype ? protoInstance, string strMethodName, List<object> lstParameters)
 		{
 			object ? oRes = RunMethodAsObject(protoInstance, strMethodName, lstParameters);
 

@@ -1,0 +1,148 @@
+﻿a.active {
+	font-weight: bold
+}
+
+.list-group-item {
+padding: 8px;
+	font-family: monospace;
+	font-size: 12px;
+	border: none;
+}
+/* Style for the file list header */
+.file-list-header .input-group-addon {
+	background-color: #fff;
+	border-right: none;
+}
+
+.file-list-header .form-control {
+	border-left: none;
+}
+
+/* Style for the Add File button */
+.file-list-header .btn-success {
+	background-color: #28a745;
+	border-color: #28a745;
+}
+
+	.file-list-header .btn-success:hover {
+		background-color: #218838;
+		border-color: #1e7e34;
+	}
+
+/* Style for file list items */
+#divProject li a:hover {
+	text-decoration: underline;
+	color: #0056b3;
+}
+
+#divProject .label-info {
+	background-color: #17a2b8;
+}
+
+.file-list {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+	.file-list li {
+		padding: 5px 0;
+		border-bottom: 1px solid #ddd;
+	}
+
+		.file-list li a {
+			text-decoration: none;
+			color: #0062cc;
+			cursor: pointer;
+		}
+
+			.file-list li a:hover {
+				text-decoration: underline;
+				color: #0056b3; /* Darker blue for hover effect */
+			}
+
+	.file-list .label-info {
+		background-color: #17a2b8; /* Label-specific styling */
+	}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.file-list-header .col-md-8, .file-list-header .col-md-4 {
+		width: 100%;
+	}
+
+	.file-list-header .col-md-4 {
+		margin-top: 10px;
+	}
+}
+
+.bi-spin {
+	display: inline-block;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+
+.found-text-marker {
+	text-decoration: underline dotted;
+	text-decoration-color: cornflowerblue;
+}
+
+.debug-break-marker {
+	background-color: yellow;
+}
+
+.error-marker {
+	color: black;
+	width: 10px !important;
+	background-color: #ff0000;
+}
+
+	.error-marker .error-message {
+		display: none;
+		position: absolute;
+		background-color: #ddd;
+		border: 1px solid #999;
+		padding: 6px;
+		width: 140px;
+		left: 15px;
+		top: -1em;
+	}
+
+	.error-marker:hover .error-message {
+		display: block;
+	}
+
+.breakpoints {
+	width: .8em;
+}
+
+.breakpoint {
+        color: #822;
+        font-size: x-large;
+        padding-top: 0px;
+        margin-top: -5px;
+}
+
+/* Style for dynamically added file tabs */
+.FileTab .nav-link {
+	max-width: 150px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+@media (max-width: 991.98px) {
+	#divSymbolContainer {
+		position: static;
+		height: auto;
+	}
+}
