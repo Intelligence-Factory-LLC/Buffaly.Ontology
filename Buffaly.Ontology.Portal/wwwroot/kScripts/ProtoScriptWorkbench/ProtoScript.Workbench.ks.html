@@ -162,6 +162,11 @@
 <script type="text/javascript" src="js/plugins/codemirror/simple-hint.js"></script>
 <link rel="stylesheet" href="js/plugins/codemirror/simple-hint.css" />
 
+<link rel="stylesheet" href="js/plugins/codemirror/addon/dialog/dialog.css" />
+<script type="text/javascript" src="js/plugins/codemirror/addon/search/searchcursor.js"></script>
+<script type="text/javascript" src="js/plugins/codemirror/addon/search/search.js"></script>
+<script type="text/javascript" src="js/plugins/codemirror/addon/dialog/dialog.js"></script>
+
 
 <script type="text/javascript">
 	function isLetter(str) {
@@ -302,7 +307,19 @@
 		autofocus: true,
 		lineSeparator: '\r\n',
 		newline : "crlf",
-		extraKeys: { "Ctrl-Space": "autocomplete", "Ctrl-Enter" : OnEnter, "Alt-Space" : OnPredictNextLine },
+		extraKeys: {
+			"Ctrl-Space": "autocomplete",
+			"Ctrl-Enter": OnEnter,
+			"Alt-Space": OnPredictNextLine,
+			"Ctrl-F": "findPersistent",
+			"Ctrl-G": "findNext",
+			"Shift-Ctrl-G": "findPrev",
+			"F3": "findNext",
+			"Shift-F3": "findPrev",
+			"Ctrl-H": "replace",
+			"Shift-Ctrl-F": "replace",
+			"Shift-Ctrl-R": "replaceAll"
+		},
 		hintOptions: { hint: OnSuggest, completeSingle : false },
 		gutters: ['gutter-error', "breakpoints"]
 	});
