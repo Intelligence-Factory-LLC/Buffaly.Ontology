@@ -68,8 +68,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simpsons", "Simpsons", "{25
 		..\examples\Simpsons\Simpsons.md = ..\examples\Simpsons\Simpsons.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Agents", "..\Ontology.Agents\Ontology.Agents.csproj", "{045900F5-62A0-9D2B-DA69-5108E94F8ECE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,10 +118,6 @@ Global
 		{E426548C-511A-24A1-95F3-4780A61F10BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E426548C-511A-24A1-95F3-4780A61F10BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E426548C-511A-24A1-95F3-4780A61F10BE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{045900F5-62A0-9D2B-DA69-5108E94F8ECE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{045900F5-62A0-9D2B-DA69-5108E94F8ECE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{045900F5-62A0-9D2B-DA69-5108E94F8ECE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{045900F5-62A0-9D2B-DA69-5108E94F8ECE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
