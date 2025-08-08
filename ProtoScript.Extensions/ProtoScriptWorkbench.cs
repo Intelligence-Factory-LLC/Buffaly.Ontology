@@ -186,38 +186,58 @@ namespace ProtoScript.Extensions
 				Project project = new Project();
 				project.FileName = strProject;
 				project.RootDirectory = strRootDir;
+				session.Context.Project = project;
 
 				//TODO: This needs to not load everything separate from the compilation process
-				List<File> lstFiles = Compiler.GetAllIncludedFiles(fileProject, false);
-
+				List<File> lstFiles = Compiler.GetAllIncludedFiles(fileProject, false, true);
 				foreach (File file in lstFiles.OrderBy(x => x.Info.Name))
 				{
+					long length = 0;
+					if (file.Info != null && file.Info.Exists)
+					length = file.Info.Length;
 					project.Files.Add(new ProtoScriptFile()
 					{
 						FileName = file.Info.FullName,
-						Length = file.Info.Length
+						Length = length
 					});
 				}
-
+				FileInfo infoProject = new FileInfo(strProject);
+				long projectLength = 0;
+				if (infoProject.Exists)
+				projectLength = infoProject.Length;
 				project.Files.Add(new ProtoScriptFile()
 				{
 					FileName = strProject,
-					Length = fileProject.Info.Length
+					Length = projectLength
 				});
-
-				session.Context.Project = project;
-
 				return project.Files.Select(x => x.FileName).ToList();
 			}
 			catch (ProtoScriptParsingException err)
 			{
+				FileInfo infoProject = new FileInfo(strProject);
+				long projectLength = 0;
+				if (infoProject.Exists)
+				projectLength = infoProject.Length;
+				project.Files.Add(new ProtoScriptFile()
+				{
+					FileName = strProject,
+					Length = projectLength
+				});
 				throw new JsonWsException(err.Message + ", " + err.Explanation);
 			}
 			catch (Exception)
 			{
+				FileInfo infoProject = new FileInfo(strProject);
+				long projectLength = 0;
+				if (infoProject.Exists)
+				projectLength = infoProject.Length;
+				project.Files.Add(new ProtoScriptFile()
+				{
+					FileName = strProject,
+					Length = projectLength
+				});
 				throw;
 			}
-
 		}
 
 		static public void SaveCurrentCode(string strSessionKey, string strFile, string Code)
