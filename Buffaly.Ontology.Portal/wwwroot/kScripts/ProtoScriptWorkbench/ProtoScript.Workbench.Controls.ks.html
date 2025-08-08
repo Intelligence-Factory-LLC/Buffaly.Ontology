@@ -182,10 +182,10 @@
 				<div id="divImmediateContainer" class="mt-2">
 					<div class="row g-2">
 						<div class="col-6">
-							<textarea id="txtImmediate" kcs:FieldName="ImmediateText" class="form-control no-autosize tabstop" style="font-family: monospace; min-height:100px; white-space:pre;"></textarea>
+							<textarea id="txtImmediate" kcs:FieldName="ImmediateText" class="form-control no-autosize tabstop" style="font-family: monospace; height: 140px; white-space:pre;"></textarea>
 						</div>
 						<div class="col-6">
-							<div id="divImmediateHistory" class="overflow-auto border rounded p-2" style="max-height: 140px;"></div>
+							<div id="divImmediateHistory" class="overflow-auto border rounded p-2 small" style="height: 140px;"></div>
 						</div>
 					</div>
 				</div>
@@ -352,7 +352,7 @@
 		_$("btnMaximize").removeClass("hidden");
 		_$("divFileContent").style.height = (window.innerHeight - 380) + "px";
 		_$("divSymbolContainer").style.height = (window.innerHeight - 315) + "px";
-		_$("divImmediateHistory").style.height = "100px";
+		_$("divImmediateHistory").style.height = "50px";
 
 		ControlUtil.SetValue("chkSaveVerification", false);
 		Page.LocalSettings.WindowSize = 'Minimize'
