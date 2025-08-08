@@ -1808,7 +1808,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 				List<System.Type> lstParameterTypes = lstParams.Select(x => x.InferredType.Type).ToList();
 
-				System.Reflection.ConstructorInfo constructor = type.GetConstructor(lstParameterTypes.ToArray());
+				System.Reflection.ConstructorInfo? constructor = ReflectionUtil.GetConstructor(type, lstParameterTypes);
 
 				if (null == constructor)
 				{
