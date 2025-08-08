@@ -32,6 +32,11 @@ namespace ProtoScript.Interpretter
 			type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
 				.Where(m => m.Name == name && m.GetParameters().Length == arity);
 
+		/// <summary>Enumerate all constructors with the given arity.</summary>
+		public static IEnumerable<ConstructorInfo> GetCandidateConstructors(System.Type type, int arity) =>
+			type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+				.Where(c => c.GetParameters().Length == arity);
+
 		/// <summary>
 		/// Resolve the most specific overload of <paramref name="strMethodName"/> for the supplied argument types.
 		/// Wrapper types (IntWrapper, StringWrapper, …) are treated as their primitive counterparts.
@@ -111,6 +116,78 @@ namespace ProtoScript.Interpretter
 
 			return best;
 		}
+		/// <summary>
+		/// Resolve the most specific constructor for the supplied argument types.
+		/// Wrapper types (IntWrapper, StringWrapper, …) are treated as their primitive counterparts.
+		/// </summary>
+		public static ConstructorInfo? GetConstructor(System.Type type, IReadOnlyList<System.Type> lstParameters)
+		{
+			if (lstParameters == null || lstParameters.Any(p => p == null))
+				throw new ArgumentNullException(nameof(lstParameters), "Parameter types cannot be null.");
+
+			System.Type[] normalised = lstParameters.Select(Normalise).ToArray();
+
+			ConstructorInfo? exact = type.GetConstructor(
+				BindingFlags.Public | BindingFlags.Instance,
+				binder: null,
+				types: normalised,
+				modifiers: null);
+
+			if (exact != null)
+				return exact;            // best possible match
+
+			exact = type.GetConstructor(
+				BindingFlags.Public | BindingFlags.Instance,
+				binder: null,
+				types: lstParameters.ToArray(),
+				modifiers: null);
+
+			if (exact != null)
+				return exact;            // best possible match
+
+			ConstructorInfo? best = null;
+			int bestScore = int.MaxValue;  // lower == better
+
+			foreach (ConstructorInfo candidate in GetCandidateConstructors(type, normalised.Length))
+			{
+				ParameterInfo[] pars = candidate.GetParameters();
+				int score = 0;
+				bool compatible = true;
+
+				for (int i = 0; i < pars.Length; i++)
+				{
+					System.Type arg = normalised[i];
+					System.Type dest = pars[i].ParameterType;
+
+					if (arg == dest)                         // exact
+						continue;
+
+					if (IsWrapperFor(lstParameters[i], dest)) // wrapper -> primitive
+					{
+						score += 1;
+						continue;
+					}
+
+					if (dest.IsAssignableFrom(arg))         // up-cast
+					{
+						score += 2;
+						continue;
+					}
+
+					compatible = false;
+					break;
+				}
+
+				if (compatible && score < bestScore)
+				{
+					best = candidate;
+					bestScore = score;
+				}
+			}
+
+			return best;
+		}
+
 
 		public static bool HasBaseType(System.Type typeTarget, System.Type type)
 		{
