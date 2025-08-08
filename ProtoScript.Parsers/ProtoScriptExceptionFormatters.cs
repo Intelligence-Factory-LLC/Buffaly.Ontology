@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using BasicUtilities;
+using static Logs;
 
 namespace ProtoScript.Parsers
 {
@@ -25,7 +26,7 @@ namespace ProtoScript.Parsers
 		public virtual string ToPretty(Exception err)
 		{
 			ProtoScriptTokenizingException ex = (ProtoScriptTokenizingException)err;
-			Type t = typeof(ProtoScriptTokenizingException);
+			System.Type t = typeof(ProtoScriptTokenizingException);
 			FieldInfo scriptField = t.GetField("m_strProtoScript", BindingFlags.NonPublic | BindingFlags.Instance);
 			FieldInfo cursorField = t.GetField("m_iCursor", BindingFlags.NonPublic | BindingFlags.Instance);
 			string script = scriptField == null ? null : scriptField.GetValue(ex) as string;

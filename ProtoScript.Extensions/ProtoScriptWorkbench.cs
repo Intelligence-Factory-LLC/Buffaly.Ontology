@@ -174,6 +174,10 @@ namespace ProtoScript.Extensions
 		{
 			try
 			{
+				Logs.RegisterExceptionFormatter(typeof(ProtoScriptTokenizingException), new ProtoScriptTokenizingExceptionFormatter());
+				Logs.RegisterExceptionFormatter(typeof(ProtoScriptParsingException), new ProtoScriptParsingExceptionFormatter());
+				Logs.RegisterExceptionFormatter(typeof(ProtoScriptCompilerException), new ProtoScriptCompilerExceptionFormatter());
+
 				string strProject = session.SessionKey;
 				File fileProject = ProtoScript.Parsers.Files.Parse(strProject);
 

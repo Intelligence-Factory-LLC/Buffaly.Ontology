@@ -25,6 +25,19 @@ function IsCurrentFileSaved() {
 
 
 Page.HandleUnexpectedError = function (oErr) {
+
+
+	if (typeof oErr.Error === "string") {
+		try {
+			oErr.Error = JSON.parse(oErr.Error)
+		}
+		catch { }
+	}
+
+	if (oErr.Error.Error)
+		oErr.Error = oErr.Error.Error;
+
+
 	if (oErr instanceof ReferenceError) {
 		// specific handling if you want it
 		Output(`ReferenceError: ${oErr.message}\n${oErr.stack ?? ""}`);
@@ -53,10 +66,10 @@ Page.AddOnLoad(async function () {
 			OnSaveCurrentFile();
 			event.preventDefault();
 		}
-                else if (event.ctrlKey && event.key == ',') {
-                        event.preventDefault();
-                        OnStartSymbolSearch(event);
-                }
+		else if (event.ctrlKey && event.key == ',') {
+			event.preventDefault();
+			OnStartSymbolSearch(event);
+		}
 		else if (event.ctrlKey && event.key == 'b') {
 			event.preventDefault();
 			CompileCode();
@@ -153,12 +166,12 @@ async function GetWebRoot() {
 
 function BindSolutionHistory() {
 	// history -------------------------------------------------------------
-       const ulHist = ["ul", { class: "list-group space-y-1" }];
+	const ulHist = ["ul", { class: "list-group space-y-1" }];
 
 	Page.LocalSettings.SolutionHistory.each(function (item) {
 		ulHist.push([
 			"li",
-                       { class: "list-group-item list-group-item-action p-2" },
+			{ class: "list-group-item list-group-item-action p-2" },
 			[
 				"a",
 				{
@@ -176,12 +189,12 @@ function BindSolutionHistory() {
 
 	// examples ------------------------------------------------------------
 	const examples = ["projects\\hello.pts", "projects\\Simpsons.pts"];
-       const ulEx = ["ul", { class: "list-group space-y-1" }];
+	const ulEx = ["ul", { class: "list-group space-y-1" }];
 
 	examples.forEach(p =>
 		ulEx.push([
 			"li",
-                       { class: "list-group-item list-group-item-action p-2" },
+			{ class: "list-group-item list-group-item-action p-2" },
 			[
 				"a",
 				{
@@ -271,15 +284,15 @@ async function OnLoadProject() {
 			$$$(oUl).inject(_$("divProject"));
 
 			ShowTab("tab-project");
-                        if ($$(".navbar-header").length > 0) {
-                                var header = $$(".navbar-header")[0];
-                                while (header.firstChild)
-                                        header.removeChild(header.firstChild);
-                                var h3 = document.createElement("h3");
-                                h3.style.color = "white";
-                                h3.textContent = sProjectFile;
-                                header.appendChild(h3);
-                        }
+			if ($$(".navbar-header").length > 0) {
+				var header = $$(".navbar-header")[0];
+				while (header.firstChild)
+					header.removeChild(header.firstChild);
+				var h3 = document.createElement("h3");
+				h3.style.color = "white";
+				h3.textContent = sProjectFile;
+				header.appendChild(h3);
+			}
 
 			Page.LocalSettings.Solution = sProjectFile;
 			Page.LocalSettings.SolutionHistory = QueueFront(
@@ -300,13 +313,13 @@ async function OnLoadProject() {
 
 
 async function OnLoadFile() {
-        var sFile = ControlUtil.GetValue("txtFileName");
-        try {
-                await LoadFile(sFile);
-        }
-        catch (err) {
-                Output(err);
-        }
+	var sFile = ControlUtil.GetValue("txtFileName");
+	try {
+		await LoadFile(sFile);
+	}
+	catch (err) {
+		Output(err);
+	}
 }
 
 async function LoadFile(sFile) {
@@ -329,32 +342,32 @@ async function LoadFile(sFile) {
 		}
 	}
 
-        try {
-                let f = new Promise((resolve) => {
-                        ProtoScriptWorkbench.LoadFile(Page.LocalSettings.Solution, sFile, function (sFileContents) {
-                                SetCode(sFileContents);
-                                sLastSaved = sFileContents;
-                                Page.LocalSettings.File = sFile;
+	try {
+		let f = new Promise((resolve) => {
+			ProtoScriptWorkbench.LoadFile(Page.LocalSettings.Solution, sFile, function (sFileContents) {
+				SetCode(sFileContents);
+				sLastSaved = sFileContents;
+				Page.LocalSettings.File = sFile;
 
-                                let fCurrent = AddFileToHistory(sFile);
+				let fCurrent = AddFileToHistory(sFile);
 
-                                if (fCurrent.Recent.length > 0) {
-                                        let cur = fCurrent.Recent[0];
-                                        _$("divFileContent").scrollTop = cur;
-                                }
+				if (fCurrent.Recent.length > 0) {
+					let cur = fCurrent.Recent[0];
+					_$("divFileContent").scrollTop = cur;
+				}
 
-                                BindFileHistory();
-                                OnBindFileSymbols();
-                                AdjustWindowSizes();
-                                resolve();
-                        })
-                });
+				BindFileHistory();
+				OnBindFileSymbols();
+				AdjustWindowSizes();
+				resolve();
+			})
+		});
 
-                await f;
-        }
-        catch (err) {
-                Output(err);
-        }
+		await f;
+	}
+	catch (err) {
+		Output(err);
+	}
 
 	return true;
 }
@@ -446,32 +459,32 @@ function BindFileHistory() {
 
 var sLastSaved = null;
 async function OnSaveCurrentFile() {
-        try {
-                await SaveCurrentFile();
-        }
-        catch (err) {
-                Output(err);
-        }
+	try {
+		await SaveCurrentFile();
+	}
+	catch (err) {
+		Output(err);
+	}
 }
 
 async function SaveCurrentFile() {
-        var sCode = GetCode();
-        sLastSaved = sCode;
+	var sCode = GetCode();
+	sLastSaved = sCode;
 
-        try {
-                let f = new Promise(async function (resolve) {
+	try {
+		let f = new Promise(async function (resolve) {
 
-                        ProtoScriptWorkbench.SaveCurrentCode(Page.LocalSettings.Solution, Page.LocalSettings.File, sCode, function (oRes) {
-                                UserMessages.DisplayNow("File saved", "Success")
-                                resolve();
-                        })
-                });
+			ProtoScriptWorkbench.SaveCurrentCode(Page.LocalSettings.Solution, Page.LocalSettings.File, sCode, function (oRes) {
+				UserMessages.DisplayNow("File saved", "Success")
+				resolve();
+			})
+		});
 
-                await f;
-        }
-        catch (err) {
-                Output(err);
-        }
+		await f;
+	}
+	catch (err) {
+		Output(err);
+	}
 }
 
 ///////////////////File and Symbol Panels///////////////////////////////
@@ -652,7 +665,7 @@ async function OnStartSymbolSearch(evt) {
 		await CompileCode()
 	}
 
-        OnFilterSymbols(evt);
+	OnFilterSymbols(evt);
 	_$("txtSymbolSearch").scrollIntoView(false)
 	_$("txtSymbolSearch").focus();
 }
@@ -685,8 +698,8 @@ function OnNavigateToSelectedSymbol() {
 }
 
 function OnFilterSymbols(evt) {
-        //(function () {
-        if (!evt || (evt.code != "ArrowDown" && evt.code != "ArrowUp")) {
+	//(function () {
+	if (!evt || (evt.code != "ArrowDown" && evt.code != "ArrowUp")) {
 		var sSearch = ControlUtil.GetValue("txtSymbolSearch");
 		if (StringUtil.IsEmpty(sSearch))
 			OnBindFileSymbols();
@@ -735,81 +748,81 @@ function ParseFile() {
 }
 
 async function CompileCode() {
-        try {
-                if (!IsCurrentFileSaved())
-                        await SaveCurrentFile();
+	try {
+		if (!IsCurrentFileSaved())
+			await SaveCurrentFile();
 
-                Output("Compilation starting...");
+		Output("Compilation starting...");
 
-                var sCode = GetCode();
-                ProtoScriptWorkbench.CompileCode.onErrorReceived = function (oErr) {
-                        Output("Compilation failed");
-                };
+		var sCode = GetCode();
+		ProtoScriptWorkbench.CompileCode.onErrorReceived = function (oErr) {
+			Output("Compilation failed");
+		};
 
-                ProtoScriptWorkbench.CompileCodeWithProject.onErrorReceived = function (oErr) {
-                        Output("Compilation failed");
-                        Output(oErr);
-                };
+		ProtoScriptWorkbench.CompileCodeWithProject.onErrorReceived = function (oErr) {
+			Output("Compilation failed");
+			Output(oErr);
+		};
 
-        let sProjectFile = ControlUtil.GetValue("txtSolution");
-        if (!StringUtil.IsEmpty(sProjectFile)) {
+		let sProjectFile = ControlUtil.GetValue("txtSolution");
+		if (!StringUtil.IsEmpty(sProjectFile)) {
 
-		clearErrors();
+			clearErrors();
 
-		let f = new Promise(resolve => {
-			ProtoScriptWorkbench.CompileCodeWithProject.Serialize = { Info: true }
-			ProtoScriptWorkbench.CompileCodeWithProject(sCode, sProjectFile, async function (oRes) {
+			let f = new Promise(resolve => {
+				ProtoScriptWorkbench.CompileCodeWithProject.Serialize = { Info: true }
+				ProtoScriptWorkbench.CompileCodeWithProject(sCode, sProjectFile, async function (oRes) {
 
-				let bFirst = true;
+					let bFirst = true;
+					oRes.each(function (err) {
+						if (bFirst && null != err.Info) {
+							bFirst = false;
+							NavigateTo(err.Info);
+						}
+
+						//Something is happening inside code mirror to clear this if not delayed
+						(function () {
+							highlightError(err);
+						}).delay(1000);
+
+						if (null != err.Info)
+							Output(err.Message + ", " + err.Info.File);
+						else
+							Output(err.Message);
+
+						//					["a", { click: function () { NavigateTo(x.Info, x.SymbolName); } }, x.SymbolName ]]
+					})
+
+					Output(oRes.length + " errors");
+
+					await OnLoadSymbols();
+
+					resolve();
+				})
+			});
+
+			await f;
+
+		}
+		else {
+
+			ProtoScriptWorkbench.CompileCode(sCode, function (oRes) {
+				clearErrors();
+
 				oRes.each(function (err) {
-					if (bFirst && null != err.Info) {
-						bFirst = false;
-						NavigateTo(err.Info);
-					}
-
-					//Something is happening inside code mirror to clear this if not delayed
-					(function () {
-						highlightError(err);
-					}).delay(1000);
-
-					if (null != err.Info)
-						Output(err.Message + ", " + err.Info.File);
-					else
-						Output(err.Message);
-
-					//					["a", { click: function () { NavigateTo(x.Info, x.SymbolName); } }, x.SymbolName ]]
+					highlightError(err);
 				})
 
 				Output(oRes.length + " errors");
 
-				await OnLoadSymbols();
-
-				resolve();
 			})
-		});
+		}
 
-                await f;
-
-        }
-        else {
-
-		ProtoScriptWorkbench.CompileCode(sCode, function (oRes) {
-			clearErrors();
-
-			oRes.each(function (err) {
-				highlightError(err);
-			})
-
-			Output(oRes.length + " errors");
-
-                })
-        }
-
-        Output("Compilation finished");
-        }
-        catch (err) {
-                Output(err);
-        }
+		Output("Compilation finished");
+	}
+	catch (err) {
+		Output(err);
+	}
 }
 
 function ClearOutput() {
