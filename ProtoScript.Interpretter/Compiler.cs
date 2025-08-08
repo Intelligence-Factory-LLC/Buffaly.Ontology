@@ -368,66 +368,65 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			return lstStatements;
 		}
 
-
-		static public List<File> GetAllIncludedFiles(File file, bool bAllowParallelism)
+	
+	static public List<File> GetAllIncludedFiles(File file, bool bAllowParallelism, bool bIgnoreErrors = false)
+	{
+		List<File> lstFiles = new List<File>();
+		
+		//Note: testing shows parallelism has no effect on performance.
+		if (bAllowParallelism)
 		{
-			List<File> lstFiles = new List<File>();
-
-			//Note: testing shows parallelism has no effect on performance.
-			if (bAllowParallelism)
-			{
-				GetIncludedFilesRecursive(file, lstFiles);
-			}
-			else
-			{
-				GetIncludedFiles(file, lstFiles);
-			}
-
-			return lstFiles;
+			GetIncludedFilesRecursive(file, lstFiles, bIgnoreErrors);
 		}
-
-		///	Recursively gather all included files in parallel.
-		static private void GetIncludedFilesRecursive(File file, List<File> lstFiles)
+		else
 		{
-			//TODO: Doesn't currently work because the order of defining prototypes still matters. 
-
-			ConcurrentDictionary<string, byte> seen = new(StringComparer.OrdinalIgnoreCase);
-			ConcurrentQueue<File> queue = new();
-			ConcurrentBag<File> bag = new();
-
-			// ── seed ───────────────────────────────────────────────────────────────
-			seen.TryAdd(file.Info.FullName, 0);
-			queue.Enqueue(file);
-			bag.Add(file);
-
-			const int BatchSize = 32;
-
-			// ── breadth-first expansion ────────────────────────────────────────────
-			while (!queue.IsEmpty)
+			GetIncludedFiles(file, lstFiles, bIgnoreErrors);
+		}
+		
+		return lstFiles;
+	}
+	
+	///	Recursively gather all included files in parallel.
+	static private void GetIncludedFilesRecursive(File file, List<File> lstFiles, bool bIgnoreErrors)
+	{
+		//TODO: Doesn't currently work because the order of defining prototypes still matters.
+		
+		ConcurrentDictionary<string, byte> seen = new ConcurrentDictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
+		ConcurrentQueue<File> queue = new ConcurrentQueue<File>();
+		ConcurrentBag<File> bag = new ConcurrentBag<File>();
+		
+		// ── seed ───────────────────────────────────────────────────────────────
+		seen.TryAdd(file.Info.FullName, 0);
+		queue.Enqueue(file);
+		bag.Add(file);
+		
+		const int BatchSize = 32;
+		
+		// ── breadth-first expansion ────────────────────────────────────────────
+		while (!queue.IsEmpty)
+		{
+			List<File> batch = new List<File>(BatchSize);
+			while (batch.Count < BatchSize && queue.TryDequeue(out File f))
+			batch.Add(f);
+			
+			Parallel.ForEach(batch, fileCurrent =>
 			{
-				List<File> batch = new(BatchSize);
-				while (batch.Count < BatchSize && queue.TryDequeue(out File f))
-					batch.Add(f);
-
-				Parallel.ForEach(batch, fileCurrent =>
+				string rootDir = StringUtil.LeftOfLast(fileCurrent.Info.FullName, "\\");
+				
+				foreach (IncludeStatement inc in fileCurrent.Includes)
 				{
-					string rootDir = StringUtil.LeftOfLast(fileCurrent.Info.FullName, "\\");
-
-					foreach (IncludeStatement inc in fileCurrent.Includes)
+					IEnumerable<string> paths =
+					inc.FileName.Contains('*')
+					? Directory.GetFiles(rootDir,
+					inc.FileName,
+					inc.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+					: new[] { FileUtil.BuildPath(rootDir, inc.FileName) };
+					
+					foreach (string path in paths)
 					{
-						IEnumerable<string> paths =
-							inc.FileName.Contains('*')
-								? Directory.GetFiles(rootDir,
-													 inc.FileName,
-													 inc.Recursive ? SearchOption.AllDirectories
-																   : SearchOption.TopDirectoryOnly)
-								: new[] { FileUtil.BuildPath(rootDir, inc.FileName) };
-
-						foreach (string path in paths)
+						File? sub = TryParse(path, bIgnoreErrors);
+						if (sub != null)
 						{
-							File? sub = TryParse(path);
-							if (sub == null) continue;
-
 							if (seen.TryAdd(sub.Info.FullName, 0))
 							{
 								bag.Add(sub);
@@ -438,96 +437,127 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 								Logs.DebugLog.WriteEvent("**** WARNING **** File already included", sub.Info.FullName);
 							}
 						}
-					}
-				});
-			}
-
-			lstFiles.AddRange(bag);
-		}
-
-
-
-		static private void GetIncludedFiles(File file, List<File> lstFiles)
-		{
-			string strRootDir = StringUtil.LeftOfLast(file.Info.FullName, "\\");
-
-			foreach (IncludeStatement include in file.Includes)
-			{
-				if (include.FileName.Contains("*"))
-				{
-					foreach (string strFile in Directory.GetFiles(strRootDir, include.FileName, include.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
-					{
-						File? fileSub = TryParse(strFile);
-						if (null != fileSub)
+						else if (bIgnoreErrors)
 						{
-							if (!lstFiles.Any(x => StringUtil.EqualNoCase(x.Info.FullName, fileSub.Info.FullName)))
-							{
-								lstFiles.Add(fileSub);
-								GetIncludedFiles(fileSub, lstFiles);
-							}
-							else
-							{
-								//This is just to see if we are wasting time parsing, if so rewrite to check first
-								Logs.DebugLog.WriteEvent("**** WARNING **** File already included", fileSub.Info.FullName);
-							}
+							FileInfo infoPlaceholder = new FileInfo(path);
+							File placeholder = new File();
+							placeholder.Info = infoPlaceholder;
+							bag.Add(placeholder);
 						}
 					}
 				}
-				else
+			});
+		}
+		
+		lstFiles.AddRange(bag);
+	}
+	
+	
+	
+	static private void GetIncludedFiles(File file, List<File> lstFiles, bool bIgnoreErrors)
+	{
+		string strRootDir = StringUtil.LeftOfLast(file.Info.FullName, "\\");
+		
+		foreach (IncludeStatement include in file.Includes)
+		{
+			if (include.FileName.Contains("*"))
+			{
+				foreach (string strFile in Directory.GetFiles(strRootDir, include.FileName, include.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
 				{
-					File? fileSub = TryParse(FileUtil.BuildPath(strRootDir, include.FileName));
-					if (null != fileSub)
+					File? fileSub = TryParse(strFile, bIgnoreErrors);
+					if (fileSub != null)
 					{
 						if (!lstFiles.Any(x => StringUtil.EqualNoCase(x.Info.FullName, fileSub.Info.FullName)))
 						{
 							lstFiles.Add(fileSub);
-							GetIncludedFiles(fileSub, lstFiles);
+							GetIncludedFiles(fileSub, lstFiles, bIgnoreErrors);
 						}
 						else
 						{
+							//This is just to see if we are wasting time parsing, if so rewrite to check first
 							Logs.DebugLog.WriteEvent("**** WARNING **** File already included", fileSub.Info.FullName);
 						}
 					}
+					else if (bIgnoreErrors)
+					{
+						FileInfo infoPlaceholder = new FileInfo(strFile);
+						File placeholder = new File();
+						placeholder.Info = infoPlaceholder;
+						lstFiles.Add(placeholder);
+					}
 				}
 			}
-		}
-
-
-
-
-		static private ProtoScript.File TryParse(string strFile)
-		{
-			try
+			else
 			{
-				if (Parsers.Settings.AllowPrecompiled && System.IO.File.Exists(strFile + ".json"))
+				string path = FileUtil.BuildPath(strRootDir, include.FileName);
+				File? fileSub = TryParse(path, bIgnoreErrors);
+				if (fileSub != null)
 				{
-					return new File() { Info = new FileInfo(strFile), RawCode = FileUtil.ReadFile(strFile + ".json"), IsPrecompiled = true };
+					if (!lstFiles.Any(x => StringUtil.EqualNoCase(x.Info.FullName, fileSub.Info.FullName)))
+					{
+						lstFiles.Add(fileSub);
+						GetIncludedFiles(fileSub, lstFiles, bIgnoreErrors);
+					}
+					else
+					{
+						Logs.DebugLog.WriteEvent("**** WARNING **** File already included", fileSub.Info.FullName);
+					}
 				}
-
-				return ProtoScript.Parsers.Files.Parse(strFile);
+				else if (bIgnoreErrors)
+				{
+					FileInfo infoPlaceholder = new FileInfo(path);
+					File placeholder = new File();
+					placeholder.Info = infoPlaceholder;
+					lstFiles.Add(placeholder);
+				}
 			}
-			catch (Parsers.Files.FileDoesNotExistException err)
+		}
+	}
+	
+	
+	
+	
+	static private ProtoScript.File TryParse(string strFile, bool bIgnoreErrors)
+	{
+		try
+		{
+			if (Parsers.Settings.AllowPrecompiled && System.IO.File.Exists(strFile + ".json"))
 			{
-				Parsers.ProtoScriptParsingException ex = new Parsers.ProtoScriptParsingException("", 0, "");
-				ex.Explanation = "File does not exist: " + err.Message;
-				ex.File = strFile;
-				throw;
+				return new File() { Info = new FileInfo(strFile), RawCode = FileUtil.ReadFile(strFile + ".json"), IsPrecompiled = true };
 			}
+			
+			return ProtoScript.Parsers.Files.Parse(strFile);
 		}
-
-
-
-
-		public Compiled.File Compile(ProtoScript.File fileCurrent)
+		catch (Parsers.Files.FileDoesNotExistException err)
 		{
-			Compiled.File file = new Compiled.File();
-			file.Statements = CompileFileList(new List<File> { fileCurrent });
-			return file;
+			if (bIgnoreErrors)
+			return null;
+			Parsers.ProtoScriptParsingException ex = new Parsers.ProtoScriptParsingException("", 0, "");
+			ex.Explanation = "File does not exist: " + err.Message;
+			ex.File = strFile;
+			throw;
 		}
-
-		public List<Compiled.Statement> DeclareFilePrototypes(ProtoScript.File file)
+		catch (Exception)
 		{
-			Compiler compiler = this;
+			if (bIgnoreErrors)
+			return null;
+			throw;
+		}
+	}
+	
+	
+	
+	
+	public Compiled.File Compile(ProtoScript.File fileCurrent)
+	{
+		Compiled.File file = new Compiled.File();
+		file.Statements = CompileFileList(new List<File> { fileCurrent });
+		return file;
+	}
+	
+	public List<Compiled.Statement> DeclareFilePrototypes(ProtoScript.File file)
+	{
+		Compiler compiler = this;
 			compiler.Source = file.RawCode;
 
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
