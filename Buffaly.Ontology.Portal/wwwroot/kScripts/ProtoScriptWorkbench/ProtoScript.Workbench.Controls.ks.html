@@ -327,7 +327,8 @@
 		_$("btnMinimize").removeClass("hidden");
 		_$("btnMaximize").addClass("hidden");
 		Page.LocalSettings.WindowSize = 'Maximize';
-	}
+		AdjustLayout();
+}
 	function OnHalfize() {
 		let iSize = (window.innerHeight / 4 - 115) + "px";
 
@@ -342,7 +343,8 @@
 		_$("divSymbolContainer").style.height = (window.innerHeight / 2 - 65) + "px";
 
 		Page.LocalSettings.WindowSize = 'Halfize';
-	}
+		AdjustLayout();
+}
 	function OnMinimize() {
 		_$("txtImmediate").setStyle('height', '50px');
 		_$("divImmediate").setStyle('height', '250px')
@@ -356,17 +358,19 @@
 
 		ControlUtil.SetValue("chkSaveVerification", false);
 		Page.LocalSettings.WindowSize = 'Minimize'
-	}
+		AdjustLayout();
+}
 
 	function AdjustWindowSizes() {
 		let sWindowSize = Page.LocalSettings.WindowSize;
 		if (sWindowSize == 'Maximize')
-			OnMaximize();
+		OnMaximize();
 		if (sWindowSize == 'Minimize')
-			OnMinimize();
+		OnMinimize();
 		if (sWindowSize == 'Halfize')
-			OnHalfize();
-	}
+		OnHalfize();
+		AdjustLayout();
+}
 </script>
 				<%})
 			})

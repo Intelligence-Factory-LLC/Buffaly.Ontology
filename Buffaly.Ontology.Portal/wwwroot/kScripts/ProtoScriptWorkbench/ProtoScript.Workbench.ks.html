@@ -16,7 +16,7 @@
 	}
 </style>
         <%})
-}%>
+	}%>
 
 <%redefinefunction SimplePage.Title
 {
@@ -55,7 +55,7 @@
 
 
 
-<div id="divDirective" class="position-relative" style="height:100vh; padding-right:300px;">
+<div id="divDirective" class="position-relative" style="height:calc(100vh - 250px); padding-right:300px;">
 <div id="divWorkbenchContent" class="h-100 overflow-auto">
 <%oFile.Content{%>
 <div id="divFileContent">
@@ -177,9 +177,17 @@
 
 
 <script type="text/javascript">
+	function AdjustLayout() {
+		let oDirective = _$("divDirective");
+		let oImmediate = _$("divImmediate");
+		if (oDirective && oImmediate)
+			oDirective.style.height = (window.innerHeight - oImmediate.offsetHeight) + "px";
+}
+	window.addEventListener('resize', AdjustLayout);
+	window.addEventListener('load', AdjustLayout);
 	function isLetter(str) {
 		return str.length === 1 && str.match(/[a-z]/i);
-	}
+}
 
 	function OnPredictNextLine(cm, option) {
 
