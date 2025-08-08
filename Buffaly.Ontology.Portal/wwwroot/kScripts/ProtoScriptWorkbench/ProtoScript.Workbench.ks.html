@@ -45,83 +45,81 @@
 
 
 
-<div class="row g-3" id="divDirective">
-    <div class="col-lg-9 border">
-        <%oFile.Content{%>
-        <div id="divFileContent" class="overflow-auto">
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" id="txtFileName" placeholder="Enter file name..." />
-                <button class="btn btn-primary" type="button" onclick="OnLoadFile()">
-                    <i class="bi bi-folder2-open"></i> Load
-                </button>
-                <button class="btn btn-success" type="button" onclick="OnSaveCurrentFile()">
-                    <i class="bi bi-save"></i> Save
-                </button>
-            </div>
-            <textarea id="txtCode" kcs:FieldName="Directive" class="form-control no-autosize code-area"></textarea>
-            <div id="divOffset"></div>
-            <div id="divDescription"></div>
-            <div id="divPredictions" class="text-pre"></div>
-        </div>
-        <%}%>
+<div id="divDirective" class="position-relative" style="height:100vh; padding-right:300px;">
+<div id="divWorkbenchContent" class="h-100 overflow-auto">
+<%oFile.Content{%>
+<div id="divFileContent">
+<div class="input-group mb-3">
+<input type="text" class="form-control" id="txtFileName" placeholder="Enter file name..." />
+<button class="btn btn-primary" type="button" onclick="OnLoadFile()">
+<i class="bi bi-folder2-open"></i> Load
+</button>
+<button class="btn btn-success" type="button" onclick="OnSaveCurrentFile()">
+<i class="bi bi-save"></i> Save
+</button>
+</div>
+<textarea id="txtCode" kcs:FieldName="Directive" class="form-control no-autosize code-area"></textarea>
+<div id="divOffset"></div>
+<div id="divDescription"></div>
+<div id="divPredictions" class="text-pre"></div>
+</div>
+<%}%>
 
-		<%oSolution.Content{%>
-		<div class="mb-3">
-		    <label for="txtSolution" class="form-label">Project</label>
-		    <div class="input-group">
-		        <input type="text" kcs:FieldName="Directory" id="txtSolution" class="form-control" />
-		        <button class="btn btn-primary" onclick="OnLoadProject()">Load Project</button>
-		    </div>
-		    <h6 class="fw-bold mt-3">Recent</h6>
-		    <div  class="" id="divSolutionHistory"></div>
-		    <div class="mt-3" id="divSolutionExamples"></div>
-		</div>
-		<%}%>
-        <%SimplePage.GetTabs(oTopTabs)%>
-    </div>
-    <div class="col-lg-3 border">
-        <div id="divSymbolContainer" class="position-fixed symbol-container">
-            <%oProject.Content{%>
-            <div class="mb-2">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" id="txtProjectFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterProjectFiles()" />
-                </div>
-            </div>
-            <button class="btn btn-success mb-2" onclick="OnAddNewFile()" title="Add a new file">
-                <i class="bi bi-plus"></i> Add File
-            </button>
-            <div id="divProject" class="overflow-auto" style="max-width: 290px; max-height: 80vh;"></div>
-            <%}%>
-            <%oSymbols.Content{%>
-			<div class="mb-3">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" id="txtSymbolSearch" class="form-control" placeholder="Search symbols..." onkeyup="OnFilterSymbols(event)" />
-                </div>
-            </div>
+<%oSolution.Content{%>
+<div class="mb-3">
+<label for="txtSolution" class="form-label">Project</label>
+<div class="input-group">
+<input type="text" kcs:FieldName="Directory" id="txtSolution" class="form-control" />
+<button class="btn btn-primary" onclick="OnLoadProject()">Load Project</button>
+</div>
+<h6 class="fw-bold mt-3">Recent</h6>
+<div  class="" id="divSolutionHistory"></div>
+<div class="mt-3" id="divSolutionExamples"></div>
+</div>
+<%}%>
+<%SimplePage.GetTabs(oTopTabs)%>
+</div>
+<div id="divSymbolContainer" class="symbol-container border-start">
+<%oProject.Content{%>
+<div class="mb-2">
+<div class="input-group">
+<span class="input-group-text">
+<i class="bi bi-search"></i>
+</span>
+<input type="text" id="txtProjectFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterProjectFiles()" />
+</div>
+</div>
+<button class="btn btn-success mb-2" onclick="OnAddNewFile()" title="Add a new file">
+<i class="bi bi-plus"></i> Add File
+</button>
+<div id="divProject" class="overflow-auto"></div>
+<%}%>
+<%oSymbols.Content{%>
+<div class="mb-3">
+<div class="input-group">
+<span class="input-group-text">
+<i class="bi bi-search"></i>
+</span>
+<input type="text" id="txtSymbolSearch" class="form-control" placeholder="Search symbols..." onkeyup="OnFilterSymbols(event)" />
+</div>
+</div>
 
-            <div id="divRecentSymbols" class="text-pre overflow-auto mt-3"></div>
-            <div id="divSymbolTable" class="text-pre overflow-auto"></div>
-            <%}%>
-            <%oFiles.Content{%>
-			<div class="mb-3">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" id="txtFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterFiles()"  autocomplete="off" />
-                </div>
-            </div>
-            <div id="divSolution" class="overflow-auto"></div>
-            <%}%>
-            <%SimplePage.GetTabs(oSideTabs)%>
-        </div>
-    </div>
+<div id="divRecentSymbols" class="text-pre overflow-auto mt-3"></div>
+<div id="divSymbolTable" class="text-pre overflow-auto"></div>
+<%}%>
+<%oFiles.Content{%>
+<div class="mb-3">
+<div class="input-group">
+<span class="input-group-text">
+<i class="bi bi-search"></i>
+</span>
+<input type="text" id="txtFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterFiles()" autocomplete="off" />
+</div>
+</div>
+<div id="divSolution" class="overflow-auto"></div>
+<%}%>
+<%SimplePage.GetTabs(oSideTabs)%>
+</div>
 </div>
 
  
