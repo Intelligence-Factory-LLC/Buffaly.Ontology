@@ -24,6 +24,13 @@ namespace Ontology.Simulation
 
 		public StringWrapper(Prototype prototype) 
 		{
+			if (prototype is StringWrapper sw)
+			{
+				this.Prototype = sw.Prototype;
+				PopulateClone(this, this.Prototype);
+				return;
+			}
+
 			if (!Prototypes.TypeOf(prototype, System_String.Prototype))
 				throw new Exception("Cannot create a string from prototype: " + prototype.PrototypeName);
 
@@ -70,6 +77,9 @@ namespace Ontology.Simulation
 
 		public static string ToString(Prototype protoPredicate)
 		{
+			if (protoPredicate is StringWrapper sw)
+				return sw.GetStringValue();
+
 			return new StringWrapper(protoPredicate).GetStringValue();		
 		}
 

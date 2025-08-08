@@ -22,7 +22,7 @@ namespace Ontology.Agents
 			AgentName = "Dev.Agent";
 			ProjectFile = BasicUtilities.Settings.GetStringOrDefault(
 				"Dev.Agent.ProjectFile",
-				@"C:\dev\ai\Ontology\ProtoScript.Tests\DevAgent\Project.pts"
+				@"C:\dev\ai\Ontology8\Buffaly.Ontology.Portal\wwwroot\projects\DevAgent\Project.pts"
 			);
 			SQLPipeline.ApplicationName = AgentName;
 		}

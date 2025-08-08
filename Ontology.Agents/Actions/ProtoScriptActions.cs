@@ -9,6 +9,7 @@ using Buffaly.NLU;
 using Ontology.Agents.NodeBasedAgent;
 using Ontology.Agents.DevelopmentAgent;
 using Buffaly.AIProviderAPI;
+using CSharp.Extensions.CodeIndex;
 
 namespace Ontology.Agents.Actions
 {
@@ -17,7 +18,7 @@ namespace Ontology.Agents.Actions
 		//>create a method to get an existing program. Take the strDirective and return a Prototype 
 		//>1) Look for most similar fragments with Tag "ProtoScript Action"
 		//>2) If there is a similar fragment with threshold over 0.9 then get the prototype from the fragment and return it
-                public static async Task<Prototype?> GetExistingProgram(string strDirective)
+		public static async Task<Prototype?> GetExistingProgram(string strDirective)
 		{
 			List<Prototype> lstSimilarFragments = await ProtoScriptActions.GetRelevantActions(strDirective);
 			foreach (Prototype proto in lstSimilarFragments)
@@ -65,40 +66,40 @@ namespace Ontology.Agents.Actions
 		}
 
 
-                public static async Task<JsonObject> GenerateSyntheticProgram(string strDirective,
-			JsonObject jsonRequest,
-			SessionObject session)
-        {
-                        ProtoScriptTagger tagger = session.Tagger;
+		public static async Task<JsonObject> GenerateSyntheticProgram(string strDirective,
+	JsonObject jsonRequest,
+	SessionObject session)
+		{
+			ProtoScriptTagger tagger = session.Tagger;
 
-                        string strInput = strDirective; // continuations use just the new value
+			string strInput = strDirective; // continuations use just the new value
 
-                        if (!session.HasSystemMessage())
-                        {
-                                FragmentsRow rowProgramGenerator = Fragments.GetFragmentByFragmentKey("Synthetic Program Generator");
-                                StringBuilder sbPrompt = new StringBuilder();
-                                sbPrompt.AppendLine(rowProgramGenerator.Fragment);
+			if (!session.HasSystemMessage())
+			{
+				FragmentsRow rowProgramGenerator = Fragments.GetFragmentByFragmentKey("Synthetic Semantic Program Generator");
+				StringBuilder sbPrompt = new StringBuilder();
+				sbPrompt.AppendLine(rowProgramGenerator.Fragment);
 
-                                //>+ get the ProtoScript Basics fragment and append it to the prompt
-                                FragmentsRow rowProtoScriptBasics = Fragments.GetFragmentByFragmentKey("ProtoScript Basics");
-                                sbPrompt.AppendLine(rowProtoScriptBasics.Fragment);
+				//>+ get the ProtoScript Basics fragment and append it to the prompt
+				FragmentsRow rowProtoScriptBasics = Fragments.GetFragmentByFragmentKey("ProtoScript Basics");
+				sbPrompt.AppendLine(rowProtoScriptBasics.Fragment);
 
-                                string strPrompt = LLMs.AddSectionToPrompt(sbPrompt.ToString(), "Output Format",
-                                        "Respond in JSON with a format of {Program: 'generated code here', Call : 'the call to the program with parameters'}");
+				string strPrompt = LLMs.AddSectionToPrompt(sbPrompt.ToString(), "Output Format",
+						"Respond in JSON with a format of {Program: 'generated code here', Call : 'the call to the program with parameters'}");
 
-                                session.AddSystemMessage(strPrompt);
-                                Logs.DebugLog.WriteEvent("GenerateSyntheticProgram.Prompt", strPrompt);
+				session.AddSystemMessage(strPrompt);
+				Logs.DebugLog.WriteEvent("GenerateSyntheticProgram.Prompt", strPrompt);
 
-                                List<Prototype> lstProtoScriptActions = await ProtoScriptActions.GetRelevantActions(strDirective, 15);
-                                //List<Prototype> lstCSharpMethods = await CSharpMethods.GetRelevantMethods(strDirective);
+				List<Prototype> lstProtoScriptActions = await ProtoScriptActions.GetRelevantActions(strDirective, 15);
+				List<Prototype> lstCSharpMethods = await CSharpMethods.GetRelevantMethods(strDirective);
 
-                                StringBuilder strProtoScriptDescriptions = ActionsToString(lstProtoScriptActions, tagger);
-                                //string strCSharpDescriptions = CSharpMethods.MethodsToString(lstCSharpMethods);
+				StringBuilder strProtoScriptDescriptions = ActionsToString(lstProtoScriptActions, tagger);
+				string strCSharpDescriptions = CSharpMethods.MethodsToString(lstCSharpMethods);
 
-                                List<Prototype> lstRelatedEntities = Entities.RecognizeEntitiesViaActivationSpreading(strDirective, tagger);
-                                StringBuilder sbEntities = new StringBuilder(Entities.EntitiesToString(lstRelatedEntities));
+				List<Prototype> lstRelatedEntities = Entities.RecognizeEntitiesViaActivationSpreading(strDirective, tagger);
+				StringBuilder sbEntities = new StringBuilder(Entities.EntitiesToString(lstRelatedEntities));
 
-                                strInput = @"
+				strInput = @"
 # Input Phrase
 
 " + strDirective + @"
@@ -115,34 +116,34 @@ or generalized.
 
 These methods are available to you to use in your synthetic program and are in CSharp:
 
-" /* + strCSharpDescriptions + */ + @"
+"  + strCSharpDescriptions +  @"
 
 # Related Entities
 
 These entities are related to the directive and may be useful in your synthetic program:
 
 " + sbEntities.ToString();
-                                foreach (var key in jsonRequest?.Keys ?? Enumerable.Empty<string>())
-                                {
-                                        string strKey = key;
-                                        string strValue = jsonRequest.GetStringOrNull(key);
-                                        if (strKey != null)
-                                        {
-                                                strInput += string.Format("\n# {0}\n{1}", strKey, strValue);
-                                        }
-                                }
-                        }
+				foreach (var key in jsonRequest?.Keys ?? Enumerable.Empty<string>())
+				{
+					string strKey = key;
+					string strValue = jsonRequest.GetStringOrNull(key);
+					if (strKey != null)
+					{
+						strInput += string.Format("\n# {0}\n{1}", strKey, strValue);
+					}
+				}
+			}
 
-                        session.AddUserMessage(strInput);
+			session.AddUserMessage(strInput);
 
-                        Logs.DebugLog.WriteEvent("GenerateSyntheticProgram.Input", strInput);
+			Logs.DebugLog.WriteEvent("GenerateSyntheticProgram.Input", strInput);
 
-                        JsonObject jsonResult = await LLMs.ExecuteLLMPromptAndInputWithHistory(session.Messages, ModelSize.LargeModel);
+			JsonObject jsonResult = await LLMs.ExecuteLLMPromptAndInputWithHistory(session.Messages, ModelSize.LargeModel);
 
-                        session.AddAgentMessage(jsonResult.ToString());
+			session.AddAgentMessage(jsonResult.ToString());
 
-                        return jsonResult;
-                }
+			return jsonResult;
+		}
 
 		//>+ merge the above two methods into a new method GenerateProgramAndVerify that 
 		//>1) Gets the program 
@@ -192,9 +193,24 @@ These entities are related to the directive and may be useful in your synthetic 
 			}
 			catch (Exception err)
 			{
-				string strErrorMessage = "Could not execute program: " + err.Message;
-				if (null != err.InnerException)
-					strErrorMessage += ", " + err.InnerException.Message;
+				string strErrorMessage = "Could not execute program: ";
+
+				if (tagger.Compiler.Diagnostics.Count > 0)
+				{
+					foreach (var diagnostic in tagger.Compiler.Diagnostics)
+					{
+						strErrorMessage += "\n" + diagnostic.Diagnostic.Message;
+						StatementParsingInfo? info = diagnostic.Statement?.Info ?? diagnostic.Expression?.Info;
+						if (null != info)
+							strErrorMessage += " at `" + strProgram.Substring(info.StartingOffset, info.Length) + "`";
+					}
+				}
+				else
+				{
+					strErrorMessage += err.Message;
+					if (null != err.InnerException)
+						strErrorMessage += ", " + err.InnerException.Message;
+				}
 
 				string strFixed = await FixProtoScript(strDirective, strProgram, strErrorMessage, tagger);
 				JsonObject jsonResult = new JsonObject(strFixed);
@@ -275,7 +291,7 @@ These entities are related to the directive and may be useful in your synthetic 
 			throw new NotImplementedException();
 
 		}
-	
+
 		public async static Task<string> PlanProgram(string strDirective, JsonObject jsonRequest, SessionObject session)
 		{
 			//			ProtoScriptTagger tagger = session.Tagger;
@@ -378,7 +394,7 @@ These entities are related to the directive and may be useful in your synthetic 
 				return jsonResult;
 
 
-                        Prototype? protoProgram = await ProtoScriptActions.GetExistingProgram(strDirective);
+			Prototype? protoProgram = await ProtoScriptActions.GetExistingProgram(strDirective);
 			string? strNewProgram = null;
 
 			if (null != protoProgram)

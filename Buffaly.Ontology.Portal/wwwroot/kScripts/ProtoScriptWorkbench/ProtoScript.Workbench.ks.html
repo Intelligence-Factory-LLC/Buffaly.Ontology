@@ -57,19 +57,19 @@
 
 
 <div id="divDirective" class="position-relative" style="height:calc(100vh - 250px); padding-right:300px;">
-<div id="divWorkbenchContent" class="h-100 overflow-auto">
-<%oFile.Content{%>
-<div id="divFileContent">
-<div class="input-group mb-3">
-<input type="text" class="form-control" id="txtFileName" placeholder="Enter file name..." />
-<button class="btn btn-primary" type="button" onclick="OnLoadFile()">
-<i class="bi bi-folder2-open"></i> Load
-</button>
-<button class="btn btn-success" type="button" onclick="OnSaveCurrentFile()">
-<i class="bi bi-save"></i> Save
-</button>
-</div>
-<textarea id="txtCode" kcs:FieldName="Directive" class="form-control no-autosize code-area"></textarea>
+	<div id="divWorkbenchContent" class="h-100">
+		<%oFile.Content{%>
+		<div id="divFileContent" class="overflow-auto">
+			<div class="input-group mb-3">
+				<input type="text" class="form-control" id="txtFileName" placeholder="Enter file name..." />
+				<button class="btn btn-primary" type="button" onclick="OnLoadFile()">
+					<i class="bi bi-folder2-open"></i> Load
+				</button>
+				<button class="btn btn-success" type="button" onclick="OnSaveCurrentFile()">
+					<i class="bi bi-save"></i> Save
+				</button>
+			</div>
+			<textarea id="txtCode" kcs:FieldName="Directive" class="form-control no-autosize code-area"></textarea>
 			<div id="divOffset"></div>
 			<div id="divDescription"></div>
 			<div id="divPredictions" class="text-pre"></div>
@@ -183,12 +183,12 @@
 		let oImmediate = _$("divImmediate");
 		if (oDirective && oImmediate)
 			oDirective.style.height = (window.innerHeight - oImmediate.offsetHeight) + "px";
-}
+	}
 	window.addEventListener('resize', AdjustLayout);
 	window.addEventListener('load', AdjustLayout);
 	function isLetter(str) {
 		return str.length === 1 && str.match(/[a-z]/i);
-}
+	}
 
 	function OnPredictNextLine(cm, option) {
 

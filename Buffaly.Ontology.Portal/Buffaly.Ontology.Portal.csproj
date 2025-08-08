@@ -48,9 +48,6 @@
     <Reference Include="kScript">
       <HintPath>..\lib\kScript.dll</HintPath>
     </Reference>
-    <Reference Include="Ontology.Agents">
-      <HintPath>..\lib\Ontology.Agents.dll</HintPath>
-    </Reference>
     <Reference Include="RooTrax.Cache">
       <HintPath>..\lib\RooTrax.Cache.dll</HintPath>
     </Reference>
@@ -91,6 +88,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Buffaly.NLU.Tagger\Buffaly.NLU.Tagger.csproj" />
     <ProjectReference Include="..\Buffaly.NLU\Buffaly.NLU.csproj" />
+    <ProjectReference Include="..\Ontology.Agents\Ontology.Agents.csproj" />
     <ProjectReference Include="..\Ontology.Parsers\Ontology.Parsers.csproj" />
     <ProjectReference Include="..\Ontology.Simulation\Ontology.Simulation.csproj" />
     <ProjectReference Include="..\Ontology\Ontology.csproj" />

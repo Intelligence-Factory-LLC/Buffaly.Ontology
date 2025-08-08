@@ -118,6 +118,7 @@ String strResult = Method4();
 
 		static private FragmentsDataTable? EntityFragments = null;
 
+		const bool AllowInsertLexemes = false; 
 		static public async Task InsertSemanticEntity(Prototype prototype, string strEntity, ProtoScriptTagger tagger)
 		{
 			if (null == EntityFragments)
@@ -147,7 +148,8 @@ String strResult = Method4();
 				FragmentsRepository.UpdateFragmentData(rowFragment);
 			}
 
-			List<Prototype> lstParts = LexemeUtil.InsertLexemesForSemanticEntity(prototype, strEntity, tagger);
+			if (AllowInsertLexemes)
+				LexemeUtil.InsertLexemesForSemanticEntity(prototype, strEntity, tagger);
 		}
 
 
