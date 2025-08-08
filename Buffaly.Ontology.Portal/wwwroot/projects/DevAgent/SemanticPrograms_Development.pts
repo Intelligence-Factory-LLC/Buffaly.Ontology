@@ -250,33 +250,7 @@ prototype ToInstallRooTraxCompletionComponentInProductionInstance : ProtoScriptA
 	}
 }
 
-[SemanticProgram.InfinitivePhrase("To create a new VisualStudioSolution prototype")]
-prototype ToCreateVisualStudioSolutionPrototype : ProtoScriptAction 
-{
-	function that() : void 
-	{
-		this.Name = nameof(that);
-		this.Signature = "ToCreateVisualStudioSolutionPrototype.Execute(string directory, string solutionName) : VisualStudioSolution";
-		this.Description = @"
-			Creates a new instance of a VisualStudioSolution prototype using the provided directory and solution name.
-		";
-	}
 
-	function Execute(string directory, string solutionName) : VisualStudioSolution 
-	{
-		VisualStudioSolution instance = TemporaryPrototypes.CreateInstance(VisualStudioSolution, solutionName) as VisualStudioSolution;
-		instance.SolutionName =  directory + "\\" + solutionName + ".sln";
-		instance.Directory = directory;
-
-		// Build ScriptDirectory using the directory and solution name
-		instance.ScriptDirectory = directory + "\\Scripts";
-
-		// Build FileName using the solution name
-		instance.FileName = solutionName + ".sln";
-
-		return instance;
-	}
-}
 
 ///////////// Web Applications ///////////////
 
@@ -623,67 +597,9 @@ prototype ToAddClassLibraryProjectToSolutionUsingDotnetCLI : ProtoScriptAction
     }
 }
 
-[SemanticProgram.InfinitivePhrase("create a prototype for solution in given directory and materialize it to a string")]
-prototype CreateAndMaterializeSolutionPrototype : ProtoScriptAction 
-{
-	function that() : void 
-	{
-		this.Name = nameof(that);
-		this.Signature = "CreateAndMaterializeSolutionPrototype.Execute(string solutionDirectory, string solutionName) : string";
-		this.Description = @"
-			Creates a VisualStudioSolution prototype for the specified directory and solution name and materializes it to a string.
-		";
-	}
-
-	function Execute(string solutionDirectory, string solutionName) : string 
-	{
-		// Step 1: Validate input parameters using StringUtil.IsEmpty
-		if (StringUtil.IsEmpty(solutionDirectory))
-		{
-			return "Invalid solution directory.";
-		}
-		if (StringUtil.IsEmpty(solutionName))
-		{
-			return "Invalid solution name.";
-		}
-
-		// Step 2: Create a new VisualStudioSolution prototype using the provided parameters
-		VisualStudioSolution solutionPrototype = ToCreateVisualStudioSolutionPrototype.Execute(solutionDirectory, solutionName);
-
-		// Step 3: Materialize the created prototype into a string representation
-		string materializedSolution = ToMaterializeAPrototypeToString.Execute(solutionPrototype);
-
-		// Step 4: Return the result
-		return materializedSolution;
-	}
-}
 
 
-[SemanticProgram.InfinitivePhrase("create and materialize the solution RooTrax.Creator")]
-prototype CreateAndMaterializeRooTraxCreatorSolution : ProtoScriptAction 
-{
-	function that() : void 
-	{
-		this.Name = nameof(that);
-		this.Signature = "CreateAndMaterializeRooTraxCreatorSolution.Execute() : string";
-		this.Description = @"
-			Creates a Visual Studio solution prototype for RooTrax.Creator in the specified directory and materializes it to a string.
-		";
-	}
 
-	function Execute() : string 
-	{
-		// Step 1: Define solution directory and name
-		string solutionDirectory = "c:\\dev\\RooTrax.Creator"; // Set the appropriate directory path
-		string solutionName = "RooTrax.Creator"; // Name of the solution
-
-		// Step 2: Create and materialize the Visual Studio solution prototype
-		string materializedSolution = CreateAndMaterializeSolutionPrototype.Execute(solutionDirectory, solutionName);
-
-		// Step 3: Return the materialized string
-		return materializedSolution;
-	}
-}
 
 
 [SemanticProgram.InfinitivePhrase("read a file from disk and send it to the LLM with a prompt")]

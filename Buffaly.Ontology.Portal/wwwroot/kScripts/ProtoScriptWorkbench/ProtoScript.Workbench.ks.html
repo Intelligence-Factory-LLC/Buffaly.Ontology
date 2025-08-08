@@ -10,10 +10,11 @@
 	#divImmediateHistory {
 		height: 140px;
 	}
-	#divImmediateHistory .list-group-item {
-		padding: 0.25rem 0.5rem;
-		font-size: 0.875rem;
-	}
+
+		#divImmediateHistory .list-group-item {
+			padding: 0.25rem 0.5rem;
+			font-size: 0.875rem;
+		}
 </style>
         <%})
 }%>
@@ -56,83 +57,83 @@
 
 
 <div id="divDirective" class="position-relative" style="height:100vh; padding-right:300px;">
-<div id="divWorkbenchContent" class="h-100 overflow-auto">
-<%oFile.Content{%>
-<div id="divFileContent">
-<div class="input-group mb-3">
-<input type="text" class="form-control" id="txtFileName" placeholder="Enter file name..." />
-<button class="btn btn-primary" type="button" onclick="OnLoadFile()">
-<i class="bi bi-folder2-open"></i> Load
-</button>
-<button class="btn btn-success" type="button" onclick="OnSaveCurrentFile()">
-<i class="bi bi-save"></i> Save
-</button>
-</div>
+	<div id="divWorkbenchContent" class="h-100 overflow-auto">
+		<%oFile.Content{%>
+		<div id="divFileContent">
+			<div class="input-group mb-3">
+				<input type="text" class="form-control" id="txtFileName" placeholder="Enter file name..." />
+				<button class="btn btn-primary" type="button" onclick="OnLoadFile()">
+					<i class="bi bi-folder2-open"></i> Load
+				</button>
+				<button class="btn btn-success" type="button" onclick="OnSaveCurrentFile()">
+					<i class="bi bi-save"></i> Save
+				</button>
+			</div>
 <textarea id="txtCode" kcs:FieldName="Directive" class="form-control no-autosize code-area"></textarea>
-<div id="divOffset"></div>
-<div id="divDescription"></div>
-<div id="divPredictions" class="text-pre"></div>
-</div>
-<%}%>
+			<div id="divOffset"></div>
+			<div id="divDescription"></div>
+			<div id="divPredictions" class="text-pre"></div>
+		</div>
+		<%}%>
 
-<%oSolution.Content{%>
-<div class="mb-3">
-<label for="txtSolution" class="form-label">Project</label>
-<div class="input-group">
-<input type="text" kcs:FieldName="Directory" id="txtSolution" class="form-control" />
-<button class="btn btn-primary" onclick="OnLoadProject()">Load Project</button>
-</div>
-<h6 class="fw-bold mt-3">Recent</h6>
-<div  class="" id="divSolutionHistory"></div>
-<div class="mt-3" id="divSolutionExamples"></div>
-</div>
-<%}%>
-<%SimplePage.GetTabs(oTopTabs)%>
-</div>
-<div id="divSymbolContainer" class="symbol-container border-start">
-<%oProject.Content{%>
-<div class="mb-2">
-<div class="input-group">
-<span class="input-group-text">
-<i class="bi bi-search"></i>
-</span>
-<input type="text" id="txtProjectFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterProjectFiles()" />
-</div>
-</div>
-<button class="btn btn-success mb-2" onclick="OnAddNewFile()" title="Add a new file">
-<i class="bi bi-plus"></i> Add File
-</button>
-<div id="divProject" class="overflow-auto"></div>
-<%}%>
-<%oSymbols.Content{%>
-<div class="mb-3">
-<div class="input-group">
-<span class="input-group-text">
-<i class="bi bi-search"></i>
-</span>
-<input type="text" id="txtSymbolSearch" class="form-control" placeholder="Search symbols..." onkeyup="OnFilterSymbols(event)" />
-</div>
+		<%oSolution.Content{%>
+		<div class="mb-3">
+			<label for="txtSolution" class="form-label">Project</label>
+			<div class="input-group">
+				<input type="text" kcs:FieldName="Directory" id="txtSolution" class="form-control" />
+				<button class="btn btn-primary" onclick="OnLoadProject()">Load Project</button>
+			</div>
+			<h6 class="fw-bold mt-3">Recent</h6>
+			<div class="" id="divSolutionHistory"></div>
+			<div class="mt-3" id="divSolutionExamples"></div>
+		</div>
+		<%}%>
+		<%SimplePage.GetTabs(oTopTabs)%>
+	</div>
+	<div id="divSymbolContainer" class="symbol-container border-start">
+		<%oProject.Content{%>
+		<div class="mb-2">
+			<div class="input-group">
+				<span class="input-group-text">
+					<i class="bi bi-search"></i>
+				</span>
+				<input type="text" id="txtProjectFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterProjectFiles()" />
+			</div>
+		</div>
+		<button class="btn btn-success mb-2" onclick="OnAddNewFile()" title="Add a new file">
+			<i class="bi bi-plus"></i> Add File
+		</button>
+		<div id="divProject" class="overflow-auto"></div>
+		<%}%>
+		<%oSymbols.Content{%>
+		<div class="mb-3">
+			<div class="input-group">
+				<span class="input-group-text">
+					<i class="bi bi-search"></i>
+				</span>
+				<input type="text" id="txtSymbolSearch" class="form-control" placeholder="Search symbols..." onkeyup="OnFilterSymbols(event)" />
+			</div>
+		</div>
+
+		<div id="divRecentSymbols" class="text-pre overflow-auto mt-3"></div>
+		<div id="divSymbolTable" class="text-pre overflow-auto"></div>
+		<%}%>
+		<%oFiles.Content{%>
+		<div class="mb-3">
+			<div class="input-group">
+				<span class="input-group-text">
+					<i class="bi bi-search"></i>
+				</span>
+				<input type="text" id="txtFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterFiles()" autocomplete="off" />
+			</div>
+		</div>
+		<div id="divSolution" class="overflow-auto"></div>
+		<%}%>
+		<%SimplePage.GetTabs(oSideTabs)%>
+	</div>
 </div>
 
-<div id="divRecentSymbols" class="text-pre overflow-auto mt-3"></div>
-<div id="divSymbolTable" class="text-pre overflow-auto"></div>
-<%}%>
-<%oFiles.Content{%>
-<div class="mb-3">
-<div class="input-group">
-<span class="input-group-text">
-<i class="bi bi-search"></i>
-</span>
-<input type="text" id="txtFileSearch" class="form-control" placeholder="Search files..." onkeyup="OnFilterFiles()" autocomplete="off" />
-</div>
-</div>
-<div id="divSolution" class="overflow-auto"></div>
-<%}%>
-<%SimplePage.GetTabs(oSideTabs)%>
-</div>
-</div>
 
- 
 
 <%ProtoScriptWorkbench.GetImmediateWindow%>
 <%ProtoScriptWorkbench.GetModals%>
@@ -206,13 +207,13 @@
 
 		return;
 	}
-	
+
 	function isNumber(str) {
 		return str.length === 1 && str.match(/\d/);
 	}
-		
+
 	function OnSuggest(cm, option) {
-		var cursor = cm.getCursor(), line = cm.getLine(cursor.line)		
+		var cursor = cm.getCursor(), line = cm.getLine(cursor.line)
 		let iPos = cm.indexFromPos(cursor);
 
 		line = line.substr(0, cursor.ch);
@@ -260,7 +261,7 @@
 			if (!StringUtil.IsEmpty(sSearch) && ['Symbol', 'Parameter'].contains(sType)) {
 				//oRes2 = ProtoScriptWorkbench.GetSymbolsAtCursor(Page.LocalSettings.Solution, Page.LocalSettings.File, iPos);
 				//if (null == oRes2)
-					oRes2 = ProtoScriptWorkbench.GetSymbolsAtCursor(Page.LocalSettings.Solution, Page.LocalSettings.File, iPos - iLastSaved);
+				oRes2 = ProtoScriptWorkbench.GetSymbolsAtCursor(Page.LocalSettings.Solution, Page.LocalSettings.File, iPos - iLastSaved);
 
 				if (null == oRes2)
 					oRes2 = [];
@@ -302,7 +303,7 @@
 		else
 			return null;
 	}
-	
+
 
 
 
@@ -311,10 +312,10 @@
 		indentWithTabs: true,
 		smartIndent: true,
 		lineNumbers: true,
-		matchBrackets: true, 
+		matchBrackets: true,
 		autofocus: true,
 		lineSeparator: '\r\n',
-		newline : "crlf",
+		newline: "crlf",
 		extraKeys: {
 			"Ctrl-Space": "autocomplete",
 			"Ctrl-Enter": OnEnter,
@@ -328,7 +329,7 @@
 			"Shift-Ctrl-F": "replace",
 			"Shift-Ctrl-R": "replaceAll"
 		},
-		hintOptions: { hint: OnSuggest, completeSingle : false },
+		hintOptions: { hint: OnSuggest, completeSingle: false },
 		gutters: ['gutter-error', "breakpoints"]
 	});
 
@@ -355,15 +356,14 @@
 
 	function SetCode(sCode) {
 		// Replace single \r or \n with \r\n
-		  sCode = sCode.replace(/\r(?!\n)|(?<!\r)\n/g, "\r\n");
+		sCode = sCode.replace(/\r(?!\n)|(?<!\r)\n/g, "\r\n");
 
 
 		ControlUtil.SetValue("txtCode", sCode);
 		window.editor.setValue(sCode);
 	}
 
-	function GetCode()
-	{
+	function GetCode() {
 		return window.editor.getValue();
 	}
 
@@ -434,18 +434,18 @@
 
 	editor.on("keyup", function (cm, event) {
 		if (!cm.state.completionActive && /*Enables keyboard navigation in autocomplete list*/
-           !ExcludedIntelliSenseTriggerKeys[(event.keyCode || event.which).toString()] ) {        /*Enter - do not open autocomplete list just after item has been selected in it*/
+			!ExcludedIntelliSenseTriggerKeys[(event.keyCode || event.which).toString()]) {        /*Enter - do not open autocomplete list just after item has been selected in it*/
 			CodeMirror.commands.autocomplete(cm, null, { completeSingle: false });
 		}
 	});
 
 	let bMouseDown = false;
 
-	ControlUtil.AddEvent(document, "mousedown", function() { bMouseDown = true; })
+	ControlUtil.AddEvent(document, "mousedown", function () { bMouseDown = true; })
 	ControlUtil.AddEvent(document, "mouseup", function () {
-		bMouseDown=false;
+		bMouseDown = false;
 
-		if (!bMouseDown&&!StringUtil.IsEmpty(editor.getSelection())) {
+		if (!bMouseDown && !StringUtil.IsEmpty(editor.getSelection())) {
 			OnSelectedText(window.event);
 		}
 		else {
@@ -455,7 +455,7 @@
 			OnCloseDebugContext();
 		}
 	});
-	
+
 	ControlUtil.AddEvent(document, "keydown", function () {
 		OnCloseContextActions();
 	});
@@ -472,19 +472,18 @@
 
 	function highlightError(error) {
 
-		if (null!=error.Info) {
+		if (null != error.Info) {
 			if (StringUtil.EqualNoCase(error.Info.File, Page.LocalSettings.File)) {
-				var errorLine=editor.posFromIndex(error.Info.StartingOffset).line;
+				var errorLine = editor.posFromIndex(error.Info.StartingOffset).line;
 
-				var marker=makeMarker('(Error '+error.Type+') '+error.Message);
+				var marker = makeMarker('(Error ' + error.Type + ') ' + error.Message);
 				editor.setGutterMarker(errorLine, 'gutter-error', marker);
 			}
 		}
 		//jQuery('[data-toggle="tooltip"]').tooltip();
 	}
 
-	function ScrollTo(info, markerClass)
-	{
+	function ScrollTo(info, markerClass) {
 		let lineStart = editor.posFromIndex(info.StartingOffset);
 		let lineStop = editor.posFromIndex(info.StartingOffset + Math.max(info.Length, 2));
 
@@ -493,7 +492,7 @@
 			lineStart.ch = 0;
 		}
 
-		let sText = editor.getLine(lineStart.line)	
+		let sText = editor.getLine(lineStart.line)
 		if (sText.length <= lineStart.ch)
 			lineStart.ch = 0;
 
@@ -513,7 +512,7 @@
 		//_$("divFileContent").scrollTop = 65	//height to first line
 		//	+ (line * 20);
 		const scroller = _$("divFileContent");                // your wrapper utility
-		const top      = editor.heightAtLine(line, "local"); // px distance of line’s top edge
+		const top = editor.heightAtLine(line, "local"); // px distance of line’s top edge
 		scroller.scrollTop = Math.max(0, top - 65);          // keep header offset
 	}
 
@@ -523,8 +522,7 @@
 		editor.scrollTo(null, t - middleHeight - 5);
 	}
 
-	function clearErrors()
-	{
+	function clearErrors() {
 		editor.clearGutter('gutter-error');
 	}
 
@@ -541,14 +539,12 @@
 		return marker;
 	}
 
-	function ReplaceCurrentLine(sText)
-	{
+	function ReplaceCurrentLine(sText) {
 		let cur = window.editor.getCursor();
 		window.editor.getDoc().replaceRange(sText, { line: cur.line, ch: 0 }, { line: cur.line, ch: cur.ch })
 	}
 
-	function InsertAtOffset(sText, oInfo)
-	{
+	function InsertAtOffset(sText, oInfo) {
 		let oFrom = window.editor.posFromIndex(oInfo.StartingOffset);
 		let oTo = window.editor.posFromIndex(oInfo.StartingOffset + oInfo.Length);
 
@@ -557,21 +553,21 @@
 
 
 	$$('.tabstop').each(x => x.addEventListener('keydown', function (e) {
-				
-			if (e.key == 'Tab') {
-				e.preventDefault();
-				var start = this.selectionStart;
-				var end = this.selectionEnd;
 
-				// set textarea value to: text before caret + tab + text after caret
-				this.value = this.value.substring(0, start) +
-					"\t" + this.value.substring(end);
+		if (e.key == 'Tab') {
+			e.preventDefault();
+			var start = this.selectionStart;
+			var end = this.selectionEnd;
 
-				// put caret at right position again
-				this.selectionStart =
-					this.selectionEnd = start + 1;
-			}
-		}));
+			// set textarea value to: text before caret + tab + text after caret
+			this.value = this.value.substring(0, start) +
+				"\t" + this.value.substring(end);
+
+			// put caret at right position again
+			this.selectionStart =
+				this.selectionEnd = start + 1;
+		}
+	}));
 </script>
 	<%})
 }%>
@@ -581,7 +577,7 @@
 <%redefinefunction SimplePage.FileMenu
 {
 	(returnex{%>
-					
- 
+
+
 	<%})
 }%>

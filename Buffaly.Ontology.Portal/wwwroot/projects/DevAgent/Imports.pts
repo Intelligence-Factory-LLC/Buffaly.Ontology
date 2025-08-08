@@ -54,11 +54,10 @@ import Ontology.Agents Ontology.Agents.Actions.SystemOperations SystemOperations
 import Ontology.Agents Ontology.Agents.Actions.WebPages WebPages;
 
 import Ontology.Agents Ontology.Agents.DevelopmentAgent.ProtoScriptAgent ProtoScriptAgent;
-//import Ontology.Agents Ontology.Agents.SemanticPrograms.CSharpMethods CSharpMethods;
 
 reference CSharp.Extensions CSharp.Extensions;
 import CSharp.Extensions CSharp.Extensions.Utils.VsProjects VsProjects;
-
+import CSharp.Extensions CSharp.Extensions.CodeIndex.CSharpMethods CSharpMethods;
 
 
 reference Buffaly.SemanticDB Buffaly.SemanticDB;
@@ -67,11 +66,6 @@ import Buffaly.SemanticDB Buffaly.SemanticDB.Fragments Fragments;
 reference Buffaly.SemanticDB.Data Buffaly.SemanticDB.Data;
 import Buffaly.SemanticDB.Data Buffaly.SemanticDB.Data.FragmentsRow FragmentsRow;
 import Buffaly.SemanticDB.Data Buffaly.SemanticDB.Data.FragmentsRepository FragmentsRepository;
-
-
-
-
-
 
 
 reference WebAppUtilities WebAppUtilities;

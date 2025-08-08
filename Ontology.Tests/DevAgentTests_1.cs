@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BasicUtilities;
+using Buffaly.Common;
 using Buffaly.NLU;
 using Buffaly.NLU.Tagger.Nodes;
+using Microsoft.Extensions.Configuration;
 using Ontology.Simulation;
 using ProtoScript.Extensions;
 using System;
 using System.IO;
-using BasicUtilities;
 
 namespace Ontology.Tests
 {
@@ -34,6 +35,8 @@ namespace Ontology.Tests
 			Initializer.Initialize();
 
 			TemporaryPrototypes.Cache.InsertLogFrequency = 10000;
+
+			Buffaly.SemanticDB.Data.DataAccess.SetConnectionString(config.GetConnectionStringOrFail("buffaly_semanticdb.readwrite"));
 		}
 
 	

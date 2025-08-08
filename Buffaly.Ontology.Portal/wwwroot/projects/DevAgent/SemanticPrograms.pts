@@ -183,26 +183,7 @@ prototype ToRetrieveAPropertyFromAPrototype : ProtoScriptAction
 	}
 }
 
-/*
-[SemanticProgram.InfinitivePhrase("To insert an entity as a prototype")]
-prototype ToInsertAnEntityAsAPrototype : ProtoScriptAction 
-{
-	function that() : void 
-	{
-		this.Name = nameof(that);
-		this.Signature = "ToInsertAnEntityAsAPrototype.Execute(string strEntity, string strParent, string strRelated) : void";
-		this.Description = @"
-			Inserts an entity by utilizing ProtoScriptActions.InsertEntity method, providing entity, parent, and related information.
-		";
-	}
 
-	function Execute(string strEntity, string strParent, string strRelated) : Prototype 
-	{
-		// Use the InsertEntity method to perform the entity insertion.
-		// Insert the entity using the specified parameters (entity name, parent, related information).
-		return ProtoScriptActions.InsertEntity(strEntity, strParent, strRelated, _tagger);
-	}
-} */
 
 
 

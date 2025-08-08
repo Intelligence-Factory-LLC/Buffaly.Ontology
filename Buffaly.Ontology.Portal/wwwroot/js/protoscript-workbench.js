@@ -786,9 +786,9 @@ async function CompileCode() {
 						}).delay(1000);
 
 						if (null != err.Info)
-								Output({ Message: err.Message, Info: err.Info });
+							Output({ Message: err.Message, Info: err.Info });
 						else
-								Output(err.Message);
+							Output(err.Message);
 
 						//					["a", { click: function () { NavigateTo(x.Info, x.SymbolName); } }, x.SymbolName ]]
 					})
@@ -827,27 +827,34 @@ async function CompileCode() {
 
 function ClearOutput() {
 	_$("txtResults2").innerHTML = "";
-	}
-	
-	function appendOutputLine(sMessage, oInfo) {
+}
+
+function appendOutputLine(sMessage, oInfo) {
 	const oDiv = document.createElement("div");
 	oDiv.appendChild(document.createTextNode(sMessage));
 	if (oInfo && oInfo.File) {
-	const oLink = document.createElement("a");
-	oLink.href = "#";
-	oLink.textContent = ` (${oInfo.File}${oInfo.StartingOffset ? ":" + oInfo.StartingOffset : ""})`;
-	oLink.onclick = function () { NavigateTo(oInfo); return false; };
-	oDiv.appendChild(oLink);
+		const oLink = document.createElement("a");
+		oLink.href = "#";
+		oLink.textContent = ` (${oInfo.File}${oInfo.StartingOffset ? ":" + oInfo.StartingOffset : ""})`;
+		oLink.onclick = function () {
+			NavigateTo(oInfo);
+			(function () {
+				highlightError({Info: oInfo});
+			}).delay(1000);
+
+			return false;
+		};
+		oDiv.appendChild(oLink);
 	}
 	const oOut = _$("txtResults2");
 	oOut.insertBefore(oDiv, oOut.firstChild);
-	}
+}
 
 function Output(oMessage) {
 	if ($type(oMessage) == 'object')
-	appendOutputLine(oMessage.Message || JSON.stringify(oMessage, null, 2), oMessage.Info);
+		appendOutputLine(oMessage.Message || JSON.stringify(oMessage, null, 2), oMessage.Info);
 	else
-	appendOutputLine(oMessage, null);
+		appendOutputLine(oMessage, null);
 }
 
 function BindImmediateHistory() {
@@ -976,12 +983,12 @@ async function OnTagImmediate(ctrl) {
 		ctrl.children[0].className = ctrl.children[0].className.replace("bi-arrow-repeat bi-spin", "bi-tag")
 		clearInterval(timerUpdate);
 
-if (!StringUtil.IsEmpty(oRes.Result)) {
-Output(oRes.Result);
-}
-						else if (!StringUtil.IsEmpty(oRes.Error)) {
-		Output({ Message: oRes.Error, Info: oRes.ErrorStatement });
-}
+		if (!StringUtil.IsEmpty(oRes.Result)) {
+			Output(oRes.Result);
+		}
+		else if (!StringUtil.IsEmpty(oRes.Error)) {
+			Output({ Message: oRes.Error, Info: oRes.ErrorStatement });
+		}
 		BindImmediateHistory();
 	});
 }

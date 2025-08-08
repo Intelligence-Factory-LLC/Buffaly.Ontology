@@ -164,5 +164,6 @@ public class Program
 
 	private static void SetConnectionString(IConfigurationRoot config)
 	{
+		Buffaly.SemanticDB.Data.DataAccess.SetConnectionString(config.GetConnectionStringOrFail("buffaly_semanticdb.readwrite"));
 	}
 }
