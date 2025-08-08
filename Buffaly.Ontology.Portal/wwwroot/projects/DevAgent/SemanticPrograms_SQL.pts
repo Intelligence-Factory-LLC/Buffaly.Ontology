@@ -125,25 +125,6 @@ prototype ToGetTheStoredProcedureFromTheSQLCall : ProtoScriptAction
 	}
 }
 
-[SemanticProgram.InfinitivePhrase("To get the stored procedure prototype by name")]
-prototype ToGetTheStoredProcedurePrototypeByName : ProtoScriptAction 
-{
-	function that() : void 
-	{
-		this.Name = nameof(that);
-		this.Signature = "ToGetTheStoredProcedurePrototypeByName.Execute(string procedureName) : Prototype";
-		this.Description = @"
-			procedureName - the name of the stored procedure to retrieve the prototype for";
-	}
-
-	function Execute(String procedureName) : Prototype 
-	{
-		Prototype prototype = TemporaryPrototypes.GetTemporaryPrototypeOrNull("SQL.FeedingFrenzy." + procedureName);
-		if (null != prototype)
-			prototype = _interpretter.NewInstance(prototype);
-		return prototype;
-	}
-}
 
 
 

@@ -226,35 +226,3 @@ prototype ToMaterializeAPrototypeToString : ProtoScriptAction
 	}
 }
 
-/////////////////////////////////////////Fragments /////////////////////////////////////
-[SemanticProgram.InfinitivePhrase("To get the most similar file")]
-prototype ToGetTheMostSimilarFile : ProtoScriptAction 
-{
-	function that() : void 
-	{
-		this.Name = nameof(that);
-		this.Signature = "ToGetTheMostSimilarFile.Execute(string entityName) : File";
-		this.Description = @"
-			Finds the most similar file for the given entity name by retrieving prototypes tagged as 'Entity' 
-			and returning the first prototype of type File.";
-	}
-
-	function Execute(String entityName) : Prototype 
-	{
-		// Step 1: Retrieve closest prototypes by tag name
-		Collection prototypes = new Collection(FragmentHelpers.GetClosestPrototypesByTagName(entityName, "Entity", 0.5));
-
-		// Step 2: Find the first prototype of type File
-		foreach (Prototype proto in prototypes)
-		{
-			if (proto typeof File)
-			{
-				return proto;
-			}
-		}
-
-		// Step 3: Return null if no File type prototype is found
-		return null;
-	}
-}
-

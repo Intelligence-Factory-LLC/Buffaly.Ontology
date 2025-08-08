@@ -117,32 +117,6 @@ prototype ToRebuildUtilitiesReferences : ProtoScriptAction
 	}
 }
 
-[SemanticProgram.InfinitivePhrase("to deploy ontology.services")]
-prototype ToDeployOntologyServices : ProtoScriptAction 
-{ 
-	function that() : void 
-	{ 
-		this.Name = nameof(that);
-		this.Signature = "ToDeployOntologyServices.Execute() : void";
-		this.Description = @"
-			Deploys the ontology services by executing two batch scripts.
-		";
-	}
-
-	function Execute() : Prototype 
-	{ 
-		// Step 1: Execute the build deployment services batch script
-		String buildCommand = @"C:\dev\ai\ontology\scripts\build_deployment_services.bat";
-		String buildResult = ToExecuteCommandLineOperation.Execute(buildCommand, "");
-		
-		// Step 2: Execute the deploy services batch script
-		String deployCommand = @"C:\dev\ai\ontology\scripts\deploy_services.bat";
-		String deployResult = ToExecuteCommandLineOperation.Execute(deployCommand, "");
-		
-
-		return buildResult + "\r\n" + deployResult;
-	}
-}
 
 [SemanticProgram.InfinitivePhrase("to launch a file or to open a file")]
 prototype ToLaunchOrOpenFile : ProtoScriptAction 
@@ -311,14 +285,6 @@ prototype WebApplication : LearnedEntity
 	String RootDirectory = new String();
 }
 
-[SemanticEntity("ontology-services.dev.buffa.ly")]
-prototype OntologyServicesWebApplication : WebApplication 
-{
-	init
-	{
-		RootDirectory = @"c:\inetpub\wwwroot\Ontology.Services";
-	}
-}
 
 [SemanticProgram.InfinitivePhrase("To open the web.config for a web application")]
 prototype ToOpenWebConfigForWebApplication : ProtoScriptAction 
@@ -481,18 +447,6 @@ prototype ToDownloadFileFromUrl : ProtoScriptAction
 }
 
 
-////////////////////Visual Studio Solutions/////////////////////
-partial prototype File#PackInstallRestore_bat : File
-{
-	init
-	{
-		FullPath = @"C:\dev\ai\ontology\ProtoScript.Tests\DevAgent\PackInstallRestore.bat";
-		FileName = "PackInstallRestore.bat";
-	}
-
-}
-
-
 [SemanticProgram.InfinitivePhrase("to download the NuGet command line app installation package")]
 prototype ToDownloadNuGetCommandLineApp : ProtoScriptAction 
 {
@@ -598,7 +552,7 @@ prototype ToInstallNuGetPackageIntoVisualStudioProject : ProtoScriptAction
 		String solutionDirectory = project.Solution.Directory + "\\" + project.ProjectName;
 
 		// Step 4: Define the path to the PackInstallRestore.bat script
-		String scriptPath = File#PackInstallRestore_bat.FullPath;
+		String scriptPath = @"C:\\dev\\ai\\ontology\\ProtoScript.Tests\\DevAgent\\PackInstallRestore.bat";
 
 		// Step 5: Define the arguments for the script
 		String arguments = solutionDirectory + " " + packageName;
@@ -704,25 +658,6 @@ prototype CreateAndMaterializeSolutionPrototype : ProtoScriptAction
 	}
 }
 
-////////// Ad Hoc ////////////
-[SemanticProgram.InfinitivePhrase("to get the most recent events from the windows application event log")]
-prototype ToGetMostRecentEventsFromWindowsApplicationEventLog : ProtoScriptAction 
-{
-	function that() : void 
-	{
-		this.Name = nameof(that);
-		this.Signature = "ToGetMostRecentEventsFromWindowsApplicationEventLog.Execute() : List";
-		this.Description = @"
-			Retrieves the most recent events from the Windows Application Event Log, returning a list of formatted strings containing the details of each event.
-		";
-	}
-
-	function Execute() : Prototype 
-	{
-		// Use the C# method to retrieve the last three events from the Windows Application Event Log
-		return SystemOperations.GetLast3EventsFromApplicationLog();
-	}
-}
 
 [SemanticProgram.InfinitivePhrase("create and materialize the solution RooTrax.Creator")]
 prototype CreateAndMaterializeRooTraxCreatorSolution : ProtoScriptAction 
