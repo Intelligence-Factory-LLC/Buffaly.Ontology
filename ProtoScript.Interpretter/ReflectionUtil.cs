@@ -56,6 +56,18 @@ namespace ProtoScript.Interpretter
 			if (exact != null)
 				return exact;            // best possible match
 
+			//Note: there is no reason behind normalized being first, so it can be switched
+			exact = type.GetMethod(
+									strMethodName,
+									BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance,
+									binder: null,
+									types: lstParameters.ToArray(),
+									modifiers: null);
+
+			if (exact != null)
+				return exact;            // best possible match
+
+
 			//──── 2. manual scoring among the remaining candidates ───────────
 			MethodInfo? best = null;
 			int bestScore = int.MaxValue;  // lower == better

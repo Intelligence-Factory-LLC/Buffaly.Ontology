@@ -41,7 +41,7 @@ namespace Ontology.Tests
 		{
 			//string path = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Buffaly.Ontology.Portal", "wwwroot", "projects", file);
 
-			string path = Path.Combine("C:\\dev\\ai\\ontology\\ProtoScript.Tests\\DevAgent\\", file);
+			string path = Path.Combine("C:\\dev\\ai\\Ontology8\\Buffaly.Ontology.Portal\\wwwroot\\projects\\DevAgent\\", file);
 			return Path.GetFullPath(path);
 		}
 		public static string GetProjectSmall()

@@ -1,0 +1,12 @@
+prototype MetaActions
+{
+	function EntityResolution(string Directive) : string 
+	{
+		return MetaActionsInternal.EntityResolution(Directive, _tagger);
+	}
+
+	function LookupActions(string Directive) : string 
+	{
+		return MetaActionsInternal.LookupActions(Directive, _tagger);
+	}
+}

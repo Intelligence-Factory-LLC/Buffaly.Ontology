@@ -1,0 +1,84 @@
+reference Ontology Ontology; 
+reference Ontology.Simulation Ontology.Simulation;
+reference ProtoScript.Interpretter ProtoScript.Interpretter;
+reference BasicUtilities BasicUtilities;
+reference Buffaly.NLU Buffaly.NLU;
+
+
+import Ontology Ontology.PrototypeLogging PrototypeLogging;
+import Ontology Ontology.Collection Collection;
+import Ontology Ontology.Prototype Prototype;
+import Ontology Ontology.TypeOfs TypeOfs;
+import Ontology Ontology.PrototypeGraphs PrototypeGraphs;
+import Ontology Ontology.NativeValuePrototype NativeValuePrototype;
+import Ontology Ontology.Prototypes Prototypes;
+import Ontology Ontology.TemporaryPrototypes TemporaryPrototypes;
+
+import Ontology.Simulation Ontology.Simulation.TemporarySequences TemporarySequences;
+import Ontology.Simulation Ontology.Simulation.TemporaryPrototypeCategorization TemporaryPrototypeCategorization;
+import Ontology.Simulation Ontology.Simulation.TemporaryPrototypeGraphs TemporaryPrototypeGraphs;
+import Ontology.Simulation Ontology.Simulation.TemporaryPrototypeShortFormParser TemporaryPrototypeShortFormParser;
+import Ontology.Simulation Ontology.Simulation.Possibilities Possibilities;
+import Ontology.Simulation Ontology.Simulation.MultiTokenPhrases MultiTokenPhrases;
+
+
+import Ontology.Simulation Ontology.Simulation.StringWrapper String;
+import Ontology.Simulation Ontology.Simulation.IntWrapper Int;
+import Ontology.Simulation Ontology.Simulation.DoubleWrapper Double;
+import Ontology.Simulation Ontology.Simulation.BoolWrapper Bool;
+
+import ProtoScript.Interpretter ProtoScript.Interpretter.SimpleInterpretter SimpleInterpretter;
+import ProtoScript.Interpretter ProtoScript.Interpretter.NativeInterpretter NativeInterpretter;
+import Buffaly.NLU Buffaly.NLU.UnderstandUtil UnderstandUtil;
+import Buffaly.NLU Buffaly.NLU.ProtoScriptTagger ProtoScriptTagger;
+import Buffaly.NLU Buffaly.NLU.PrototypeDefinitionHelpers PrototypeDefinitionHelpers;
+import Buffaly.NLU Buffaly.NLU.TemporaryActions TemporaryActions;
+import Buffaly.NLU Buffaly.NLU.TemporarySubTypes TemporarySubTypes;
+//import ProtoScript.Tagging ProtoScript.Tagging.Generators.PrototypeDefinitionGenerator PrototypeDefinitionGenerator;
+
+
+//import ProtoScript.Tagging ProtoScript.Tagging.Nodes.ProtoScriptControllers ProtoScriptControllers;
+
+import BasicUtilities BasicUtilities.StringUtil StringUtil;
+import BasicUtilities BasicUtilities.FileUtil FileUtil;
+import BasicUtilities BasicUtilities.JsonObject JsonObject; 
+import BasicUtilities Logs Logs; 
+
+
+reference Ontology.Agents Ontology.Agents;
+import Ontology.Agents Ontology.Agents.Actions.LLMs LLMs;
+import Ontology.Agents Ontology.Agents.Actions.FragmentHelpers FragmentHelpers;
+import Ontology.Agents Ontology.Agents.Actions.ProtoScriptActions ProtoScriptActions;
+import Ontology.Agents Ontology.Agents.Actions.MetaActionsInternal MetaActionsInternal;
+import Ontology.Agents Ontology.Agents.Actions.SystemOperations SystemOperations;
+import Ontology.Agents Ontology.Agents.Actions.WebPages WebPages;
+
+import Ontology.Agents Ontology.Agents.DevelopmentAgent.ProtoScriptAgent ProtoScriptAgent;
+//import Ontology.Agents Ontology.Agents.SemanticPrograms.CSharpMethods CSharpMethods;
+
+reference CSharp.Extensions CSharp.Extensions;
+import CSharp.Extensions CSharp.Extensions.Utils.VsProjects VsProjects;
+
+
+
+reference Buffaly.SemanticDB Buffaly.SemanticDB;
+import Buffaly.SemanticDB Buffaly.SemanticDB.Fragments Fragments;
+
+reference Buffaly.SemanticDB.Data Buffaly.SemanticDB.Data;
+import Buffaly.SemanticDB.Data Buffaly.SemanticDB.Data.FragmentsRow FragmentsRow;
+import Buffaly.SemanticDB.Data Buffaly.SemanticDB.Data.FragmentsRepository FragmentsRepository;
+
+
+
+
+
+
+
+reference WebAppUtilities WebAppUtilities;
+import WebAppUtilities HttpUtil HttpUtil;
+
+
+reference mscorlib mscorlib;
+import mscorlib System.Collections.Generic.List`1 List;
+
+

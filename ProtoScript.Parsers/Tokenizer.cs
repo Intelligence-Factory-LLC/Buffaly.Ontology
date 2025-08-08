@@ -208,7 +208,7 @@ namespace ProtoScript.Parsers
 			// Add other critical single-character tokens
 			insertSymbol('@');  // For verbatim strings @"..."
 			insertSymbol('$');  // For interpolated strings $"..."
-			insertSymbol('#');  // For preprocessor directives #region
+			//insertSymbol('#'); # is not a symbol in ProtoScript, it can be used within an identifier
 			insertSymbol('{');
 			insertSymbol('}');
 			insertSymbol('[');

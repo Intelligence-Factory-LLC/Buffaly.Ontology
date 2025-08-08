@@ -1,0 +1,448 @@
+
+
+[SemanticProgram.InfinitivePhrase("To create a SQL Predicate via LLM")]
+prototype ToCreateASQLPredicate : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToCreateASQLPredicate.Execute(string predicate, string sqlCall) : string";
+		this.Description = @"
+			predictate - the question to ask about the input 	
+			sqlCall - a list of inputs and output pairs to provide as examples" ;
+	}	
+
+	function Execute(String predicate, String sqlCall) : bool 
+	{
+		String prompt = ToCreateAnLLMPrompt.CreateLLMPrompt(
+			"You are examining a piece of SQL and will answer a question about that code.",
+			[], 
+			"{ IsConditionTrue = true or false }");
+		
+		prompt = ToAddASectionToAnLLMPrompt.Execute(prompt, "Question", predicate);
+				
+		JsonObject response = ToExecuteAnLLMPromptAndInput.Execute(prompt, sqlCall); 
+		
+		return response.GetBooleanOrFalse("IsConditionTrue");
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To create a SQL Call via LLM")]
+prototype ToCreateASqlCallViaLLM : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToCreateASqlCallViaLLM.Execute(string input, Collection examples) : string";
+		this.Description = @"
+			input - the SQL call to provide as the base input
+			examples - examples to guide the LLM in generating the SQL call";
+	}
+
+	function Execute(String input, Collection examples) : String 
+	{
+		// Step 1: Define the hardcoded instructions
+		String instructions = "Create a SQL Call using the examples below. Generate valid SQL for Microsoft SQL Server...";
+
+		// Step 2: Define the hardcoded output format
+		String outputFormat = "{ GeneratedSqlCall : the sql call is here }";
+
+		// Step 3: Create the LLM prompt
+		String prompt = ToCreateAnLLMPrompt.CreateLLMPrompt(instructions, examples, outputFormat);
+
+		// Step 4: Execute the prompt with the input
+		JsonObject response = ToExecuteAnLLMPromptAndInput.Execute(prompt, input);
+
+		// Step 5: Return the generated SQL call
+		return response.GetStringOrDefault("GeneratedSqlCall", "Failed to generate SQL call.");
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To check if a SQL Call contains a stored procedure call")]
+prototype ToCheckIfASQLCallContainsAStoredProcedureCall : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToCheckIfASQLCallContainsAStoredProcedureCall.Execute(string sqlCall) : bool";
+		this.Description = @"
+			sqlCall - the SQL statement to analyze to determine if it contains a stored procedure call.";
+	}
+
+	function Execute(String sqlCall) : bool 
+	{
+		// Step 1: Define the predicate
+		String predicate = "Does the SQL call contain a stored procedure call?";
+
+		// Step 2: Provide examples for the SQL predicate
+		Collection examples = new Collection();
+		examples.Add(new Example(
+			"EXEC [dbo].[GetLeadsSp];",
+			"{ IsConditionTrue = true }"
+		));
+		examples.Add(new Example(
+			"SELECT * FROM Leads;",
+			"{ IsConditionTrue = false }"
+		));
+		examples.Add(new Example(
+			"EXEC SomeProcedure @Param = 1;",
+			"{ IsConditionTrue = true }"
+		));
+		examples.Add(new Example(
+			"INSERT INTO Leads VALUES (1, 'John');",
+			"{ IsConditionTrue = false }"
+		));
+
+		// Step 3: Use the ToCreateASQLPredicate prototype to evaluate the predicate
+		bool result = ToCreateASQLPredicate.Execute(predicate, sqlCall);
+
+		// Step 4: Return the result
+		return result;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To get the stored procedure from the SQL Call")]
+prototype ToGetTheStoredProcedureFromTheSQLCall : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGetTheStoredProcedureFromTheSQLCall.Execute(string sqlCall) : string";
+		this.Description = @"
+			sqlCall - the SQL code from which the stored procedure will be extracted";
+	}
+
+	function Execute(String sqlCall) : String 
+	{
+		String prompt = ToCreateAnLLMPrompt.CreateLLMPrompt(
+			"You are analyzing SQL code to extract the stored procedure definition.",
+			[], 
+			"{ StoredProcedureName = string }");
+
+		JsonObject response = LLMs.ExecuteLLMPromptAndInput(prompt, sqlCall);
+
+		return response.GetStringOrDefault("StoredProcedureName", "UnknownProcedure");
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To get the stored procedure prototype by name")]
+prototype ToGetTheStoredProcedurePrototypeByName : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGetTheStoredProcedurePrototypeByName.Execute(string procedureName) : Prototype";
+		this.Description = @"
+			procedureName - the name of the stored procedure to retrieve the prototype for";
+	}
+
+	function Execute(String procedureName) : Prototype 
+	{
+		Prototype prototype = TemporaryPrototypes.GetTemporaryPrototypeOrNull("SQL.FeedingFrenzy." + procedureName);
+		if (null != prototype)
+			prototype = _interpretter.NewInstance(prototype);
+		return prototype;
+	}
+}
+
+
+
+[SemanticProgram.InfinitivePhrase("To check if the stored procedure ends with a select statement")]
+prototype ToCheckIfTheStoredProcedureEndsWithASelectStatement : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToCheckIfTheStoredProcedureEndsWithASelectStatement.Execute(string storedProcedureName) : bool";
+		this.Description = @"
+			storedProcedureName - the name of the stored procedure to check if it ends with a SELECT statement";
+	}
+
+	function Execute(String storedProcedureName) : bool 
+	{
+		// Step 1: Get the stored procedure definition
+		String storedProcedureDefinition = ToGetAStoredProcedureDefinitionFromName.Execute(storedProcedureName);
+		
+		// Step 2: Define the SQL predicate
+		String predicate = "Does the SQL call end with a SELECT statement with no statements after the final SELECT statement?";
+
+		// Step 3: Generate examples for the prompt
+		Collection examples = new Collection();
+		examples.Add(new Example(
+			"CREATE PROCEDURE TestProcedure AS BEGIN SELECT * FROM Table1; END;",
+			"{ IsConditionTrue = true }"
+		));
+		examples.Add(new Example(
+			"CREATE PROCEDURE TestProcedure AS BEGIN SELECT * FROM Table1; INSERT INTO Table2 VALUES (1); END;",
+			"{ IsConditionTrue = false }"
+		));
+		examples.Add(new Example(
+			"CREATE PROCEDURE TestProcedure AS BEGIN SELECT * FROM Table1; SELECT * FROM Table2; END;",
+			"{ IsConditionTrue = true }"
+		));
+
+		// Step 4: Create the LLM prompt
+		String prompt = ToCreateAnLLMPrompt.CreateLLMPrompt(
+			"You are examining a piece of SQL and need to answer a question about whether it ends with a SELECT statement with no additional statements afterward.",
+			examples,
+			"{ IsConditionTrue = true or false }"
+		);
+
+		// Step 5: Add the question as a section to the LLM prompt
+		prompt = ToAddASectionToAnLLMPrompt.Execute(prompt, "Question", predicate);
+
+		// Step 6: Execute the prompt with the stored procedure definition as input
+		JsonObject response = ToExecuteAnLLMPromptAndInput.Execute(prompt, storedProcedureDefinition);
+
+		// Step 7: Return the result from the LLM
+		return response.GetBooleanOrFalse("IsConditionTrue");
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("To use @@ROWCOUNT to count the rows of the SQL call")]
+prototype ToUseRowCountToCountTheRowsOfTheSQLCall : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToUseRowCountToCountTheRowsOfTheSQLCall.Execute(string sqlCall) : string";
+		this.Description = @"
+			sqlCall - the SQL statement to modify to include @@ROWCOUNT for counting rows";
+	}
+
+	function Execute(String sqlCall) : String 
+	{
+		// Step 1: Check if the SQL call contains a stored procedure call
+		Prototype isStoredProcedureCall = ToCheckIfASQLCallContainsAStoredProcedureCall.Execute(sqlCall);
+
+		if (isStoredProcedureCall)
+		{
+			// Step 2: Get the stored procedure name from the SQL call
+			String storedProcedureName = ToGetTheStoredProcedureFromTheSQLCall.Execute(sqlCall);
+
+			// Step 3: Check if the stored procedure ends with a SELECT statement
+			bool endsWithSelect = ToCheckIfTheStoredProcedureEndsWithASelectStatement.Execute(storedProcedureName);
+			if (!endsWithSelect)
+			{
+				return null;
+			}
+		}
+
+		// Step 4: Define the predicate for modifying the SQL call
+		String predicate = "Add SELECT @@ROWCOUNT to the SQL call after the main execution statement.";
+
+		// Step 5: Provide examples for the SQL predicate
+		Collection examples = new Collection();
+		examples.Add(new Example(
+			"EXEC [dbo].[GetLeadsSp];",
+			"EXEC [dbo].[GetLeadsSp]; SELECT @@ROWCOUNT;"
+		));
+		examples.Add(new Example(
+			"SELECT * FROM Leads;",
+			"SELECT * FROM Leads; SELECT @@ROWCOUNT;"
+		));
+
+		// Step 5: Generate the modified SQL call using the new semantic program
+		String modifiedSQLCall = ToCreateASqlCallViaLLM.Execute(sqlCall, examples);
+
+		// Step 6: Return the modified SQL call
+		return modifiedSQLCall;
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("To count the rows from a query using a count function")]
+prototype ToCountRowsFromQueryUsingCountFunction : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToCountRowsFromQueryUsingCountFunction.Execute(string sqlCall) : string";
+		this.Description = @"
+			sqlCall - the SQL statement or stored procedure call to count the rows using a COUNT function";
+	}
+
+	function Execute(String sqlCall) : String 
+	{
+		// Step 1: Check if the SQL call is a stored procedure
+		bool isStoredProcedureCall = ToCheckIfASQLCallContainsAStoredProcedureCall.Execute(sqlCall);
+
+		// Initialize variables for definition and examples
+		String storedProcedureDefinition = null;
+		Collection examples = new Collection();
+
+		if (isStoredProcedureCall)
+		{
+			// Step 2: Get the stored procedure definition
+			String storedProcedureName = ToGetTheStoredProcedureFromTheSQLCall.Execute(sqlCall);
+			storedProcedureDefinition = ToGetAStoredProcedureDefinitionFromName.Execute(storedProcedureName);
+
+			// Step 3: Add examples for stored procedure SQL calls
+			examples.Add(new Example(
+				"SQL Call: exec dbo.GetLeadsSp  Definition: CREATE PROCEDURE GetLeadsSp AS SELECT * FROM Leads;",
+				"SELECT COUNT(*) FROM (SELECT * FROM Leads) AS Result;"
+			));
+			examples.Add(new Example(
+				"SQL Call: exec dbo.GetUsersByIDSp 123, Definition: CREATE PROCEDURE GetUsers @ID int AS SELECT * FROM Users WHERE UserID = @ID;",
+				"SELECT COUNT(*) FROM (SELECT * FROM User where UserID = 123) AS Result;"
+			));
+		}
+		else
+		{
+			// Step 4: Add examples for direct query SQL calls
+			examples.Add(new Example(
+				"SELECT * FROM Leads;",
+				"SELECT COUNT(*) FROM Leads;"
+			));
+			examples.Add(new Example(
+				"SELECT Name, Email FROM Users;",
+				"SELECT COUNT(*) FROM (SELECT Name, Email FROM Users) AS Result;"
+			));
+		}
+
+		// Step 5: Use ToCreateASqlCallViaLLM to generate the SQL call with COUNT
+		String input;
+		if (isStoredProcedureCall)
+		{
+			input = "SQL Call: " + sqlCall + "\r\nDefinition: " + storedProcedureDefinition;
+		}
+		else
+		{
+			input = sqlCall;
+		}
+
+		// Generate the final SQL call
+		String countSqlCall = ToCreateASqlCallViaLLM.Execute(input, examples);
+
+		// Step 6: Return the final SQL call
+		return countSqlCall;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To get database entities")]
+prototype ToGetDatabaseEntities : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGetDatabaseEntities.Execute(string strEntity) : string";
+		this.Description = @"
+			Retrieves and returns database entities in a formatted string. This should be 
+			used to find database objects (like tables) that are associated with an English entity.
+				strEntity - a word or phrase associated with the database object
+		";
+	}
+
+	function Execute(string strEntity) : string 
+	{
+		// Call the C# method to get database entities
+		string dbEntities = SQLActions.GetDatabaseEntities(strEntity, _sessionObject);
+
+		// Return the formatted string of database entities
+		return dbEntities;
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("to get a table definition")]
+prototype ToGetTableDefinition : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGetTableDefinition.Execute(string tableName) : string";
+		this.Description = @"
+			Retrieves the definition of a table by its name using the given session object.
+				tableName - the table to retrieve
+		";
+	}
+
+	function Execute(string tableName) : string 
+	{
+		// Validate the input tableName
+		if (StringUtil.IsEmpty(tableName))
+		{
+			return "Table name cannot be empty.";
+		}
+
+		// Retrieve and return the table definition using the SQLActions method
+		return SQLActions.GetTableDefinition(tableName, _sessionObject);
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To get a stored procedure definition from name")]
+prototype ToGetAStoredProcedureDefinitionFromName : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGetAStoredProcedureDefinitionFromName.Execute(string procedureName) : string";
+		this.Description = @"
+			Get a stored procedure definition from the database. 
+				procedureName - the name of the stored procedure to retrieve the full definition for";
+	}
+
+	function Execute(String procedureName) : String 
+	{
+		return SQLActions.GetStoredProcedureText(procedureName, _sessionObject);
+	}
+}
+
+
+
+
+[SemanticProgram.InfinitivePhrase("to connect to a database")]
+prototype ToConnectToDatabase : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToConnectToDatabase.Execute(string strConnection) : void";
+		this.Description = @"
+			Establishes a connection to a database using the DatabaseService.Connect method.
+		";
+	}
+
+	function Execute(string strConnection) : void 
+	{
+		SQLActions.ConnectToDatabase(strConnection, _sessionObject);
+	}
+}
+
+function Test_AdHoc(): string 
+{
+  ToConnectToDatabase.Execute("buffaly_semanticdb.readwrite");
+	return ToGetAStoredProcedureDefinitionFromName.Execute("Fragments_GetMostSimilar1ByTagID_Sp");
+}
+[SemanticProgram.InfinitivePhrase("to generate a sql call")]
+prototype ToGenerateASqlCall : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGenerateASqlCall.Execute(string directive, string code, string databaseObjects) : string";
+		this.Description = @"
+			Generates a SQL call based on the given user directive and context provided in jsonValues.
+				directive - the instruction to create the SQL call
+				code - any inline code provided to modify
+				databaseObjects - the referenced database objects
+			returns:
+				{
+					""GeneratedSQL"": ""string"",					// The complete generated SQL code if all required objects are available; if not, any partial SQL that could be generated.
+					""IsInformationNeeded"" = true					//if you need more information to fulfill the request
+					""Explanation"" = 'explanation'					//Detail any problems with the sql, such as missing objects, references, things you may need to successfully complete the SQL. Assume this will be
+				//used to provide any new objects back for further processing
+					""Status"": ""string"",                     // ""Success"" if all required objects are available and the SQL code is complete; ""Incomplete"" if additional objects are needed.
+				}				
+		";
+	}
+
+	function Execute(string directive, string code, string databaseObjects) : string 
+	{
+		// Step 1: Use the C# method to generate a SQL call
+		string strResult = SQLActions.GenerateSQLCall(directive, code, databaseObjects, null);
+
+		return strResult;
+	}
+}

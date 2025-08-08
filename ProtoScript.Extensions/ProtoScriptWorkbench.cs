@@ -188,13 +188,12 @@ namespace ProtoScript.Extensions
 				project.RootDirectory = strRootDir;
 				session.Context.Project = project;
 
-				//TODO: This needs to not load everything separate from the compilation process
 				List<File> lstFiles = Compiler.GetAllIncludedFiles(fileProject, false, true);
 				foreach (File file in lstFiles.OrderBy(x => x.Info.Name))
 				{
 					long length = 0;
 					if (file.Info != null && file.Info.Exists)
-					length = file.Info.Length;
+						length = file.Info.Length;
 					project.Files.Add(new ProtoScriptFile()
 					{
 						FileName = file.Info.FullName,
@@ -204,7 +203,7 @@ namespace ProtoScript.Extensions
 				FileInfo infoProject = new FileInfo(strProject);
 				long projectLength = 0;
 				if (infoProject.Exists)
-				projectLength = infoProject.Length;
+					projectLength = infoProject.Length;
 				project.Files.Add(new ProtoScriptFile()
 				{
 					FileName = strProject,
@@ -214,28 +213,10 @@ namespace ProtoScript.Extensions
 			}
 			catch (ProtoScriptParsingException err)
 			{
-				FileInfo infoProject = new FileInfo(strProject);
-				long projectLength = 0;
-				if (infoProject.Exists)
-				projectLength = infoProject.Length;
-				project.Files.Add(new ProtoScriptFile()
-				{
-					FileName = strProject,
-					Length = projectLength
-				});
 				throw new JsonWsException(err.Message + ", " + err.Explanation);
 			}
 			catch (Exception)
 			{
-				FileInfo infoProject = new FileInfo(strProject);
-				long projectLength = 0;
-				if (infoProject.Exists)
-				projectLength = infoProject.Length;
-				project.Files.Add(new ProtoScriptFile()
-				{
-					FileName = strProject,
-					Length = projectLength
-				});
 				throw;
 			}
 		}
@@ -711,10 +692,10 @@ namespace ProtoScript.Extensions
 
 		public class TagImmediateResult
 		{
-			public string ? Result = null;
-			public string ? Error = null;
-			public StatementParsingInfo ? ErrorStatement = null;
-			public Prototype ? ResultPrototype = null;
+			public string? Result = null;
+			public string? Error = null;
+			public StatementParsingInfo? ErrorStatement = null;
+			public Prototype? ResultPrototype = null;
 		}
 
 		static public void StopTagging(string strSessionKey)
@@ -891,7 +872,7 @@ namespace ProtoScript.Extensions
 			SessionObject session = GetOrCreateSession(strSessionKey);
 			Prototype prototype = TemporaryPrototypes.GetTemporaryPrototype(strPrototypeName);
 
-			JsonObject ? jsonRoot = PrototypeLogging.ToFriendlyJsonObject(prototype);
+			JsonObject? jsonRoot = PrototypeLogging.ToFriendlyJsonObject(prototype);
 			if (null != jsonRoot)
 			{
 				JsonArray jsonArray = new JsonArray();

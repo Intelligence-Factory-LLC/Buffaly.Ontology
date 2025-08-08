@@ -1,0 +1,10 @@
+include Imports.pts;
+include LocalData.pts;
+include SemanticPrograms.pts;
+include SemanticPrograms_SQL.pts;
+include SemanticPrograms_Development.pts;
+include SemanticPrograms_Planning.pts;
+
+
+
+// include recursive @"CodeIndex\*.pts";

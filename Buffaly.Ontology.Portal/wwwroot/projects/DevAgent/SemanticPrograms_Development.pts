@@ -1,0 +1,810 @@
+
+
+prototype CSharp.ClassDefinition : LearnedEntity 
+{
+	String ClassName = new String();
+	Int Length = 0;
+	String Signature = new String();
+}
+
+prototype CSharp.MethodDefinition : LearnedEntity
+{
+	String MethodName = new String();
+	String DetailedDescription = new String();
+	String Description = new String();
+	String Signature = new String();	
+	String ClassName = new String();
+	Int Length = 0;
+}
+
+
+
+///////////////////////////////File System ////////////////////////////////////////
+
+[SemanticProgram.InfinitivePhrase("To execute a command line operation")]
+prototype ToExecuteCommandLineOperation : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToExecuteCommandLineOperation.Execute(string command, string arguments) : string";
+		this.Description = @"
+			command - the command to execute on the command line
+			arguments - the arguments to pass to the command";
+	}
+
+	function Execute(String command, String arguments) : String 
+	{
+		// Step 2: Run the command with arguments
+		String result = SystemOperations.RunCommandLine(command, arguments);
+
+		// Step 3: Return the result
+		return result;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To execute a command line operation without waiting")]
+prototype ToExecuteCommandLineOperationWithoutWait : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToExecuteCommandLineOperationWithoutWait.Execute(string command, string arguments) : string";
+		this.Description = @"
+			command - the command to execute on the command line
+			arguments - the arguments to pass to the command";
+	}
+
+	function Execute(String command, String arguments) : Prototype 
+	{
+		// Step 2: Run the command with arguments
+		String result = SystemOperations.RunCommandLineAndResume(command, arguments);
+
+		// Step 3: Return the result
+		return result;
+	}
+}
+
+
+
+[SemanticProgram.InfinitivePhrase("copy a file from a source directory to a target directory")]
+prototype CopyFileFromSourceToTargetDirectory : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "CopyFileFromSourceToTargetDirectory.Execute(string fileName, string sourceDirectory, string targetDirectory) : void";
+		this.Description = @"
+			Copies a file with the given file name from the specified source directory to the designated target directory. 
+			If a file with the same name exists in the target directory, it will be overwritten.
+		";
+	}
+
+	function Execute(string fileName, string sourceDirectory, string targetDirectory) : Prototype 
+	{
+		// Step 1: Validate input parameters
+		if (StringUtil.IsEmpty(fileName) || StringUtil.IsEmpty(sourceDirectory) || StringUtil.IsEmpty(targetDirectory))
+		{
+			return null;
+		}
+
+		// Step 2: Combine source directory and file name to form the full source path
+		String sourcePath = FileUtil.BuildPath(sourceDirectory, fileName);
+
+		// Step 3: Copy the file using the System.CopyFile C# method
+		return SystemOperations.CopyFile(sourcePath, targetDirectory);
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To rebuild the utilities references")]
+prototype ToRebuildUtilitiesReferences : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToRebuildUtilitiesReferences.Execute() : string";
+		this.Description = @"
+			Rebuilds the utilities references by executing the rebuild_utilities_refs.bat file.";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the full path to the batch file
+		String command = @"C:\dev\rebuild_utilities_refs.bat";
+
+		// Step 2: Execute the batch file and return the result
+		return ToExecuteCommandLineOperation.Execute(command, "");
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("to deploy ontology.services")]
+prototype ToDeployOntologyServices : ProtoScriptAction 
+{ 
+	function that() : void 
+	{ 
+		this.Name = nameof(that);
+		this.Signature = "ToDeployOntologyServices.Execute() : void";
+		this.Description = @"
+			Deploys the ontology services by executing two batch scripts.
+		";
+	}
+
+	function Execute() : Prototype 
+	{ 
+		// Step 1: Execute the build deployment services batch script
+		String buildCommand = @"C:\dev\ai\ontology\scripts\build_deployment_services.bat";
+		String buildResult = ToExecuteCommandLineOperation.Execute(buildCommand, "");
+		
+		// Step 2: Execute the deploy services batch script
+		String deployCommand = @"C:\dev\ai\ontology\scripts\deploy_services.bat";
+		String deployResult = ToExecuteCommandLineOperation.Execute(deployCommand, "");
+		
+
+		return buildResult + "\r\n" + deployResult;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("to launch a file or to open a file")]
+prototype ToLaunchOrOpenFile : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToLaunchOrOpenFile.Execute(string filePath) : string";
+		this.Description = @"
+			Launches or opens a specified file using the system's default application.
+		";
+	}
+
+	function Execute(string filePath) : Prototype 
+	{
+		// Step 1: Validate the input parameter
+		if (StringUtil.IsEmpty(filePath))
+		{
+			return "Invalid file path.";
+		}
+
+		// Step 2: Launch the file using SystemOperations.LaunchFile
+		return SystemOperations.LaunchFile(filePath);
+	}
+}
+
+////// Visual Studio ///// 
+
+[SemanticProgram.InfinitivePhrase("To remove all extensions from the visual studio experimental instance")]
+prototype ToRemoveAllExtensionsFromExperimentalInstance : ProtoScriptAction 
+{ 
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToRemoveAllExtensionsFromExperimentalInstance.Execute() : void";
+		this.Description = @"
+			Removes all extensions from the Visual Studio experimental instance by deleting the Extensions folder using a command line operation.";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the command and arguments for removing the folder
+		String command = @"C:\Windows\System32\cmd.exe";
+		String arguments = "/c rmdir /s /q \"C:\\Users\\Administrator\\AppData\\Local\\Microsoft\\VisualStudio\\17.0_0f2fb400Exp\\Extensions\"";
+
+		// Step 2: Execute the command using the ToExecuteCommandLineOperation semantic program
+		String result = ToExecuteCommandLineOperation.Execute(command, arguments);
+
+		return result;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To open the Visual Studio experimental instance AppData directory")]
+prototype ToOpenVSExperimentalInstanceAppDataDirectory : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToOpenVSExperimentalInstanceAppDataDirectory.Execute() : string";
+		this.Description = @"
+			Opens the AppData directory for the Visual Studio experimental instance in Windows Explorer.";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the path to the AppData directory for the Visual Studio experimental instance
+		String directoryPath = @"C:\Users\Administrator\AppData\Local\Microsoft\VisualStudio\17.0_0f2fb400Exp";
+
+		// Step 2: Define the command and arguments for opening the directory in Windows Explorer
+		String command = @"C:\Windows\explorer.exe";
+		String arguments = "\"" + directoryPath + "\"";
+
+		// Step 3: Execute the command and return the result
+		return ToExecuteCommandLineOperation.Execute(command, arguments);
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("To install the RooTrax completion component in the Visual Studio experimental instance")]
+prototype ToInstallRooTraxCompletionComponentInExperimentalInstance : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToInstallRooTraxCompletionComponentInExperimentalInstance.Execute() : void";
+		this.Description = @"
+			Installs the RooTrax completion component into the Visual Studio experimental instance using the VSIX installer.";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the full path to VSIXInstaller.exe
+		String command = @"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\VSIXInstaller.exe";
+
+		// Step 2: Define the arguments for the installation
+		String arguments = "/rootSuffix:Exp \"C:\\dev\\ai\\RooTrax.Completion\\RooTrax.Completion.VSIX\\bin\\Debug\\RooTrax.Completion.VSIX.vsix\"";
+
+		// Step 3: Execute the command using the ToExecuteCommandLineOperation semantic program
+	
+		String result = ToExecuteCommandLineOperation.Execute(command, arguments);
+
+		return result;
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("To install the RooTrax completion component in the Visual Studio production instance")]
+prototype ToInstallRooTraxCompletionComponentInProductionInstance : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToInstallRooTraxCompletionComponentInProductionInstance.Execute() : void";
+		this.Description = @"
+			Installs the RooTrax completion component into the Visual Studio experimental production using the VSIX installer.";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the full path to VSIXInstaller.exe
+		String command = @"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\VSIXInstaller.exe";
+
+		// Step 2: Define the arguments for the installation
+		String arguments = "\"C:\\dev\\ai\\RooTrax.Completion\\RooTrax.Completion.VSIX\\bin\\Debug\\RooTrax.Completion.VSIX.vsix\"";
+
+		// Step 3: Execute the command using the ToExecuteCommandLineOperation semantic program
+	
+		String result = ToExecuteCommandLineOperation.Execute(command, arguments);
+
+		return result;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To create a new VisualStudioSolution prototype")]
+prototype ToCreateVisualStudioSolutionPrototype : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToCreateVisualStudioSolutionPrototype.Execute(string directory, string solutionName) : VisualStudioSolution";
+		this.Description = @"
+			Creates a new instance of a VisualStudioSolution prototype using the provided directory and solution name.
+		";
+	}
+
+	function Execute(string directory, string solutionName) : VisualStudioSolution 
+	{
+		VisualStudioSolution instance = TemporaryPrototypes.CreateInstance(VisualStudioSolution, solutionName) as VisualStudioSolution;
+		instance.SolutionName =  directory + "\\" + solutionName + ".sln";
+		instance.Directory = directory;
+
+		// Build ScriptDirectory using the directory and solution name
+		instance.ScriptDirectory = directory + "\\Scripts";
+
+		// Build FileName using the solution name
+		instance.FileName = solutionName + ".sln";
+
+		return instance;
+	}
+}
+
+///////////// Web Applications ///////////////
+
+prototype WebApplication : LearnedEntity
+{
+	String RootDirectory = new String();
+}
+
+[SemanticEntity("ontology-services.dev.buffa.ly")]
+prototype OntologyServicesWebApplication : WebApplication 
+{
+	init
+	{
+		RootDirectory = @"c:\inetpub\wwwroot\Ontology.Services";
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To open the web.config for a web application")]
+prototype ToOpenWebConfigForWebApplication : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToOpenWebConfigForWebApplication.Execute(WebApplication webApp) : void";
+		this.Description = @"
+			Opens the web.config file for the given web application using the default system editor.";
+		this.Modality = WebApplication;
+		this.Sources = [WebApplication];
+	}
+
+	function Execute(WebApplication webApp) : Prototype 
+	{
+		// Step 1: Get the root directory of the web application
+		String rootDirectory = webApp.RootDirectory;
+
+		// Step 2: Construct the full path to the web.config file
+		String webConfigPath = FileUtil.BuildPath(rootDirectory, "web.config");
+
+		Logs.DebugLog.WriteEvent("Path", webConfigPath);
+		
+		// Step 3: Define the command and arguments to open the web.config
+		String command = @"C:\Program Files\Notepad++\notepad++.exe"; // Replace with preferred editor if needed
+		String arguments = "\"" + webConfigPath + "\"";
+
+		// Step 4: Execute the command to open the web.config file
+		return ToExecuteCommandLineOperation.Execute(command, arguments);
+	}
+}
+
+
+// Deployments
+[SemanticProgram.InfinitivePhrase("To deploy Buffaly JS locally")]
+prototype ToDeployBuffalyJSLocally : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToDeployBuffalyJSLocally.Execute() : string";
+		this.Description = @"
+			Deploys Buffaly JS locally by running the deploy_js.bat script.";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the full path to the deploy_js.bat script
+		String command = @"C:\dev\Buffaly\Scripts\deploy_js.bat";
+
+		// Step 2: Execute the batch script and return the result
+		return ToExecuteCommandLineOperation.Execute(command, "");
+	}
+}
+
+///////////////////// CSharp //////////////////////////////
+[SemanticProgram.InfinitivePhrase("To reindex a CSharp file")]
+prototype ToReindexCSharpFile : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToReindexCSharpFile.Execute(string file) : void";
+		this.Description = @"
+			Reindexes a given CSharp file by calling the IndexFile method with the specified project path.";
+		this.Modality = File;
+		this.Sources = [File];
+	}
+
+	function Execute(string file) : void 
+	{
+		// Step 1: Define the project path
+		String projectPath = @"C:\dev\ai\Ontology\ProtoScript.Tests\DevAgent\Project.pts";
+
+		// Step 2: Call the CSharpMethods.IndexFile method to reindex the file
+		CSharpMethods.IndexFile(file, projectPath, _tagger, true);
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To generate semantic program to call a CSharp method")]
+prototype ToGenerateSemanticProgramToCallACSharpMethod : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGenerateSemanticProgramToCallACSharpMethod.Execute(string infinitivePhrase) : string";
+		this.Description = @"
+			Generates a semantic program by calling the GenerateSemanticProgramCSharpWrapper method with the provided infinitive phrase.
+		";
+	}
+
+	function Execute(string infinitivePhrase) : Prototype 
+	{
+		// Call the CSharp method to generate the semantic program based on the input phrase.
+		return CSharpMethods.GenerateSemanticProgramCSharpWrapper(infinitivePhrase);
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("to find a c# file")]
+prototype ToFindACSharpFile : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToFindACSharpFile.Execute(string fileName) : List";
+		this.Description = @"
+			Searches the root directories 'C:\\dev' and 'C:\\s4b' for C# files matching the given file name, recursively.
+		";
+	}
+
+	function Execute(string fileName) : Prototype 
+	{
+		// Step 1: Validate the input parameter
+		if (StringUtil.IsEmpty(fileName))
+		{
+			return null;
+		}
+
+		// Step 2: Define the directories to search
+		Collection directories = ["c:\\dev", "c:\\s4b"];
+	
+		// Step 3: Initialize an empty list to hold the matching file paths
+		List matchingFiles = new List();
+	
+		// Step 4: Define the search pattern
+		String searchPattern = fileName + ".cs";
+	
+		// Step 5: Initiate the recursive search in each directory
+		foreach (String directory in directories)
+		{
+			List filesInDirectory = SystemOperations.SearchFilesRecursively(directory, searchPattern);
+			matchingFiles.AddRange(filesInDirectory);
+		}
+
+		// Step 6: Return the list of matching files
+		return matchingFiles;
+	}
+}
+/////////////////////Web///////////////////////////
+
+[SemanticProgram.InfinitivePhrase("To download a file from an URL")]
+prototype ToDownloadFileFromUrl : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToDownloadFileFromUrl.Execute(string url, string destinationPath) : void";
+		this.Description = @"
+			Downloads a file from the specified URL to a designated local path and logs the process.
+		";
+	}
+
+	function Execute(string url, string destinationPath) : void 
+	{
+		// Call the method to download the file
+		HttpUtil.DownloadFile(url, destinationPath);
+	}
+}
+
+
+////////////////////Visual Studio Solutions/////////////////////
+partial prototype File#PackInstallRestore_bat : File
+{
+	init
+	{
+		FullPath = @"C:\dev\ai\ontology\ProtoScript.Tests\DevAgent\PackInstallRestore.bat";
+		FileName = "PackInstallRestore.bat";
+	}
+
+}
+
+
+[SemanticProgram.InfinitivePhrase("to download the NuGet command line app installation package")]
+prototype ToDownloadNuGetCommandLineApp : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToDownloadNuGetCommandLineApp.Execute(string destinationPath) : void";
+		this.Description = @"
+		Downloads the NuGet command line app installation package to the specified local path.
+		";
+	}
+
+	function Execute(string destinationPath) : void 
+	{
+		// Define the URL for the NuGet command line installer
+		String strUrl = "https://dist.nuget.org/win-x86-commandline/v5.10.0/nuget.exe";
+		// Call the HttpUtil.DownloadFile method to download the installer
+		HttpUtil.DownloadFile(strUrl, destinationPath);
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("to download the NuGet command line app installation package and run the installer")]
+prototype ToDownloadNuGetCommandLineAppAndRunInstaller : ProtoScriptAction 
+{ 
+	function that() : void 
+	{ 
+		this.Name = nameof(that);
+		this.Signature = "ToDownloadNuGetCommandLineAppAndRunInstaller.Execute() : void";
+		this.Description = @"
+			Downloads the NuGet command line app installation package to a local path and runs the installer.
+		";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the URL for the NuGet command line app installation package
+		String nuGetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
+		// Step 2: Specify the destination path where the package will be downloaded
+		String destinationPath = @"C:\temp\nuget.exe"; // Adjust path as needed
+
+		// Step 3: Download the NuGet command line app
+		ToDownloadFileFromUrl.Execute(nuGetUrl, destinationPath);
+
+		// Step 4: Define command to run the installer
+		String command = destinationPath;
+		String arguments = "install"; // Specify any required arguments for installation here
+
+		// Step 5: Run the installer
+		ToExecuteCommandLineOperation.Execute(command, arguments);
+		
+		return null;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To install the package ReverseMarkdown using the nuget.exe")]
+prototype ToInstallReverseMarkdownUsingNuGet : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToInstallReverseMarkdownUsingNuGet.Execute() : void";
+		this.Description = @"
+			Installs the package ReverseMarkdown using the nuget.exe command line tool.
+		";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Step 1: Define the URL for the NuGet command line tool
+		String nuGetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
+		// Step 2: Specify the destination path where nuget.exe will be downloaded
+		String destinationPath = @"C:\temp\nuget.exe"; // Temporary storage
+	
+		// Step 3: Download the NuGet command line app
+		ToDownloadNuGetCommandLineApp.Execute(destinationPath);
+	
+		// Step 4: Define command to run nuget.exe for installing the package
+		String command = destinationPath;
+		String arguments = "install ReverseMarkdown"; // Command to install the ReverseMarkdown package
+	
+		// Step 5: Execute the command to install the package
+		return ToExecuteCommandLineOperation.Execute(command, arguments);
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To install a NuGet package into a Visual Studio project")]
+prototype ToInstallNuGetPackageIntoVisualStudioProject : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToInstallNuGetPackageIntoVisualStudioProject.Execute(VisualStudioProject project, string packageName) : void";
+		this.Description = @"
+			Installs a predefined NuGet package into a Visual Studio project by executing the PackInstallRestore.bat script.";
+		this.Modality = VisualStudioProject;
+		this.Sources = [VisualStudioProject];
+	}
+
+	function Execute(VisualStudioProject project, string packageName) : Prototype 
+	{
+		// Step 3: Get the script directory from the associated solution
+		String solutionDirectory = project.Solution.Directory + "\\" + project.ProjectName;
+
+		// Step 4: Define the path to the PackInstallRestore.bat script
+		String scriptPath = File#PackInstallRestore_bat.FullPath;
+
+		// Step 5: Define the arguments for the script
+		String arguments = solutionDirectory + " " + packageName;
+
+		// Step 6: Execute the batch file to install the NuGet package
+		return ToExecuteCommandLineOperation.Execute(scriptPath, arguments);
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("To create a solution using dotnet CLI")] 
+prototype ToCreateSolutionUsingDotnetCLI : ProtoScriptAction 
+{ 
+	function that() : void 
+	{ 
+		this.Name = nameof(that);
+		this.Signature = "ToCreateSolutionUsingDotnetCLI.Execute(string solutionName, string rootDirectory) : string";
+		this.Description = @"
+			Creates a new .NET solution by utilizing the dotnet CLI, enabling the management of multiple projects as a single entity.
+		";
+	}
+
+	function Execute(string solutionName, string rootDirectory) : string 
+	{  
+		// Step 1: Define the full path to the dotnet command
+		String command = @"C:\Program Files\dotnet\dotnet.exe";  
+		// Step 2: Define arguments for creating a new solution with the root directory
+		String arguments = "new sln -n " + solutionName + " -o \"" + rootDirectory + "\"";  
+		
+		// Step 3: Execute the command using the ToExecuteCommandLineOperation semantic program
+		String result = ToExecuteCommandLineOperation.Execute(command, arguments);
+		
+		// Step 4: Return the result, which could include errors or success confirmation
+		return result; 
+	}
+}
+[SemanticProgram.InfinitivePhrase("To add a class library project to a solution using dotnet CLI")]
+prototype ToAddClassLibraryProjectToSolutionUsingDotnetCLI : ProtoScriptAction 
+{
+    function that() : void 
+    {
+        this.Name = nameof(that);
+        this.Signature = "ToAddClassLibraryProjectToSolutionUsingDotnetCLI.Execute(string solutionPath, string solutionName, string projectName) : string";
+        this.Description = @"
+            Adds a new .NET 8 class library project to an existing solution using the dotnet CLI.
+        ";
+    }
+
+    function Execute(string solutionPath, string solutionName, string projectName) : string 
+    {
+        // Step 1: Define the full path to the dotnet command
+        String command = @"C:\Program Files\dotnet\dotnet.exe";  
+
+        // Step 2: Define arguments for creating a new class library project
+        String projectPath = solutionPath + "\\" + projectName;
+        String newProjectArguments = "new classlib -n " + projectName + " -o " + projectPath;  
+
+        // Step 3: Execute the command to create the class library project
+        String createProjectResult = ToExecuteCommandLineOperation.Execute(command, newProjectArguments);
+
+        // Step 4: Define arguments for adding the project to the solution
+        String addProjectArguments = "sln " + solutionPath + "\\" + solutionName + ".sln add " + projectPath + "\\" + projectName + ".csproj";
+
+        // Step 5: Execute the command to add the project to the solution
+        String addProjectResult = ToExecuteCommandLineOperation.Execute(command, addProjectArguments);
+
+        // Step 6: Return the results of the operations
+        return createProjectResult + "\r\n" + addProjectResult; 
+    }
+}
+
+[SemanticProgram.InfinitivePhrase("create a prototype for solution in given directory and materialize it to a string")]
+prototype CreateAndMaterializeSolutionPrototype : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "CreateAndMaterializeSolutionPrototype.Execute(string solutionDirectory, string solutionName) : string";
+		this.Description = @"
+			Creates a VisualStudioSolution prototype for the specified directory and solution name and materializes it to a string.
+		";
+	}
+
+	function Execute(string solutionDirectory, string solutionName) : string 
+	{
+		// Step 1: Validate input parameters using StringUtil.IsEmpty
+		if (StringUtil.IsEmpty(solutionDirectory))
+		{
+			return "Invalid solution directory.";
+		}
+		if (StringUtil.IsEmpty(solutionName))
+		{
+			return "Invalid solution name.";
+		}
+
+		// Step 2: Create a new VisualStudioSolution prototype using the provided parameters
+		VisualStudioSolution solutionPrototype = ToCreateVisualStudioSolutionPrototype.Execute(solutionDirectory, solutionName);
+
+		// Step 3: Materialize the created prototype into a string representation
+		string materializedSolution = ToMaterializeAPrototypeToString.Execute(solutionPrototype);
+
+		// Step 4: Return the result
+		return materializedSolution;
+	}
+}
+
+////////// Ad Hoc ////////////
+[SemanticProgram.InfinitivePhrase("to get the most recent events from the windows application event log")]
+prototype ToGetMostRecentEventsFromWindowsApplicationEventLog : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ToGetMostRecentEventsFromWindowsApplicationEventLog.Execute() : List";
+		this.Description = @"
+			Retrieves the most recent events from the Windows Application Event Log, returning a list of formatted strings containing the details of each event.
+		";
+	}
+
+	function Execute() : Prototype 
+	{
+		// Use the C# method to retrieve the last three events from the Windows Application Event Log
+		return SystemOperations.GetLast3EventsFromApplicationLog();
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("create and materialize the solution RooTrax.Creator")]
+prototype CreateAndMaterializeRooTraxCreatorSolution : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "CreateAndMaterializeRooTraxCreatorSolution.Execute() : string";
+		this.Description = @"
+			Creates a Visual Studio solution prototype for RooTrax.Creator in the specified directory and materializes it to a string.
+		";
+	}
+
+	function Execute() : string 
+	{
+		// Step 1: Define solution directory and name
+		string solutionDirectory = "c:\\dev\\RooTrax.Creator"; // Set the appropriate directory path
+		string solutionName = "RooTrax.Creator"; // Name of the solution
+
+		// Step 2: Create and materialize the Visual Studio solution prototype
+		string materializedSolution = CreateAndMaterializeSolutionPrototype.Execute(solutionDirectory, solutionName);
+
+		// Step 3: Return the materialized string
+		return materializedSolution;
+	}
+}
+
+
+[SemanticProgram.InfinitivePhrase("read a file from disk and send it to the LLM with a prompt")]
+prototype ReadFileAndSendToLLM : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ReadFileAndSendToLLM.Execute(string filePath, string prompt) : string";
+		this.Description = @"
+			Reads a file from disk and sends its content to the LLM along with a specified prompt.
+			filePath - the path to the file to read
+			prompt - the prompt to send to the LLM.";
+	}
+
+	function Execute(string filePath, string prompt) : JsonObject 
+	{
+		// Step 1: Check if the file path is valid
+		if (StringUtil.IsEmpty(filePath))
+		{
+			return null;
+		}
+
+		// Step 2: Read the contents of the file
+		String fileContent = FileUtil.ReadFile(filePath);
+
+		// Step 3: Send the file contents and prompt to the LLM
+		JsonObject response = ToExecuteAnLLMPromptAndInput.Execute(prompt, fileContent);
+
+		// Step 4: Return the LLM response
+		return response;
+	}
+}
+
+[SemanticProgram.InfinitivePhrase("Convert fragment to markdown using a fragment ID")]
+prototype ConvertFragmentToMarkdown : ProtoScriptAction 
+{
+	function that() : void 
+	{
+		this.Name = nameof(that);
+		this.Signature = "ConvertFragmentToMarkdown.Execute(int fragmentID) : string";
+		this.Description = @"
+			Fetches a fragment using its ID and converts the HTML content of the fragment to Markdown format.
+		";
+	}
+
+	function Execute(int fragmentID) : String 
+	{
+		// Step 1: Get the fragment by ID using FragmentsRepository.Get method
+		FragmentsRow rowFragment = FragmentsRepository.Get(9197);
+		
+
+		// Step 2: Convert the HTML content of the fragment to Markdown
+		String strMarkdown = WebPages.ConvertHtmlToMarkdown(rowFragment.Fragment);
+
+		// Step 3: Return the Markdown string
+		return strMarkdown;
+	}
+}
