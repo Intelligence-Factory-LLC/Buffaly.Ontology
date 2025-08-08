@@ -14,8 +14,8 @@ namespace ProtoScript.Interpretter
 {
 	public class CompilerDiagnostic
 	{
-		public Statement ? Statement;
-		public Expression ? Expression;
+		public Statement? Statement;
+		public Expression? Expression;
 		public Diagnostic Diagnostic;
 
 		public override string ToString()
@@ -33,12 +33,12 @@ namespace ProtoScript.Interpretter
 		public List<File> Files = new List<File>();
 		public bool AllowParallelism = false;
 
-		public void AddDiagnostic(Diagnostic diagnostic, Statement ? statement, Expression ? expression)
+		public void AddDiagnostic(Diagnostic diagnostic, Statement? statement, Expression? expression)
 		{
 			Diagnostics.Add(new CompilerDiagnostic() { Diagnostic = diagnostic, Statement = statement, Expression = expression });
 		}
 
-		public void AddDiagnostic(string strMessage, Statement? statement, Expression?expression)
+		public void AddDiagnostic(string strMessage, Statement? statement, Expression? expression)
 		{
 			Diagnostics.Add(new CompilerDiagnostic() { Diagnostic = new Diagnostic(strMessage), Statement = statement, Expression = expression });
 		}
@@ -274,19 +274,19 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.CreateTimer("CompileProject.DefinePrototypes");
 			//if (!AllowParallelism)
 			//{
-				foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in lstFiles)
+			{
+				try
 				{
-					try
-					{
-						lstStatements.AddRange(PrototypeCompiler.DefinePrototypes(fileCurrent, this));
-					}
-					catch (ProtoScriptCompilerException ex)
-					{
-						ex.m_strProtoScript = fileCurrent.RawCode;
-						ex.File = fileCurrent.Info?.FullName;
-						throw;
-					}
+					lstStatements.AddRange(PrototypeCompiler.DefinePrototypes(fileCurrent, this));
 				}
+				catch (ProtoScriptCompilerException ex)
+				{
+					ex.m_strProtoScript = fileCurrent.RawCode;
+					ex.File = fileCurrent.Info?.FullName;
+					throw;
+				}
+			}
 			//}
 			//else
 			//{
@@ -492,7 +492,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			}
 		}
 
-	
+
 
 
 		static private ProtoScript.File TryParse(string strFile)
@@ -511,7 +511,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				Parsers.ProtoScriptParsingException ex = new Parsers.ProtoScriptParsingException("", 0, "");
 				ex.Explanation = "File does not exist: " + err.Message;
 				ex.File = strFile;
-throw;
+				throw;
 			}
 		}
 
@@ -554,7 +554,7 @@ throw;
 				statement.Info.File = file.Info?.FullName;
 			}
 
-		
+
 
 			return lstStatements;
 		}
@@ -746,13 +746,13 @@ throw;
 		}
 
 
-		public Compiled.Expression ? CompileRootIdentifier(string strValue, StatementParsingInfo info)
+		public Compiled.Expression? CompileRootIdentifier(string strValue, StatementParsingInfo info)
 		{
 			if (strValue == "global")
-				return new GetGlobalStack() { Index = -1, InferredType = new Namespace() { Scope = Symbols.GetGlobalScope() }, Info = info};
+				return new GetGlobalStack() { Index = -1, InferredType = new Namespace() { Scope = Symbols.GetGlobalScope() }, Info = info };
 
 			Scope scope;
-			object ? obj = Symbols.GetSymbolAndScope(strValue, out scope);
+			object? obj = Symbols.GetSymbolAndScope(strValue, out scope);
 
 			if (null == obj)
 			{
@@ -870,7 +870,7 @@ throw;
 
 			else if (typeInfo is TypeInfo)
 			{
-				VariableRuntimeInfo info = new VariableRuntimeInfo();				
+				VariableRuntimeInfo info = new VariableRuntimeInfo();
 				info.Type = typeInfo as TypeInfo;
 				info.OriginalType = info.Type.Clone();
 				info.Index = Symbols.LocalStack.Add(info);
@@ -886,7 +886,7 @@ throw;
 						this.AddDiagnostic(new CannotConvert(declaration.Initializer.InferredType.ToString(), typeInfo.ToString()), statement, null);
 						return null;
 					}
-				}					
+				}
 
 				declaration.RuntimeInfo = info;
 			}
@@ -1066,7 +1066,7 @@ throw;
 			if (exp.Value == "&&")
 				return CompileAndOperator(exp);
 
-			if (exp.Value == ".")
+			if (exp.Value == "." || exp.Value == "?.")
 				return CompileDotOperator(exp);
 
 			if (exp.Value == "+")
@@ -1092,8 +1092,9 @@ throw;
 
 			Compiled.Expression expr = Compile(initializer.Value);
 
-			return new NewInstance.ObjectInitializer() {
-				Property = tuple.Item1, 
+			return new NewInstance.ObjectInitializer()
+			{
+				Property = tuple.Item1,
 				Value = expr
 			};
 
@@ -1119,21 +1120,21 @@ throw;
 					if (null != infoType && infoType.GetType() == typeof(PrototypeTypeInfo))
 					{
 						return new GetGlobalStack() { Index = infoType.Index, InferredType = infoType };
-					}		
+					}
 
 					FieldTypeInfo infoField = GetFieldInfo(prototypeTypeInfo, strPropertyName);
 					if (null != infoField)
 					{
-PrototypeFieldReference res = new PrototypeFieldReference()
-{
-Left = compiledLeft,
-Right = new GetGlobalStack() { Index = infoField.Index, InferredType = infoField.FieldInfo, Info = op.Right.Info },
-InferredType = infoField.FieldInfo,
-FieldInfo = infoField,
-Info = op.Info
-};
-res.IsNullConditional = op.Value == "?.";
-return res;
+						PrototypeFieldReference res = new PrototypeFieldReference()
+						{
+							Left = compiledLeft,
+							Right = new GetGlobalStack() { Index = infoField.Index, InferredType = infoField.FieldInfo, Info = op.Right.Info },
+							InferredType = infoField.FieldInfo,
+							FieldInfo = infoField,
+							Info = op.Info
+						};
+						res.IsNullConditional = op.Value == "?.";
+						return res;
 					}
 
 
@@ -1160,7 +1161,7 @@ return res;
 						FunctionRuntimeInfo functionRuntimeInfo = MethodCompiler.ResolveMethod2(prototypeTypeInfo.Prototype, strPropertyName, this.Symbols);
 
 						if (null != functionRuntimeInfo)
-						{							
+						{
 							PrototypeTypeInfo typeInfoParent = Symbols.GetGlobalScope().GetSymbol(functionRuntimeInfo.ParentPrototype.PrototypeName) as PrototypeTypeInfo;
 
 							return new GetStack() { Scope = typeInfoParent.Scope, Index = functionRuntimeInfo.Index, InferredType = new TypeInfo(typeof(FunctionRuntimeInfo)) };
@@ -1192,15 +1193,15 @@ return res;
 				Compiled.Expression objCur = compiledLeft;
 				//Try as a .NET property 
 				{
-Compiled.Expression ? memberInfo = GetDotNetMemberReference(op.Info, strPropertyName, objCur);
-if (null != memberInfo)
-{
-if (memberInfo is DotNetFieldReference df)
-df.IsNullConditional = op.Value == "?.";
-else if (memberInfo is DotNetPropertyReference dp)
-dp.IsNullConditional = op.Value == "?.";
-return memberInfo;
-}
+					Compiled.Expression? memberInfo = GetDotNetMemberReference(op.Info, strPropertyName, objCur);
+					if (null != memberInfo)
+					{
+						if (memberInfo is DotNetFieldReference df)
+							df.IsNullConditional = op.Value == "?.";
+						else if (memberInfo is DotNetPropertyReference dp)
+							dp.IsNullConditional = op.Value == "?.";
+						return memberInfo;
+					}
 				}
 
 				this.AddDiagnostic(new Diagnostic($"Could not find property {strPropertyName}"), null, op);
@@ -1208,10 +1209,10 @@ return memberInfo;
 			}
 			else if (op.Right is MethodEvaluation)
 			{
-Compiled.Expression compiledRight = CompileMethodEvaluationInternal(op.Right as MethodEvaluation, compiledLeft);
-if (compiledRight is DotNetMethodEvaluation dme)
-dme.IsNullConditional = op.Value == "?.";
-return compiledRight;
+				Compiled.Expression compiledRight = CompileMethodEvaluationInternal(op.Right as MethodEvaluation, compiledLeft);
+				if (compiledRight is DotNetMethodEvaluation dme)
+					dme.IsNullConditional = op.Value == "?.";
+				return compiledRight;
 			}
 			else if (op.Right is BinaryOperator && (op.Right as BinaryOperator).Value == ".")
 			{
@@ -1219,10 +1220,10 @@ return compiledRight;
 			}
 
 			this.AddDiagnostic(new Diagnostic("Could not compile expression"), null, op);
-			return null;			
+			return null;
 		}
 
-		internal static Compiled.Expression ? GetDotNetMemberReference(StatementParsingInfo info, string strPropertyName, Compiled.Expression objCur)
+		internal static Compiled.Expression? GetDotNetMemberReference(StatementParsingInfo info, string strPropertyName, Compiled.Expression objCur)
 		{
 			System.Reflection.FieldInfo fieldInfo = objCur.InferredType.Type.GetField(strPropertyName);
 			if (null != fieldInfo)
@@ -1290,7 +1291,7 @@ return compiledRight;
 					{
 						if (prototypeFieldInfo is FieldTypeInfo)
 							return (FieldTypeInfo)prototypeFieldInfo;
-						
+
 						FieldTypeInfo infoField = Symbols.GetGlobalScope().GetSymbol(prototypeFieldInfo.Prototype.PrototypeName) as FieldTypeInfo;
 						return infoField;
 					}
@@ -1400,13 +1401,13 @@ return compiledRight;
 			else if (op.Right is PrototypeStringLiteral)
 			{
 				GetGlobalStack op2 = Compile(op.Right as PrototypeStringLiteral) as GetGlobalStack;
-                if (null == op2)
-                {
-                    this.AddDiagnostic(new Diagnostic("Cannot compile target of casting operator"), null, op.Right);
-                    return null;
-                }
+				if (null == op2)
+				{
+					this.AddDiagnostic(new Diagnostic("Cannot compile target of casting operator"), null, op.Right);
+					return null;
+				}
 
-                return new Compiled.CastingOperator
+				return new Compiled.CastingOperator
 				{
 					Left = compiledLeft,
 					Right = op2,
@@ -1447,7 +1448,7 @@ return compiledRight;
 			return new Compiled.CastingOperator
 			{
 				Left = compiledLeft,
-				Right = new GetGlobalStack() {Index = typeInfo.Index, InferredType = typeInfo }, 
+				Right = new GetGlobalStack() { Index = typeInfo.Index, InferredType = typeInfo },
 				InferredType = typeInfo
 			};
 		}
@@ -1539,7 +1540,7 @@ return compiledRight;
 				infoParam.Type = new TypeInfo(typeof(Prototype));
 				infoParam.OriginalType = new TypeInfo(typeof(Prototype));
 				infoParam.Index = funcInfo.Scope.Stack.Add(infoParam);
-				
+
 				funcInfo.Parameters.Add(infoParam);
 				funcInfo.Scope.InsertSymbol((exp.Left as Identifier).Value, infoParam);
 
@@ -1579,7 +1580,7 @@ return compiledRight;
 			{
 				this.AddDiagnostic(new Diagnostic("Expected a prototype field reference"), null, exp);
 				return null;
-			}	
+			}
 
 			PrototypeFieldReference reference = compiledRight as PrototypeFieldReference;
 			reference.AllowLazyInitializaton = false;
@@ -1594,7 +1595,8 @@ return compiledRight;
 			Compiled.Expression compiledLeft = Compile(exp.Left);
 			Compiled.Expression compiledRight = Compile(exp.Right);
 
-			return new Compiled.IndexOperator {
+			return new Compiled.IndexOperator
+			{
 				Left = compiledLeft,
 				Right = compiledRight,
 				InferredType = new TypeInfo(typeof(Prototype)),
@@ -1622,7 +1624,7 @@ return compiledRight;
 			if (!SimpleInterpretter.IsAssignableFrom(compiledRight.InferredType, compiledLeft.InferredType))
 			{
 				this.AddDiagnostic(new CannotConvert(compiledRight.InferredType.ToString(), compiledLeft.InferredType.ToString()), null, exp);
-			}				
+			}
 
 			return new AssignmentOperator
 			{
@@ -1679,7 +1681,7 @@ return compiledRight;
 			if (null == compiledRight)
 			{
 				this.AddDiagnostic(new Diagnostic("Could not locate right side prototype"), null, exp);
-				return null; 
+				return null;
 			}
 
 			//N20221230-02 - Prevents a difficult to find bug
@@ -1735,7 +1737,7 @@ return compiledRight;
 				newInstance.Parameters = lstParams;
 
 				PrototypeTypeInfo prototypeTypeInfo = typeInfo as PrototypeTypeInfo;
-				
+
 				FunctionRuntimeInfo functionRuntimeInfo = prototypeTypeInfo.Scope.GetSymbol(expr.Type.TypeName) as FunctionRuntimeInfo;
 				if (null != functionRuntimeInfo)
 				{
@@ -1744,7 +1746,7 @@ return compiledRight;
 
 				if (null != expr.Initializers)
 				{
-//					Symbols.EnterScope(prototypeTypeInfo.Scope);
+					//					Symbols.EnterScope(prototypeTypeInfo.Scope);
 
 					try
 					{
@@ -1782,7 +1784,7 @@ return compiledRight;
 					this.AddDiagnostic(new Diagnostic("No matching constructor on type: " + type.Name), null, expr);
 					return null;
 				}
-				
+
 				return new DotNetNewInstance() { Constructor = constructor, Parameters = lstParams, InferredType = new TypeInfo(type) };
 			}
 
@@ -1840,7 +1842,7 @@ return compiledRight;
 								Left = objCur,
 								Right = new GetGlobalStack() { Index = fieldTypeInfo.Index, InferredType = fieldTypeInfo.FieldInfo, Info = exp.Info },
 								InferredType = fieldTypeInfo.FieldInfo,
-								FieldInfo = fieldTypeInfo, 
+								FieldInfo = fieldTypeInfo,
 								Info = exp.Info
 							};
 
@@ -1923,7 +1925,7 @@ return compiledRight;
 							continue;
 						}
 					}
-		
+
 					this.AddDiagnostic(new Diagnostic($"Cannot find field {strPropertyName}"), null, exp);
 					return null;
 				}
@@ -2038,7 +2040,7 @@ return compiledRight;
 			{
 				Symbols.InsertSymbol("return", funcInfo.ReturnType);
 				if (funcDef.ReturnType.TypeName != "void" && !funcDef.IsAbstract)
-				{					
+				{
 					if (!StatementScanner.Any(funcDef, x => x is ReturnStatement))
 					{
 						this.AddDiagnostic(new Diagnostic("Function does not return a value"), funcDef, null);
@@ -2375,7 +2377,7 @@ return compiledRight;
 			return compiledReturn;
 		}
 
-		
+
 
 		public void Compile(ReferenceStatement statement)
 		{
@@ -2403,7 +2405,7 @@ return compiledRight;
 		public void Compile(ImportStatement statement)
 		{
 			System.Reflection.Assembly assembly;
-			
+
 			if (!References.TryGetValue(statement.Reference, out object obj))
 			{
 				this.AddDiagnostic(new Diagnostic("Assembly not referenced: " + statement.Reference), statement, null);
@@ -2455,7 +2457,7 @@ return compiledRight;
 					compiled.ElseIfBodies.Add(Compile(codeBlock));
 				}
 			}
-				
+
 
 
 			return compiled;
@@ -2502,7 +2504,7 @@ return compiledRight;
 				Symbols.LeaveScope();
 			}
 
-			return  new Compiled.CodeBlockStatement(compiled);
+			return new Compiled.CodeBlockStatement(compiled);
 		}
 	}
 }
