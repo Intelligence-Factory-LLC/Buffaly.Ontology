@@ -786,9 +786,9 @@ async function CompileCode() {
 						}).delay(1000);
 
 						if (null != err.Info)
-							Output(err.Message + ", " + err.Info.File);
+								Output({ Message: err.Message, Info: err.Info });
 						else
-							Output(err.Message);
+								Output(err.Message);
 
 						//					["a", { click: function () { NavigateTo(x.Info, x.SymbolName); } }, x.SymbolName ]]
 					})
@@ -826,14 +826,28 @@ async function CompileCode() {
 }
 
 function ClearOutput() {
-	ControlUtil.SetValue("txtResults2", "");
-}
+	_$("txtResults2").innerHTML = "";
+	}
+	
+	function appendOutputLine(sMessage, oInfo) {
+	const oDiv = document.createElement("div");
+	oDiv.appendChild(document.createTextNode(sMessage));
+	if (oInfo && oInfo.File) {
+	const oLink = document.createElement("a");
+	oLink.href = "#";
+	oLink.textContent = ` (${oInfo.File}${oInfo.StartingOffset ? ":" + oInfo.StartingOffset : ""})`;
+	oLink.onclick = function () { NavigateTo(oInfo); return false; };
+	oDiv.appendChild(oLink);
+	}
+	const oOut = _$("txtResults2");
+	oOut.insertBefore(oDiv, oOut.firstChild);
+	}
 
-function Output(sMessage) {
-	if ($type(sMessage) == 'object')
-		sMessage = JSON.stringify(sMessage, null, 2);
-
-	ControlUtil.SetValue("txtResults2", sMessage + "\r\n" + ControlUtil.GetValue("txtResults2"));
+function Output(oMessage) {
+	if ($type(oMessage) == 'object')
+	appendOutputLine(oMessage.Message || JSON.stringify(oMessage, null, 2), oMessage.Info);
+	else
+	appendOutputLine(oMessage, null);
 }
 
 function BindImmediateHistory() {
@@ -875,9 +889,7 @@ async function OnInterpretImmediate() {
 
 	ProtoScriptWorkbench.InterpretImmediate.onErrorReceived = function (oErr) {
 		OnStopDebugging();
-		Output(oErr.Error);
-		if (oErr.ErrorStatement)
-			NavigateTo(oErr.ErrorStatement);
+		Output({ Message: oErr.Error, Info: oErr.ErrorStatement });
 	};
 
 	ProtoScriptWorkbench.InterpretImmediate(sProjectName, sImmediate, oOptions, function (sRes) {
@@ -945,9 +957,7 @@ async function OnTagImmediate(ctrl) {
 
 	ProtoScriptWorkbench.TagImmediate.onErrorReceived = function (oErr) {
 		clearInterval(timerUpdate);
-		Output(oErr.Error);
-		if (oErr.ErrorStatement)
-			NavigateTo(oErr.ErrorStatement);
+		Output({ Message: oErr.Error, Info: oErr.ErrorStatement });
 	};
 
 	ctrl.children[0].className = ctrl.children[0].className.replace("bi-tag", "bi-arrow-repeat bi-spin");
@@ -955,7 +965,7 @@ async function OnTagImmediate(ctrl) {
 	timerUpdate = setInterval(function () {
 		ProtoScriptWorkbench.GetTaggingProgress(sessionKey, function (progress) {
 			if (progress) {
-				_$("txtResults2").value = progress.Iterations + ":\r\n " + progress.CurrentInterpretation;
+				_$('txtResults2').textContent = progress.Iterations + ":\r\n " + progress.CurrentInterpretation;
 			}
 		});
 	}, 1000);
@@ -966,13 +976,12 @@ async function OnTagImmediate(ctrl) {
 		ctrl.children[0].className = ctrl.children[0].className.replace("bi-arrow-repeat bi-spin", "bi-tag")
 		clearInterval(timerUpdate);
 
-		if (!StringUtil.IsEmpty(oRes.Result)) {
-			Output(oRes.Result);
-		}
-		else if (!StringUtil.IsEmpty(oRes.Error)) {
-			Output(oRes.Error);
-			NavigateTo(oRes.ErrorStatement);
-		}
+if (!StringUtil.IsEmpty(oRes.Result)) {
+Output(oRes.Result);
+}
+						else if (!StringUtil.IsEmpty(oRes.Error)) {
+		Output({ Message: oRes.Error, Info: oRes.ErrorStatement });
+}
 		BindImmediateHistory();
 	});
 }
@@ -1211,7 +1220,7 @@ function OnBlockedOn() {
 				let sStack = ProtoScriptWorkbench.GetCallStack();
 				sStack += "\r\n" + ProtoScriptWorkbench.GetCurrentException();
 
-				ControlUtil.SetValue("txtResults2", sStack);
+				_$('txtResults2').textContent = sStack;
 			}
 		})
 	}
