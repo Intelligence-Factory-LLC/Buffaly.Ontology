@@ -1678,6 +1678,46 @@ throw;
 			return this.RunMethod(infoFunction, protoInstance, lstParameters);
 		}
 
+		/// <summary>
+		/// Runs a ProtoScript method using named arguments.
+		/// </summary>
+		/// <example>
+		/// IDictionary<string, object> args = new Dictionary<string, object>();
+		/// args["child"] = interpreter.GetLocalPrototype("Bart");
+		/// interpreter.RunMethodAsObject("Homer", "IsParentOf", args);
+		/// </example>
+		public object ? RunMethodAsObject(Prototype ? protoInstance, string strMethodName, IDictionary<string, object> dictParameters)
+		{
+			FunctionRuntimeInfo ? infoFunction = null;
+			
+			if (null == protoInstance)
+			{
+				infoFunction = this.Symbols.GetSymbol(strMethodName) as FunctionRuntimeInfo;
+				if (null == infoFunction)
+				throw new Exception("Could not find global method: " + strMethodName);
+			}
+			
+			else
+			{
+				infoFunction = this.FindOverriddenMethod(protoInstance, strMethodName);
+				
+				if (null == infoFunction)
+				throw new Exception("Could not find method: " + strMethodName + ", on prototype: " + protoInstance.PrototypeName);
+			}
+			
+			List<object> lstParameters = new List<object>();
+			
+			foreach (ParameterRuntimeInfo infoParam in infoFunction.Parameters)
+			{
+				object oValue;
+				if (!dictParameters.TryGetValue(infoParam.ParameterName, out oValue))
+				throw new Exception("Missing parameter: " + infoParam.ParameterName);
+				lstParameters.Add(oValue);
+			}
+			
+			return this.RunMethod(infoFunction, protoInstance, lstParameters);
+		}
+
 		public Prototype ? RunMethodAsPrototype(Prototype protoInstance, string strMethodName, object oParam1)
 		{
 			return RunMethodAsPrototype(protoInstance, strMethodName, new List<object> { oParam1 });

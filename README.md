@@ -63,6 +63,9 @@ namespace SimpsonsOntology
 		function IsParent() : Boolean {
 			return ParentOf.Count > 0;
 		}
+		function HasChild(Person child) : Boolean {
+			return ParentOf.Contains(child);
+		}
 	}
 
 	prototype Bart : Person {
@@ -85,6 +88,13 @@ interpreter.Evaluate(compiled);
 
 bool isParent = (bool)interpreter.RunMethodAsObject("Homer", "IsParent", new List<object>());
 Console.WriteLine($"Homer is a parent? {isParent}");
+
+Dictionary<string, object> namedArgs = new Dictionary<string, object>
+{
+	{ "child", interpreter.GetLocalPrototype("Bart") }
+};
+bool isParentOfBart = (bool)interpreter.RunMethodAsObject("Homer", "HasChild", namedArgs);
+Console.WriteLine($"Homer is Bart's parent? {isParentOfBart}");
 ```
 See the unit tests under **Ontology.Tests** for examples on how to load
 the ontology, query concepts and register custom behaviours.
