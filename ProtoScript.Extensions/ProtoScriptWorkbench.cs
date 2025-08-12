@@ -629,6 +629,15 @@ namespace ProtoScript.Extensions
 						result.Result = sw.GetStringValue();
 					}
 
+					else if (obj is JsonObject jsonValue)
+					{
+						result.Result = JsonUtil.ToFriendlyJSON(jsonValue).ToString();
+					}
+
+					else if (obj is JsonArray jsonArr)
+					{
+						result.Result = JsonUtil.ToFriendlyJSON(jsonArr).ToString();
+					}
 
 
 					else

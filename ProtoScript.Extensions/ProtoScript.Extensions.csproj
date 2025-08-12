@@ -19,9 +19,6 @@
     <Reference Include="BasicUtilities">
       <HintPath>..\lib\BasicUtilities.dll</HintPath>
     </Reference>
-    <Reference Include="OpenAIAPI">
-      <HintPath>..\lib\OpenAIAPI.dll</HintPath>
-    </Reference>
     <Reference Include="RooTrax.Cache">
       <HintPath>..\lib\RooTrax.Cache.dll</HintPath>
     </Reference>

@@ -1,4 +1,5 @@
 ﻿using Ontology.Simulation;
+using System;
 using System.Reflection;
 
 
@@ -45,33 +46,38 @@ namespace ProtoScript.Interpretter
 											string strMethodName,
 											IReadOnlyList<System.Type> lstParameters)
 		{
-			if (lstParameters == null || lstParameters.Any(p => p == null))
+			if (lstParameters == null)
 				throw new ArgumentNullException(nameof(lstParameters), "Parameter types cannot be null.");
 
-			//──── 1. try exact match on normalised parameter list ────────────
+			bool bHasNull = lstParameters.Any(p => p == null);
 			var normalised = lstParameters.Select(Normalise).ToArray();
 
-			MethodInfo? exact = type.GetMethod(
-									strMethodName,
-									BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance,
-									binder: null,
-									types: normalised,
-									modifiers: null);
+			if (!bHasNull)
+			{
+				//──── 1. try exact match on normalised parameter list ────────────
 
-			if (exact != null)
-				return exact;            // best possible match
+				MethodInfo? exact = type.GetMethod(
+										strMethodName,
+										BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance,
+										binder: null,
+										types: normalised,
+										modifiers: null);
 
-			//Note: there is no reason behind normalized being first, so it can be switched
-			exact = type.GetMethod(
-									strMethodName,
-									BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance,
-									binder: null,
-									types: lstParameters.ToArray(),
-									modifiers: null);
+				if (exact != null)
+					return exact;            // best possible match
 
-			if (exact != null)
-				return exact;            // best possible match
+				//Note: there is no reason behind normalized being first, so it can be switched
+				exact = type.GetMethod(
+										strMethodName,
+										BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance,
+										binder: null,
+										types: lstParameters.ToArray(),
+										modifiers: null);
 
+				if (exact != null)
+					return exact;            // best possible match
+
+			}
 
 			//──── 2. manual scoring among the remaining candidates ───────────
 			MethodInfo? best = null;
@@ -88,21 +94,31 @@ namespace ProtoScript.Interpretter
 					System.Type arg = normalised[i];
 					System.Type dest = pars[i].ParameterType;
 
-					if (arg == dest)                         // exact
-						continue;
+					// Handle null arg case
+					if (arg == null)
+					{
+						// Check if dest is nullable (Nullable<T> or reference type)
+						if (dest.IsClass || dest.IsInterface || Nullable.GetUnderlyingType(dest) != null)
+						{
+							score += 1; 
+							continue;
+						}
+						compatible = false;
+						break;
+					}
 
+					if (arg == dest) // exact
+						continue;
 					if (IsWrapperFor(lstParameters[i], dest)) // wrapper -> primitive
 					{
 						score += 1;
 						continue;
 					}
-
-					if (dest.IsAssignableFrom(arg))         // up-cast
+					if (dest.IsAssignableFrom(arg)) // up-cast
 					{
 						score += 2;
 						continue;
 					}
-
 					compatible = false;
 					break;
 				}

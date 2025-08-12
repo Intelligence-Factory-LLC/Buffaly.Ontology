@@ -3,70 +3,39 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology", "Ontology.csproj", "{680DB72D-A017-49F9-8656-08F7CE0976BF}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{91884219-52B4-45C1-A114-BB6E59121488}"
-	ProjectSection(SolutionItems) = preProject
-		..\lib\BasicUtilities.dll = ..\lib\BasicUtilities.dll
-		..\lib\kScript.dll = ..\lib\kScript.dll
-		..\lib\RooTrax.Cache.dll = ..\lib\RooTrax.Cache.dll
-		..\lib\RooTrax.Common.DB.dll = ..\lib\RooTrax.Common.DB.dll
-		..\lib\RooTrax.Common.dll = ..\lib\RooTrax.Common.dll
-		..\lib\RooTrax.VDB.DB.dll = ..\lib\RooTrax.VDB.DB.dll
-		..\lib\RooTrax.VDB.dll = ..\lib\RooTrax.VDB.dll
-		..\lib\RooTrax.VDB.UI.dll = ..\lib\RooTrax.VDB.UI.dll
-		..\lib\WebAppUtilities.dll = ..\lib\WebAppUtilities.dll
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{FCE82B27-2B9C-4418-9001-99CDB1782F02}"
-	ProjectSection(SolutionItems) = preProject
-		..\Scripts\add_jsstubs.bat = ..\Scripts\add_jsstubs.bat
-		..\Scripts\build_deployment_portal.bat = ..\Scripts\build_deployment_portal.bat
-		..\Scripts\set_params.bat = ..\Scripts\set_params.bat
-		..\Scripts\update_dlls.bat = ..\Scripts\update_dlls.bat
-	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Tests", "..\Ontology.Tests\Ontology.Tests.csproj", "{552340BD-1E04-4898-8767-27FBFCCDE6C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Tests", "Ontology.Tests\Ontology.Tests.csproj", "{552340BD-1E04-4898-8767-27FBFCCDE6C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript.Parsers", "..\ProtoScript.Parsers\ProtoScript.Parsers.csproj", "{8BA560DB-C572-4039-853F-1EA2DDDC733C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript.Parsers", "ProtoScript.Parsers\ProtoScript.Parsers.csproj", "{8BA560DB-C572-4039-853F-1EA2DDDC733C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript", "..\ProtoScript\ProtoScript.csproj", "{2E8C77C5-0E7D-4929-8C5A-4623F8D59749}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript", "ProtoScript\ProtoScript.csproj", "{2E8C77C5-0E7D-4929-8C5A-4623F8D59749}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript.Interpretter", "..\ProtoScript.Interpretter\ProtoScript.Interpretter.csproj", "{6596B305-542C-4E0E-A3B4-3A916DB402DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript.Interpretter", "ProtoScript.Interpretter\ProtoScript.Interpretter.csproj", "{6596B305-542C-4E0E-A3B4-3A916DB402DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Simulation", "..\Ontology.Simulation\Ontology.Simulation.csproj", "{C8B45076-0B62-4BB1-8B3B-BFBC97EADBC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Simulation", "Ontology.Simulation\Ontology.Simulation.csproj", "{C8B45076-0B62-4BB1-8B3B-BFBC97EADBC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Parsers", "..\Ontology.Parsers\Ontology.Parsers.csproj", "{B6095AA0-3DFB-40BD-BAB0-480D49670075}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Parsers", "Ontology.Parsers\Ontology.Parsers.csproj", "{B6095AA0-3DFB-40BD-BAB0-480D49670075}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffaly.NLU.Tagger", "..\Buffaly.NLU.Tagger\Buffaly.NLU.Tagger.csproj", "{ACA285E4-2152-4BB3-BED0-D2F4278DFF6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffaly.NLU.Tagger", "Buffaly.NLU.Tagger\Buffaly.NLU.Tagger.csproj", "{ACA285E4-2152-4BB3-BED0-D2F4278DFF6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffaly.NLU", "..\Buffaly.NLU\Buffaly.NLU.csproj", "{E1C459B8-93EC-4C81-BC95-1AB5836EBC4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffaly.NLU", "Buffaly.NLU\Buffaly.NLU.csproj", "{E1C459B8-93EC-4C81-BC95-1AB5836EBC4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript.Extensions", "..\ProtoScript.Extensions\ProtoScript.Extensions.csproj", "{8EA3C920-3B49-4605-9A3A-8366B7615C1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoScript.Extensions", "ProtoScript.Extensions\ProtoScript.Extensions.csproj", "{8EA3C920-3B49-4605-9A3A-8366B7615C1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffaly.Ontology.Portal", "..\Buffaly.Ontology.Portal\Buffaly.Ontology.Portal.csproj", "{E426548C-511A-24A1-95F3-4780A61F10BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buffaly.Ontology.Portal", "Buffaly.Ontology.Portal\Buffaly.Ontology.Portal.csproj", "{E426548C-511A-24A1-95F3-4780A61F10BE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{ADE6EE4C-8355-42FE-B175-43AFB3728E8E}"
-	ProjectSection(SolutionItems) = preProject
-		..\AGENTS.md = ..\AGENTS.md
-		..\README.md = ..\README.md
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HelloWorld", "HelloWorld", "{6FB0CC09-C939-4797-A431-D7573617CD2D}"
-	ProjectSection(SolutionItems) = preProject
-		..\examples\HelloWorld\README.md = ..\examples\HelloWorld\README.md
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simpsons", "Simpsons", "{255DE81E-021F-4216-9270-29903684B560}"
-	ProjectSection(SolutionItems) = preProject
-		..\examples\Simpsons\images\homer-isa-person.png = ..\examples\Simpsons\images\homer-isa-person.png
-		..\examples\Simpsons\images\homer-marge.png = ..\examples\Simpsons\images\homer-marge.png
-		..\examples\Simpsons\images\more_protoscript.png = ..\examples\Simpsons\images\more_protoscript.png
-		..\examples\Simpsons\images\simpsons-ontology.png = ..\examples\Simpsons\images\simpsons-ontology.png
-		..\examples\Simpsons\Simpsons.md = ..\examples\Simpsons\Simpsons.md
-	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology", "Ontology\Ontology.csproj", "{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,10 +43,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{680DB72D-A017-49F9-8656-08F7CE0976BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{680DB72D-A017-49F9-8656-08F7CE0976BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{680DB72D-A017-49F9-8656-08F7CE0976BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{680DB72D-A017-49F9-8656-08F7CE0976BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{552340BD-1E04-4898-8767-27FBFCCDE6C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{552340BD-1E04-4898-8767-27FBFCCDE6C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{552340BD-1E04-4898-8767-27FBFCCDE6C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -118,6 +83,10 @@ Global
 		{E426548C-511A-24A1-95F3-4780A61F10BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E426548C-511A-24A1-95F3-4780A61F10BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E426548C-511A-24A1-95F3-4780A61F10BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

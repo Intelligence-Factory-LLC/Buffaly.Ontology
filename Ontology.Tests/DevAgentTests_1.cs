@@ -1,13 +1,8 @@
 ﻿using BasicUtilities;
 using Buffaly.Common;
 using Buffaly.NLU;
-using Buffaly.NLU.Tagger.Nodes;
 using Microsoft.Extensions.Configuration;
-using Ontology.Agents;
-using Ontology.Simulation;
 using ProtoScript.Extensions;
-using System;
-using System.IO;
 
 namespace Ontology.Tests
 {
@@ -90,53 +85,6 @@ namespace Ontology.Tests
 		}
 
 
-
-
-		[TestMethod]
-		[TestCategory("Integration")]
-		[TestProperty("Category", "Integration")]
-		public async Task Test_GenerateSyntheticProgram()
-		{
-			JsonObject jsonResult = await DevAgent.GenerateProgram("test_session", @"
-To Replace Grid Count
-
-This method is going to take a parameter:
-
-	File - Full path to the *.ks.html file
-
-It will look within the file for the following pattern:
-
-```kscript
-		(Grid.Count (GetGridCount  (Search)))
-```
-
-and it will replace it the `Count` property with `RowCount` because the former is reserved 
-.NET property, taking care to fix the surrounding code as well:
-
-```kscript
-
-		(declare Grid {Grid: '', RowCount: 0})		
-		...
-		(Grid.RowCount (GetGridCount  (Search)))
-		(return (Grid.ToJSON))
-```
-
-The overall plan: 
-
-	Load the file into a string 
-	Construct a prompt to look for this pattern
-	Append a diff generating prompt
-	Apply the prompt
-	Get the diffs
-	Apply the diffs
-	Verify the file or reject 
-
-", new JsonObject());
-
-			string ? strProgram = jsonResult.GetStringOrNull("Program");
-
-
-		}
 
 
 

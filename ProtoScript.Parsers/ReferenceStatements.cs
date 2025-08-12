@@ -19,17 +19,16 @@
 			tok.MustBeNext("reference");
 			
 			result.AssemblyName = ProtoScript.Parsers.Identifiers.ParseMultiple(tok);
-			if (tok.peekNextToken() == ";")
+			if (tok.CouldBeNext(";"))
 			{
-				tok.MustBeNext(";");
 				result.Reference = result.AssemblyName;
 			}
 			else
 			{
 				result.Reference = ProtoScript.Parsers.Identifiers.ParseMultiple(tok);
+				tok.MustBeNext(";");
 			}
 			
-			tok.MustBeNext(";");
 			
 			result.Info.StopStatement(tok.getCursor());
 			
