@@ -1,4 +1,4 @@
-﻿namespace ProtoScript.Interpretter.RuntimeInfo
+namespace ProtoScript.Interpretter.RuntimeInfo
 {
 	public class ParameterRuntimeInfo : ValueRuntimeInfo
 	{
@@ -10,6 +10,7 @@
 			info.Type = Type;
 			info.OriginalType = OriginalType;
 			info.Value = Value;
+			info.ParameterName = ParameterName;
 			return info;
 		}
 
@@ -17,6 +18,5 @@
 		{
 			return $"ParameterRuntimeInfo:[{Index}] {Type} ({Value})";
 		}
-
 	}
 }
