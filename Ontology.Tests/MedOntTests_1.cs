@@ -82,6 +82,31 @@ namespace Ontology.Tests
 
 		}
 
+		[TestMethod]
+		[TestCategory("Integration")]
+		[TestProperty("Category", "Integration")]
+		public void Test_SearchICD10()
+		{
+			string Search = "high blood";
+			ProtoScriptTagger tagger = GetProjectSmallTagger();
+			Prototype protoI10 = Prototypes.GetPrototypeByPrototypeName("ICD10CM.I10");
+			Prototype? protoMatch = tagger.Interpretter.RunMethodAsPrototype(null, "IsMatch", new List<object> { protoI10, Search });
+
+			Prototype? protoCollection = tagger.Interpretter.RunMethodAsPrototype(null, "GetICDCodeByDescription2", new List<object> { Search });
+			if (protoCollection != null)
+			{
+				foreach (Prototype children in protoCollection.Children)
+				{
+					string strCode = children.Properties.GetStringOrDefault("ICD10CM.Code.Field.CodeValue");
+					string strDescription = children.Properties.GetStringOrDefault("ICD10CM.Code.Field.Description");
+				//	lstResults.Add((strCode, strDescription));
+				}
+			}
+
+		}	
+
+
+
 
 	}
 

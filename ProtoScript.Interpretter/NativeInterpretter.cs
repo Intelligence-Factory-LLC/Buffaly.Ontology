@@ -17,10 +17,12 @@ namespace ProtoScript.Interpretter
 	{
 		public StatementParsingInfo Info = null;
 		public RuntimeException() { }
-		public RuntimeException(string message, StatementParsingInfo info) : base(message) {
+		public RuntimeException(string message, StatementParsingInfo info) : base(message)
+		{
 			Info = info;
 		}
-		public RuntimeException(string message, StatementParsingInfo info, Exception inner) : base(message, inner) {
+		public RuntimeException(string message, StatementParsingInfo info, Exception inner) : base(message, inner)
+		{
 			Info = info;
 		}
 		public RuntimeException(string message, Exception inner) : base(message, inner) { }
@@ -32,8 +34,8 @@ namespace ProtoScript.Interpretter
 
 	public class IncompatiblePrototypeParameter : RuntimeException
 	{
-		public IncompatiblePrototypeParameter(StatementParsingInfo info, string strSource, string strTarget) : base($"Incompatible Prototype Parameter {strSource} -> {strTarget}", info) 
-		{ 
+		public IncompatiblePrototypeParameter(StatementParsingInfo info, string strSource, string strTarget) : base($"Incompatible Prototype Parameter {strSource} -> {strTarget}", info)
+		{
 		}
 
 	}
@@ -92,9 +94,9 @@ namespace ProtoScript.Interpretter
 			if (null != functionRuntimeInfo)
 			{
 				protoThis = SimpleInterpretter.NewInstance(prototype);
-				RunConstructor(functionRuntimeInfo, lstParameters , protoThis);
+				RunConstructor(functionRuntimeInfo, lstParameters, protoThis);
 			}
-			
+
 			if (null == protoThis)
 				protoThis = prototype.Clone();
 
@@ -109,10 +111,10 @@ namespace ProtoScript.Interpretter
 
 		private FunctionRuntimeInfo GetConstructor(Prototype prototype)
 		{
-			PrototypeTypeInfo ? prototypeTypeInfo = GetPrototypeTypeInfo(prototype);
+			PrototypeTypeInfo? prototypeTypeInfo = GetPrototypeTypeInfo(prototype);
 			if (null != prototypeTypeInfo)
 			{
-FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
+				FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
 				return functionRuntimeInfo;
 			}
 
@@ -126,7 +128,7 @@ FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.First
 			PrototypeTypeInfo? prototypeTypeInfo = GetPrototypeTypeInfo(prototype);
 			if (null != prototypeTypeInfo)
 			{
-FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
+				FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.FirstOrDefault(x => (x.Value is FunctionRuntimeInfo && (x.Value as FunctionRuntimeInfo).IsConstructor)).Value as FunctionRuntimeInfo;
 				if (null != functionRuntimeInfo)
 				{
 					RunConstructor(functionRuntimeInfo, new List<Compiled.Expression>(), protoThis);
@@ -208,7 +210,7 @@ FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.First
 
 		public bool Evaluate(Compiled.File file)
 		{
-			
+
 			//N20240929-01 - We aren't using file scope now, so this call causes test cases to fail
 			if (null != file.Scope)
 				Symbols.EnterScope(file.Scope);
@@ -322,16 +324,16 @@ FunctionRuntimeInfo? functionRuntimeInfo = prototypeTypeInfo.Scope.Symbols.First
 
 				if (null != statement.Info)
 				{
-File? file = this.Compiler.Files.FirstOrDefault(x => x.Info?.FullName == statement.Info?.File);
+					File? file = this.Compiler.Files.FirstOrDefault(x => x.Info?.FullName == statement.Info?.File);
 					if (null != file)
 					{
 						string strStatement = file.RawCode.Substring(statement.Info.StartingOffset, statement.Info.Length);
-						string strMessage = err.Message; 
+						string strMessage = err.Message;
 						throw new RuntimeException(err.Message + "\r\n: " + strStatement, statement.Info, err);
 					}
 				}
-				
-throw;
+
+				throw;
 			}
 		}
 
@@ -379,7 +381,7 @@ throw;
 		public bool Evaluate(Compiled.ReturnStatement statement)
 		{
 			object oRes = statement.Expression == null ? null : Evaluate(statement.Expression);
-		
+
 			Symbols.MethodScope.Stack[0] = oRes;
 			return true;
 		}
@@ -433,7 +435,7 @@ throw;
 		public bool Evaluate(Compiled.IfStatement statement)
 		{
 			bool bRes = EvaluateAsBool(statement.Condition);
-	
+
 			if (bRes)
 			{
 				return Evaluate(statement.TrueBody);
@@ -570,7 +572,7 @@ throw;
 			int iID = exp.Scope.ID;
 			if (Symbols.ActiveScope().ID == iID)
 			{
-				return Symbols.ActiveScope().Stack[exp.Index];				
+				return Symbols.ActiveScope().Stack[exp.Index];
 			}
 
 			for (int i = Symbols.ActiveScopes.Count - 1; i >= 0; i--)
@@ -594,7 +596,7 @@ throw;
 			foreach (Compiled.Expression exp in literal.Values)
 			{
 				object value = Evaluate(exp);
-				Prototype protoValue = GetOrConvertToPrototype(value);			
+				Prototype protoValue = GetOrConvertToPrototype(value);
 				collection.Children.Add(protoValue);
 			}
 
@@ -759,6 +761,8 @@ throw;
 					DotNetTypeInfo typeInfo = right as DotNetTypeInfo;
 					if (null != left && left.GetType() == typeInfo.Type)
 						return left;
+
+					return MakeAssignable(left, typeInfo, exp.Info);
 				}
 
 				return null;
@@ -793,13 +797,13 @@ throw;
 					{
 						exp.Right.Scope.Stack[0] = protoPossible;
 
-						bool bFailed = false; 
+						bool bFailed = false;
 						foreach (Compiled.Expression expr in exp.Right.Expressions)
 						{
 							bool bRes = EvaluateAsBool(expr);
 							if (!bRes)
 							{
-								bFailed = true; 
+								bFailed = true;
 								break;
 							}
 						}
@@ -815,7 +819,7 @@ throw;
 					exp.Right.Scope.Stack[0] = left;
 
 					foreach (Compiled.Expression expr in exp.Right.Expressions)
-					{						
+					{
 						bool bRes = EvaluateAsBool(expr);
 						if (!bRes)
 							return false;
@@ -880,85 +884,85 @@ throw;
 				{
 					iPrototypeID = (int)right;
 				}
-                else if (right is string str)
-                {
-                    Prototype protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(str);
-                    iPrototypeID = protoRight.PrototypeID;
-                }
+				else if (right is string str)
+				{
+					Prototype protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(str);
+					iPrototypeID = protoRight.PrototypeID;
+				}
 				else
 				{
 					Prototype protoRight = GetAsPrototype(right);
 
-                    if (protoRight.TypeOf(System_String.Prototype))
-                    {
-                        string strValue = StringWrapper.ToString(protoRight);
-                        protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(strValue);
-                    }
+					if (protoRight.TypeOf(System_String.Prototype))
+					{
+						string strValue = StringWrapper.ToString(protoRight);
+						protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(strValue);
+					}
 
-                    iPrototypeID = protoRight.PrototypeID;
+					iPrototypeID = protoRight.PrototypeID;
 				}
 
 				return properties[iPrototypeID];
 			}
 
-            if (left is List<Prototype>)
-            {
-                if (!(right is int))
-                {
-                    throw new RuntimeException("Index must of type integer on a prototype collection", exp.Info);
-                }
+			if (left is List<Prototype>)
+			{
+				if (!(right is int))
+				{
+					throw new RuntimeException("Index must of type integer on a prototype collection", exp.Info);
+				}
 
-                int iRight = Convert.ToInt32(right);
+				int iRight = Convert.ToInt32(right);
 
-                List<Prototype> lstPrototypes = left as List<Prototype>;
-                if (iRight < 0 || iRight >= lstPrototypes.Count)
-                    throw new RuntimeException("Index is outside the bounds of the collection", exp.Info);
+				List<Prototype> lstPrototypes = left as List<Prototype>;
+				if (iRight < 0 || iRight >= lstPrototypes.Count)
+					throw new RuntimeException("Index is outside the bounds of the collection", exp.Info);
 
-                return lstPrototypes[iRight];
-            }
+				return lstPrototypes[iRight];
+			}
 
-            Prototype prototype = GetAsPrototype(left);
+			Prototype prototype = GetAsPrototype(left);
 
-            if (null == prototype)
-                throw new RuntimeException("Collection is not of recognized type for index operator", exp.Info);
-            else
-            {
-                //Note: this is somewhat inconsistent because we could use PrototypeID here
-                //Shorthand: 
-                // prototype[0] = prototype.Children[0]
-                if (right is int)
-                {
-                    int iRight = Convert.ToInt32(right);
+			if (null == prototype)
+				throw new RuntimeException("Collection is not of recognized type for index operator", exp.Info);
+			else
+			{
+				//Note: this is somewhat inconsistent because we could use PrototypeID here
+				//Shorthand: 
+				// prototype[0] = prototype.Children[0]
+				if (right is int)
+				{
+					int iRight = Convert.ToInt32(right);
 
-                    if (iRight < 0 || iRight >= prototype.Children.Count)
-                        throw new RuntimeException("Index is outside the bounds of the collection", exp.Info);
+					if (iRight < 0 || iRight >= prototype.Children.Count)
+						throw new RuntimeException("Index is outside the bounds of the collection", exp.Info);
 
-                    return prototype.Children[iRight];
-                }
+					return prototype.Children[iRight];
+				}
 
-                int iPrototypeID;
-                if (right is string)
-                {
-                    //Shorthand: 
-                    //prototype["Property"] = protototype.Properties[Property.PrototypeID]
-                    Prototype protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(right as string);
-                    iPrototypeID = protoRight.PrototypeID;
-                }
-                else
-                {
-                    //Shorthand: 
-                    //prototype[protoProp] = protototype.Properties[protoProp.PrototypeID]
-                    Prototype protoRight = GetAsPrototype(right);
-                    if (protoRight.PrototypeID == System_String.Prototype.PrototypeID)
-                    {
-                        string strValue = StringWrapper.ToString(protoRight);
-                        protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(strValue);
-                    }
-                    iPrototypeID = protoRight.PrototypeID;
-                }
+				int iPrototypeID;
+				if (right is string)
+				{
+					//Shorthand: 
+					//prototype["Property"] = protototype.Properties[Property.PrototypeID]
+					Prototype protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(right as string);
+					iPrototypeID = protoRight.PrototypeID;
+				}
+				else
+				{
+					//Shorthand: 
+					//prototype[protoProp] = protototype.Properties[protoProp.PrototypeID]
+					Prototype protoRight = GetAsPrototype(right);
+					if (protoRight.PrototypeID == System_String.Prototype.PrototypeID)
+					{
+						string strValue = StringWrapper.ToString(protoRight);
+						protoRight = TemporaryPrototypes.GetOrCreateTemporaryPrototype(strValue);
+					}
+					iPrototypeID = protoRight.PrototypeID;
+				}
 
-                return prototype.Properties[iPrototypeID];
-            }
+				return prototype.Properties[iPrototypeID];
+			}
 		}
 		public object Evaluate(UnaryExpression exp)
 		{
@@ -1005,12 +1009,12 @@ throw;
 			return SimpleInterpretter.GetAsPrototype(obj);
 		}
 
-		public Prototype ? GetOrConvertToPrototype(object ? oValue)
+		public Prototype? GetOrConvertToPrototype(object? oValue)
 		{
 			if (null == oValue)
 				return null;
 
-			Prototype ? protoValue =  SimpleInterpretter.GetAsPrototype(oValue);
+			Prototype? protoValue = SimpleInterpretter.GetAsPrototype(oValue);
 
 			if (null == protoValue)
 			{
@@ -1236,29 +1240,29 @@ throw;
 				var activator = ReflectionCache.GetConstructor(ctor);   // cached delegate
 				return activator(new[] { value });
 			}
-			
+
 			if (null != typeInfoRight && SimpleInterpretter.IsAssignableFrom(typeInfoRight, typeInfo))
 				return value;
 
 			throw new RuntimeException("Cannot assign value", statementParsingInfo);
 		}
-	
-               public object Evaluate(PrototypeFieldReference exp)
-               {
-                       object oLeft = Evaluate(exp.Left);
-                       if (exp.IsNullConditional)
-                       {
-                               if (oLeft is ValueRuntimeInfo val)
-                                       oLeft = val.Value;
-                               if (oLeft == null)
-                                       return null;
-                       }
-                       object oRight = Evaluate(exp.Right);
+
+		public object Evaluate(PrototypeFieldReference exp)
+		{
+			object oLeft = Evaluate(exp.Left);
+			if (exp.IsNullConditional)
+			{
+				if (oLeft is ValueRuntimeInfo val)
+					oLeft = val.Value;
+				if (oLeft == null)
+					return null;
+			}
+			object oRight = Evaluate(exp.Right);
 
 			Prototype prototype = GetAsPrototype(oLeft);
 
 			if (null == prototype)
-				throw new RuntimeException("Could not evaluate left side", exp.Left.Info);			
+				throw new RuntimeException("Could not evaluate left side", exp.Left.Info);
 
 			Prototype protoProp = null;
 			if (oRight is PrototypeTypeInfo)
@@ -1325,10 +1329,10 @@ throw;
 
 					if (null == fieldTypeInfo)
 						fieldTypeInfo = exp.FieldInfo;
-					
+
 					LazyPropertyInitializer(prototype, protoProp, fieldTypeInfo);
 				}
-					
+
 				else
 					return null;
 			}
@@ -1444,7 +1448,7 @@ throw;
 			{
 				fieldSetter.Prototype = (oLeft as PrototypeTypeInfo).Prototype;
 			}
-			else			
+			else
 				throw new RuntimeException("Cannot assign to null value", exp.Info);
 
 
@@ -1476,7 +1480,7 @@ throw;
 				Prototype protoSpecificBase = null;
 
 				//N20220922-01 - Use the "cast" form to force a method
-				if (exp.Object is Compiled.CastingOperator2)		//in this case we want a specific method
+				if (exp.Object is Compiled.CastingOperator2)        //in this case we want a specific method
 				{
 					protoSpecificBase = (exp.Object.InferredType as PrototypeTypeInfo).Prototype;
 				}
@@ -1616,7 +1620,7 @@ throw;
 				if (err.Message == "Parameter is null")
 					err.Info = lstParameters[err.Info.StartingOffset].Info;
 
-throw;
+				throw;
 			}
 		}
 
@@ -1630,7 +1634,7 @@ throw;
 			{
 				object oParamValue = lstParameters[i];
 				ParameterRuntimeInfo infoParam = (ParameterRuntimeInfo)infoFunc.Parameters[i].Clone();
-				
+
 				infoParam.Value = MakeAssignable(oParamValue, infoParam.Type, infoFunc.Info);
 
 				scope.Stack[infoParam.Index] = infoParam;
@@ -1649,16 +1653,16 @@ throw;
 			return scope;
 		}
 
-		public Prototype ? RunMethodAsPrototype(Prototype ? protoInstance, string strMethodName, List<object> lstParameters)
+		public Prototype? RunMethodAsPrototype(Prototype? protoInstance, string strMethodName, List<object> lstParameters)
 		{
-			object ? oRes = RunMethodAsObject(protoInstance, strMethodName, lstParameters);
+			object? oRes = RunMethodAsObject(protoInstance, strMethodName, lstParameters);
 
 			return GetOrConvertToPrototype(oRes);
 		}
-		public object ? RunMethodAsObject(Prototype ? protoInstance, string strMethodName, List<object> lstParameters)
+		public object? RunMethodAsObject(Prototype? protoInstance, string strMethodName, List<object> lstParameters)
 		{
 
-			FunctionRuntimeInfo ? infoFunction = null;
+			FunctionRuntimeInfo? infoFunction = null;
 
 			if (null == protoInstance)
 			{
@@ -1686,63 +1690,63 @@ throw;
 		/// args["child"] = interpreter.GetLocalPrototype("Bart");
 		/// interpreter.RunMethodAsObject("Homer", "IsParentOf", args);
 		/// </example>
-		public object ? RunMethodAsObject(Prototype ? protoInstance, string strMethodName, IDictionary<string, object> dictParameters)
+		public object? RunMethodAsObject(Prototype? protoInstance, string strMethodName, IDictionary<string, object> dictParameters)
 		{
-			FunctionRuntimeInfo ? infoFunction = null;
-			
+			FunctionRuntimeInfo? infoFunction = null;
+
 			if (null == protoInstance)
 			{
 				infoFunction = this.Symbols.GetSymbol(strMethodName) as FunctionRuntimeInfo;
 				if (null == infoFunction)
-				throw new Exception("Could not find global method: " + strMethodName);
+					throw new Exception("Could not find global method: " + strMethodName);
 			}
-			
+
 			else
 			{
 				infoFunction = this.FindOverriddenMethod(protoInstance, strMethodName);
-				
+
 				if (null == infoFunction)
-				throw new Exception("Could not find method: " + strMethodName + ", on prototype: " + protoInstance.PrototypeName);
+					throw new Exception("Could not find method: " + strMethodName + ", on prototype: " + protoInstance.PrototypeName);
 			}
-			
+
 			List<object> lstParameters = new List<object>();
-			
+
 			foreach (ParameterRuntimeInfo infoParam in infoFunction.Parameters)
 			{
 				object oValue;
 				if (!dictParameters.TryGetValue(infoParam.ParameterName, out oValue))
-				throw new Exception("Missing parameter: " + infoParam.ParameterName);
+					throw new Exception("Missing parameter: " + infoParam.ParameterName);
 				lstParameters.Add(oValue);
 			}
-			
+
 			return this.RunMethod(infoFunction, protoInstance, lstParameters);
 		}
 
-		public Prototype ? RunMethodAsPrototype(Prototype protoInstance, string strMethodName, object oParam1)
+		public Prototype? RunMethodAsPrototype(Prototype protoInstance, string strMethodName, object oParam1)
 		{
 			return RunMethodAsPrototype(protoInstance, strMethodName, new List<object> { oParam1 });
 		}
 
-		public Prototype ? RunMethodAsPrototype(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
+		public Prototype? RunMethodAsPrototype(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
 		{
-			object ? oRes = this.RunMethod(infoFunc, objInstance, lstParameters);
+			object? oRes = this.RunMethod(infoFunc, objInstance, lstParameters);
 
 			return GetOrConvertToPrototype(oRes);
 		}
 
-		public object ? RunMethod(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
+		public object? RunMethod(FunctionRuntimeInfo infoFunc, object objInstance, List<object> lstParameters)
 		{
 			if (LogMethodCalls)
 			{
-				Logs.DebugLog.WriteEvent("Calling Method", (infoFunc.ParentPrototype == null ? "" : infoFunc.ParentPrototype.PrototypeName + ".") +  infoFunc.FunctionName);				
+				Logs.DebugLog.WriteEvent("Calling Method", (infoFunc.ParentPrototype == null ? "" : infoFunc.ParentPrototype.PrototypeName + ".") + infoFunc.FunctionName);
 			}
 
 			if (infoFunc.Parameters.Count != lstParameters.Count)
-				throw new RuntimeException($"Not enough parameters passed to function {infoFunc.FunctionName}. {lstParameters.Count} vs {infoFunc.Parameters.Count}", infoFunc.Info); 
+				throw new RuntimeException($"Not enough parameters passed to function {infoFunc.FunctionName}. {lstParameters.Count} vs {infoFunc.Parameters.Count}", infoFunc.Info);
 
 			Scope scope = GetFunctionEvaluationScope2(infoFunc, lstParameters);
 			Symbols.EnterScope(scope);
-			object ? oReturn = null;
+			object? oReturn = null;
 
 			try
 			{
@@ -1786,7 +1790,7 @@ throw;
 
 			//Changed to GetAllParents to it doesn't traverse the same prototypes more than once
 			//N20221115-02 - Need to get the most specific if the TypeOfs are not in the correct order
-			Prototype? protoFoundTypeOf = null; 		
+			Prototype? protoFoundTypeOf = null;
 			foreach (int protoTypeOfID in prototype.GetAllParents())
 			{
 				Prototype protoTypeOf = Prototypes.GetPrototype(protoTypeOfID);
@@ -1800,7 +1804,7 @@ throw;
 						funcOverriden = funcOverridenSingle;
 						protoFoundTypeOf = protoTypeOf;
 					}
-				}				
+				}
 			}
 
 			return funcOverriden;
@@ -1832,35 +1836,35 @@ throw;
 			return null;
 		}
 
-public object Evaluate(DotNetFieldReference exp)
-{
-object obj = Evaluate(exp.Object);
-if (exp.IsNullConditional)
-{
-if (obj is ValueRuntimeInfo val)
-obj = val.Value;
-if (obj == null)
-return null;
-}
-if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
-else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
+		public object Evaluate(DotNetFieldReference exp)
+		{
+			object obj = Evaluate(exp.Object);
+			if (exp.IsNullConditional)
+			{
+				if (obj is ValueRuntimeInfo val)
+					obj = val.Value;
+				if (obj == null)
+					return null;
+			}
+			if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
+			else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
 
 			var getter = ReflectionCache.GetGetter(exp.Field);   // cached delegate
 			return getter(obj);                                  // no reflection
 		}
 
-public object Evaluate(DotNetPropertyReference exp)
-{
-object obj = Evaluate(exp.Object);
-if (exp.IsNullConditional)
-{
-if (obj is ValueRuntimeInfo val)
-obj = val.Value;
-if (obj == null)
-return null;
-}
-if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
-else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
+		public object Evaluate(DotNetPropertyReference exp)
+		{
+			object obj = Evaluate(exp.Object);
+			if (exp.IsNullConditional)
+			{
+				if (obj is ValueRuntimeInfo val)
+					obj = val.Value;
+				if (obj == null)
+					return null;
+			}
+			if (obj is ValueRuntimeInfo) obj = ((ValueRuntimeInfo)obj).Value;
+			else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
 
 			var getter = ReflectionCache.GetGetter(exp.Property); // cached delegate
 			return getter(obj);
@@ -1868,36 +1872,36 @@ else if (obj is PrototypeTypeInfo) obj = ((PrototypeTypeInfo)obj).Prototype;
 
 		virtual public object Evaluate(DotNetMethodEvaluation exp)
 		{
-int iParamCount = exp.Parameters.Count;
-List<object> lstParameters = new List<object>(iParamCount);
+			int iParamCount = exp.Parameters.Count;
+			List<object> lstParameters = new List<object>(iParamCount);
 
-System.Reflection.ParameterInfo[] infoParams = exp.Method.GetParameters();
+			System.Reflection.ParameterInfo[] infoParams = exp.Method.GetParameters();
 
-bool bSaved = AllowLazyPropertyInitialization;
-object obj;
-try
-{
-AllowLazyPropertyInitialization = true;
-obj = Evaluate(exp.Object);
-}
-finally
-{
-AllowLazyPropertyInitialization = bSaved;
-}
+			bool bSaved = AllowLazyPropertyInitialization;
+			object obj;
+			try
+			{
+				AllowLazyPropertyInitialization = true;
+				obj = Evaluate(exp.Object);
+			}
+			finally
+			{
+				AllowLazyPropertyInitialization = bSaved;
+			}
 
-if (exp.IsNullConditional)
-{
-if (obj is ValueRuntimeInfo val)
-obj = val.Value;
-else if (obj is PrototypeTypeInfo pti)
-obj = pti.Prototype;
-if (obj == null && !exp.Method.IsStatic)
-return null;
-}
+			if (exp.IsNullConditional)
+			{
+				if (obj is ValueRuntimeInfo val)
+					obj = val.Value;
+				else if (obj is PrototypeTypeInfo pti)
+					obj = pti.Prototype;
+				if (obj == null && !exp.Method.IsStatic)
+					return null;
+			}
 
-for (int i = 0; i < iParamCount; i++)
-{
-Compiled.Expression expParam = exp.Parameters[i];
+			for (int i = 0; i < iParamCount; i++)
+			{
+				Compiled.Expression expParam = exp.Parameters[i];
 
 				if (expParam is LambdaOperator lambdaOperator)
 				{
@@ -1919,12 +1923,12 @@ Compiled.Expression expParam = exp.Parameters[i];
 					System.Reflection.ParameterInfo infoParam = infoParams[i];
 
 					lstParameters.Add(MakeAssignable(oParam, new TypeInfo(infoParam.ParameterType), expParam.Info));
-				
+
 				}
 			}
-				if (obj is ValueRuntimeInfo valueRuntimeInfo1)
+			if (obj is ValueRuntimeInfo valueRuntimeInfo1)
 				obj = valueRuntimeInfo1.Value;
-				else if (obj is PrototypeTypeInfo prototypeTypeInfo)
+			else if (obj is PrototypeTypeInfo prototypeTypeInfo)
 				obj = prototypeTypeInfo.Prototype;
 
 			if (null == obj && !exp.Method.IsStatic)
