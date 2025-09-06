@@ -150,16 +150,11 @@ All contributors must sign the **Contributor Licence Agreement (CLA)**—see `CL
 
 ---
 
-## 🛡 Licence (dual)
+## 🛡 Licence
 
-* **Community Edition** – released under the **Apache License 2.0**.
-  You may use it freely in research, startups and open applications.
+Buffaly.Ontology is released under the **GNU General Public License v3.0**.
 
-* **Commercial Edition** – if you need to embed Buffaly.Ontology in a closed-source
-  or SaaS product, or require indemnity & SLA, we offer a commercial licence.
-  Email **[justin@intelligencefactory.ai](mailto:justin@intelligencefactory.ai)** for pricing and terms.
-
-The full text of the Apache 2.0 licence is in [`LICENSE`](LICENSE).
+See [`LICENSE`](LICENSE) for the full text.
 
 ---
 
