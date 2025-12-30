@@ -18,14 +18,7 @@ Shadows are the heart of ProtoScript’s learning capability, allowing the syste
 * **Structural Learning Path**: Shadows, via LGG, provide the runtime pathway for learning new categories and relationships by materializing shared structure as explicit Prototypes.  
 * **Graph-Focused Alternative**: This learning process is symbolic: it derives graph artifacts (Shadows, Paths) from structural comparisons instead of adjusting numeric weights, making it suited to sparse or evolving ontology data.
 
-### **Beyond Traditional Ontologies**
-
-Traditional ontologies (e.g., OWL, RDF) rely on static class definitions and formal axioms, with learning limited to predefined rules or external inference engines. ProtoScript’s Shadows offer:
-
-1. **Dynamic Categorization**: Shadows create subtypes on-the-fly by comparing instances, unlike OWL’s fixed hierarchies.  
-2. **Unsupervised Learning**: No need for labeled data, unlike supervised ontology learning tools.  
-3. **Structural Reasoning**: LGG generalizes based on graph structure, not statistical patterns, ensuring interpretability.  
-4. **Scalability**: Uses pairwise comparisons selected through indexing or shortlists, with pruning to discard low-utility Shadows, avoiding unbounded pair counts.
+Shadows generalize structures dynamically through LGG, enabling unsupervised learning and scalable comparisons without relying on the static class hierarchies and external inference engines used in traditional ontologies.
 
 ### **Analogy to Familiar Concepts**
 
@@ -81,6 +74,8 @@ Shadows are created using the **compare operator**, which applies LGG to two Pro
 2. **Retention**: Keep identical properties and values (e.g., same type).  
 3. **Generalization**: Replace differing values with their common type or a wildcard (e.g., `_` for names).  
 4. **Output**: Produce a new Prototype (the Shadow) representing the shared structure.
+
+> Note: The following snippet is conceptual pseudocode. The actual runtime API is very similar and equivalent in behavior; treat this as an explanatory representation of the operation.
 
 **Syntax** (Conceptual, executed by runtime):
 
@@ -157,7 +152,7 @@ prototype InitializedIntVariable : CSharp\_VariableDeclaration {
 * **Graph View**: The Shadow is a node with edges to `"int"`, `false`, and a generic `CSharp_Expression` node.  
 * **Learning Outcome**: The Shadow defines a new subtype, “initialized integer variables,” categorizing both inputs.
 
-**Beyond Ontologies**: Unlike OWL, which requires predefined classes, Shadows dynamically learn this subtype from instance comparisons, enabling unsupervised categorization.
+ Unlike OWL, which requires predefined classes, Shadows dynamically learn this subtype from instance comparisons, enabling unsupervised categorization.
 
 ### **Example 2: Generalizing Simpsons Characters**
 
@@ -223,7 +218,7 @@ prototype SimpsonsHouseParent : Person {
 * **Graph View**: The Shadow links to `SimpsonsHouse` and `[Bart, Lisa, Maggie]` nodes, with placeholder edges for `Name`, `Gender`, `Spouse`, and `Age`.  
 * **Learning Outcome**: Categorizes `Homer` and `Marge` as instances of this subtype, learned without supervision.
 
-**Beyond Ontologies**: Shadows enable ProtoScript to learn family structures dynamically, unlike OWL’s need for predefined family classes.
+ Shadows enable ProtoScript to learn family structures dynamically, unlike OWL’s need for predefined family classes.
 
 ### **Example 3: Categorizing with Shadows**
 
@@ -259,7 +254,7 @@ function IsSimpsonsHouseParent(Person person) : bool {
 * **Graph View**: The `->` operator traverses `Ned`’s properties, comparing them to the Shadow’s structure.  
 * **Learning Outcome**: The Shadow categorizes `Homer` and `Marge` but excludes `Ned`, demonstrating learned discrimination.
 
-**Beyond Ontologies**: This unsupervised categorization is more flexible than OWL’s static class membership, adapting to new instances dynamically.
+ This unsupervised categorization is more flexible than OWL’s static class membership, adapting to new instances dynamically.
 
 ## **Mechanics of Shadows**
 
@@ -332,7 +327,7 @@ prototype IntDataElement {
 * The Shadow defines a subtype for “integer data elements” (e.g., variables or columns).  
 * **Graph View**: Links to `"int"` and a generic `string` for `Name`.  
 * **Learning Outcome**: Categorizes `Int_Declaration_I` and `ID_Column`, revealing cross-domain type consistency.  
-* **Beyond Ontologies**: Unifies code and database domains, unlike OWL’s separate ontologies.
+*  Unifies code and database domains, unlike OWL’s separate ontologies.
 
 ## **Moving Forward**
 

@@ -17,14 +17,7 @@ Prototype Paths and Parameterization are essential for:
 * **Scalable and Interpretable**: Paths operate on explicit graph traversals with bounded hop counts and cached comparisons, keeping the analysis transparent.  
 * **Cross-Domain Power**: By isolating divergent properties, Paths enable transformations between domains (e.g., code to natural language), leveraging the ontology’s unified graph.
 
-### **Beyond Traditional Ontologies**
-
-Traditional ontologies (e.g., OWL, RDF) use static property assertions and axioms, with limited ability to dynamically analyze instance differences. ProtoScript’s Prototype Paths offer:
-
-1. **Dynamic Analysis**: Paths identify instance-specific subgraphs at runtime, unlike OWL’s fixed property definitions.  
-2. **Unsupervised Precision**: No labeled data is needed to pinpoint differences, unlike supervised ontology tools.  
-3. **Graph-Centric Reasoning**: Paths traverse the graph to isolate divergences, ensuring interpretability.  
-4. **Transformation Enablement**: Paths provide the data needed to map Prototypes across domains, surpassing OWL’s domain-specific mappings.
+Prototype Paths identify instance-specific subgraphs at runtime, supporting unsupervised, graph-centric analysis of divergences without relying on static property assertions or domain-specific mappings.
 
 ### **Analogy to Familiar Concepts**
 
@@ -59,6 +52,8 @@ Parameterization involves:
 2. **Path Extraction**: Identify properties where the Prototype diverges from the Shadow, tracing a path to the mismatched subgraph.  
 3. **Marking**: Use `Compare.Entity` to flag the root of each divergent subgraph.  
 4. **Output**: Produce one or more Paths, each representing a specific difference as a subgraph.
+
+> Note: The following snippet is conceptual pseudocode. The actual runtime API is very similar and equivalent in behavior; treat this as an explanatory representation of the operation.
 
 **Syntax** (Conceptual, executed by runtime):
 
@@ -142,7 +137,7 @@ Int\_Declaration\_I.Initializer \= Compare.Entity
 * **Graph View**: Paths trace from `Int_Declaration_I` to `"i"` and `IntegerLiteral_0`, marked by `Compare.Entity`.  
 * **Use Case**: Paths enable transformations (e.g., renaming the variable) or queries (e.g., finding all initializers with value `"0"`).
 
-**Beyond Ontologies**: Unlike OWL’s static property assertions, Paths dynamically identify instance-specific differences, enabling flexible reasoning without predefined rules.
+Paths dynamically identify instance-specific differences, enabling flexible reasoning without predefined rules or static property assertions.
 
 ### **Example 2: Parameterizing Simpsons Characters**
 
@@ -228,7 +223,7 @@ Homer.Age \= Compare.Entity
 * **Graph View**: Paths trace to `"Homer Simpson"`, `"Male"`, `Marge`, and `39`, marked by `Compare.Entity`.  
 * **Use Case**: Paths support queries (e.g., finding parents with specific ages) or transformations (e.g., updating `Gender`).
 
-**Beyond Ontologies**: Paths provide a granular view of instance differences, enabling dynamic reasoning without OWL’s complex SPARQL queries.
+Paths provide a granular view of instance differences, enabling dynamic reasoning without complex SPARQL queries.
 
 ### **Example 3: Cross-Domain Transformation**
 
@@ -284,7 +279,7 @@ function ToDatabaseColumn(CSharp\_VariableDeclaration var) : Database\_Column {
 * The function uses the `Name` Path (`"i"`) to set `ColumnName`, mapping `Int_Declaration_I` to a database column.  
 * **Result**: `Database_Column { ColumnName = "i", DataType = "int" }`.  
 * **Graph View**: Paths extract `"i"` for transformation, linking to the new column node.  
-* **Beyond Ontologies**: Paths enable seamless cross-domain mapping, unlike OWL’s need for external mappings.
+* Paths enable seamless cross-domain mapping, unlike OWL’s need for external mappings.
 
 ## **Internal Mechanics**
 

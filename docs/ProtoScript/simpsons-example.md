@@ -11,14 +11,7 @@ The *Simpsons* dataset is relatable and rich with relationships, making it an id
 * **Cross-Domain Potential**: The model can integrate with other domains (e.g., linking characters to a database or natural language queries), showcasing ProtoScript’s versatility.  
 * **Reasoning and Relationships**: The graph enables discovery of relationships (e.g., family structures) and transformations (e.g., generating queries about characters).
 
-### **Beyond Traditional Ontologies**
-
-Traditional ontologies define static classes (e.g., `Person`, `Location`) and properties with formal axioms, requiring significant upfront design and external inference engines for reasoning. ProtoScript’s Prototypes offer several advantages:
-
-1. **Dynamic Structure**: Prototypes can evolve at runtime, adding properties or relationships without redefining the ontology, unlike OWL’s static schemas.  
-2. **Unified Representation**: The same `prototype` construct models characters, locations, or even abstract concepts, simplifying development compared to domain-specific ontology tools.  
-3. **Lightweight Reasoning**: Structural generalization (e.g., finding common traits among characters) replaces heavy axiomatic logic, making reasoning more intuitive.  
-4. **Developer-Friendly**: C\#-like syntax lowers the barrier for developers, unlike ontology editors like Protégé, which require specialized knowledge.
+ProtoScript’s Prototypes support runtime evolution, unify different entity types under a single construct, and rely on structural generalization for reasoning, offering a practical contrast to OWL’s static schemas and formal axioms.
 
 ### **Analogy to Familiar Concepts**
 
@@ -41,7 +34,7 @@ This example models key characters (Homer, Marge, Bart) and locations (Simpsons�
 
 ### **Prototype Definitions**
 
-Below is the ProtoScript code to model the *Simpsons* ontology, corrected for syntax accuracy based on your clarifications (e.g., using lowercase `string` for literals, direct literal initializers).
+Below is ProtoScript code to model the *Simpsons* ontology using canonical syntax (lowercase `string` for literals and direct literal initializers).
 
 prototype Entity {  
     string Name \= "";  
@@ -108,11 +101,11 @@ prototype Maggie : Person {
 * Relationships are established via properties (e.g., `Homer.Spouse = Marge`, `Homer.ParentOf = [Bart, Lisa, Maggie]`).  
 * **Graph View**: Nodes for `Homer`, `Marge`, and `SimpsonsHouse` are linked via edges (`Spouse`, `Location`, `ParentOf`), forming a network of relationships.
 
-**Syntax Corrections**:
+**Syntax Notes**:
 
-* Used lowercase `string`, `bool`, `int` for primitive types, as per your clarification, with direct literals (e.g., `"Homer Simpson"`, `39`).  
-* Avoided incorrect notations like `System.String[Value]` or uppercase types unless explicitly needed, aligning with examples like `string Name = "Buffalo"`.  
-* Ensured `Collection` is used correctly for lists (e.g., `ParentOf`), matching document conventions.
+* Use lowercase `string`, `bool`, `int` for primitive types with direct literals (e.g., `"Homer Simpson"`, `39`).
+* Avoid constructor-style wrappers for primitives unless explicitly needed, aligning with examples like `string Name = "Buffalo"`.
+* `Collection` represents lists (e.g., `ParentOf`), matching document conventions.
 
 ### **Ontology Structure**
 
@@ -123,12 +116,7 @@ The *Simpsons* model forms a graph-based ontology:
 * **Properties**: `Spouse`, `ParentOf`, `Location` are edges, similar to OWL object properties, but support runtime additions and cycles (e.g., `Homer.Spouse ↔ Marge.Spouse`).  
 * **Reasoning**: The graph enables structural queries (e.g., finding all parents) without formal axioms.
 
-**Beyond Traditional Ontologies**:
-
-* **Dynamic Evolution**: Unlike OWL, which requires schema updates to add a property like `Occupation`, ProtoScript can dynamically add it to `Person` at runtime.  
-* **Unified Modeling**: The same `prototype` construct models characters and locations, unlike ontology tools needing separate class definitions.  
-* **Ease of Use**: C\#-like syntax simplifies ontology creation compared to Protégé’s complex interface.  
-* **Cross-Domain Integration**: The model can link to external data (e.g., a database of Springfield residents), enabling transformations.
+ProtoScript models can add properties at runtime (e.g., introducing an `Occupation` property to `Person`), use the same `prototype` construct for characters and locations, and integrate with external data sources such as databases.
 
 ### **Querying the Ontology**
 
@@ -154,7 +142,7 @@ prototype Person {
 * `LivesInSpringfield` uses the `->` operator to verify if the `Location`’s `Name` is `"Springfield"`.  
 * **Usage**: `Homer.IsParent()` returns `true`, `Homer.LivesInSpringfield()` returns `true` (if `SimpsonsHouse` links to `Springfield`).  
 * **Graph View**: `IsParent` traverses `ParentOf` edges, `LivesInSpringfield` follows `Location` to check `Name`.  
-* **Beyond Ontologies**: These queries use structural traversal, not axiomatic reasoning, making them more intuitive and adaptable than OWL queries.
+* Queries use structural traversal rather than OWL-style axiomatic reasoning.
 
 ### **Discovering Relationships**
 
@@ -181,7 +169,7 @@ prototype Person {
 
 * `GetChildrenNames` collects `Name` properties from `ParentOf` nodes.  
 * `Homer.GetChildrenNames()` returns a collection with `"Bart Simpson"`, `"Lisa Simpson"`, `"Maggie Simpson"`.  
-* **Beyond Ontologies**: This dynamic query avoids OWL’s need for predefined SPARQL queries, using ProtoScript’s native graph traversal.
+* The dynamic query uses ProtoScript’s native graph traversal instead of predefined SPARQL queries.
 
 ### **Cross-Domain Transformations**
 
@@ -207,7 +195,7 @@ prototype Query {
 
 *   
   * **What’s Happening?**: The function maps a natural language question to a list of `Person` nodes, leveraging the ontology.  
-  * **Beyond Ontologies**: This transformation unifies NLP and graph querying, unlike OWL’s separate processing pipelines.
+  * The transformation unifies NLP and graph querying without relying on OWL-specific processing pipelines.
 
 ## **Internal Mechanics**
 
@@ -230,7 +218,7 @@ The *Simpsons* ontology showcases ProtoScript’s strengths:
 
 ## **Moving Forward**
 
-This *Simpsons* example demonstrates how ProtoScript’s Prototypes create a dynamic, graph-based ontology that models real-world entities with ease and flexibility. In the next section, we’ll explore **Relationships in ProtoScript**, diving into the taxonomy of relationships—from simple associations to complex computed links—that power the ontology’s connectivity. You’re now equipped to model rich, interconnected systems with ProtoScript\!
+This *Simpsons* example demonstrates how ProtoScript’s Prototypes create a dynamic, graph-based ontology that models real-world entities with ease and flexibility. Next: **Relationships in ProtoScript**, covering the taxonomy of associations and computed links that power connectivity.
 
 ---
 

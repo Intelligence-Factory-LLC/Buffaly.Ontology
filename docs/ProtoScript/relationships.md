@@ -13,12 +13,7 @@ Relationships are the edges in ProtoScript’s graph, linking Prototype nodes to
 * **Cross-Domain Integration**: Connect code, data, and language within a unified graph.  
 * **Reasoning**: Discover patterns and transform data by traversing relationships.
 
-**Beyond Traditional Ontologies**:
-
-* **Flexibility**: ProtoScript’s relationships evolve without redefining schemas, unlike OWL’s fixed properties.  
-* **Unified Framework**: A single graph model handles diverse relationship types, simplifying development compared to ontology-specific tools.  
-* **Lightweight Reasoning**: Structural traversal replaces heavy axiomatic logic, making reasoning intuitive.  
-* **Developer-Friendly**: C\#-like syntax lowers the barrier for modeling relationships.
+ProtoScript’s relationships evolve without redefining schemas, applying structural traversal and a unified graph model instead of the fixed properties and axiomatic logic common in OWL-based systems.
 
 ### **Analogy to Familiar Concepts**
 
@@ -73,7 +68,7 @@ prototype Marge : Entity {
 
 * `Springfield_Group.Members` links to `Homer` and `Marge` without specifying why.  
 * **Graph View**: `Springfield_Group` has edges to `Homer` and `Marge` nodes.  
-* **Beyond Ontologies**: Unlike OWL’s need for defined properties, associative relationships allow quick, informal links.
+* Unlike OWL’s need for defined properties, associative relationships allow quick, informal links.
 
 ### **2\. Associations**
 
@@ -106,7 +101,7 @@ Turkey\_Food.BidirectionalAssociate(Gravy\_Food);
 
 * `Turkey_Food` and `Gravy_Food` are linked bidirectionally, with a weight of 1\.  
 * **Graph View**: Edges `Turkey_Food ↔ Gravy_Food` with weight metadata.  
-* **Beyond Ontologies**: Associations are simpler than OWL’s object properties, enabling rapid relationship setup.
+* Associations are simpler than OWL’s object properties, enabling rapid relationship setup.
 
 ### **3\. Cyclical Relationships**
 
@@ -150,7 +145,7 @@ NewYork\_State.Cities.Add(NewYork\_City);
 
 * `NewYork_City.State` links to `NewYork_State`, and `NewYork_State.Cities` links back, forming a cycle.  
 * **Graph View**: `NewYork_City ↔ NewYork_State` via `State` and `Cities` edges.  
-* **Beyond Ontologies**: Cycles are natural in ProtoScript, unlike OWL’s preference for acyclic hierarchies.
+* Cycles are natural in ProtoScript, unlike OWL’s preference for acyclic hierarchies.
 
 ### **4\. Type Relationships (`typeof`)**
 
@@ -183,7 +178,7 @@ function IsPerson(Prototype proto) : bool {
 
 * `Homer isa Person`, and `IsPerson(Homer)` returns `true`.  
 * **Graph View**: `Homer` has an `isa` edge to `Person`.  
-* **Beyond Ontologies**: `typeof` enables dynamic type checks, simpler than OWL’s class assertions.
+* `typeof` enables dynamic type checks, simpler than OWL’s class assertions.
 
 ### **5\. Labeled Properties**
 
@@ -219,7 +214,7 @@ prototype SimpsonsHouse : Location {
 
 * `Homer.Location` links to `SimpsonsHouse`.  
 * **Graph View**: `Homer → SimpsonsHouse` via the `Location` edge.  
-* **Beyond Ontologies**: Labeled properties are intuitive, unlike OWL’s complex property declarations.
+* Labeled properties are intuitive, unlike OWL’s complex property declarations.
 
 ### **6\. Bidirectional Relationships**
 
@@ -251,7 +246,7 @@ prototype Marge : Person {
 
 * `Homer.Spouse = Marge` and `Marge.Spouse = Homer` create mutual links.  
 * **Graph View**: `Homer ↔ Marge` via `Spouse` edges.  
-* **Beyond Ontologies**: Bidirectional relationships are explicit and dynamic, unlike OWL’s need for inverse properties.
+* Bidirectional relationships are explicit and dynamic, unlike OWL’s need for inverse properties.
 
 ### **7\. Computed Relationships**
 
@@ -290,7 +285,7 @@ prototype Bart : Person {
 * `IsParent` computes if a `Person` has children.  
 * `Homer.IsParent()` returns `true`.  
 * **Graph View**: Traverses `ParentOf` edges to count nodes.  
-* **Beyond Ontologies**: Computed relationships enable flexible reasoning without OWL’s axioms.
+* Computed relationships enable flexible reasoning without OWL’s axioms.
 
 ## **Cross-Domain Relationships**
 
@@ -319,7 +314,7 @@ prototype Query {
 **What’s Happening?**
 
 * Maps a natural language question to a list of `Person` nodes using `IsParent`.  
-* **Beyond Ontologies**: Unifies NLP and graph querying, unlike OWL’s separate pipelines.
+* Unifies NLP and graph querying, unlike OWL’s separate pipelines.
 
 ## **Internal Mechanics**
 
