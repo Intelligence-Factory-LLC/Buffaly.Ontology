@@ -21,7 +21,7 @@ namespace ProtoScript.Interpretter.Symbols
 			}
 		}
 
-		protected Scope m_pActiveScope = null;
+		protected Scope ? m_pActiveScope = null;
 
 		public Stack GlobalStack
 		{
@@ -39,7 +39,7 @@ namespace ProtoScript.Interpretter.Symbols
 			}
 		}
 
-		public Scope MethodScope
+		public Scope ? MethodScope
 		{
 			get
 			{
@@ -73,7 +73,7 @@ namespace ProtoScript.Interpretter.Symbols
 
 		}
 
-		public Scope GetTopScope(Scope.ScopeTypes scopeType)
+		public Scope ? GetTopScope(Scope.ScopeTypes scopeType)
 		{
 			if (ActiveScope().ScopeType == scopeType)
 				return ActiveScope();
@@ -142,7 +142,7 @@ namespace ProtoScript.Interpretter.Symbols
 					m_stackActiveScopes.Count != 0)
 					throw new Exception("Cannot enter global scope. A scope already exists");
 
-				m_stackActivationRecords.Add(new Scope(null) { Name = "(global)" });
+				m_stackActivationRecords.Add(new Scope() { Name = "(global)" });
 				m_pActiveScope = m_stackActivationRecords.Back();
 			}
 		}
@@ -182,6 +182,9 @@ namespace ProtoScript.Interpretter.Symbols
 
 			lock (m_syncRoot)
 			{
+				if (null == m_pActiveScope)
+					throw new Exception("No active scope to enter from.");
+
 				m_stackActiveScopes.Add(m_pActiveScope);
 				m_pActiveScope = pAct;
 			}
@@ -196,18 +199,18 @@ namespace ProtoScript.Interpretter.Symbols
 			}
 		}
 
-		public object GetSymbol(string in_strSymbol)
+		public object? GetSymbol(string in_strSymbol)
 		{
-			object oObj = null;
+			object? oObj = null;
 			if (!TryGetSymbol(in_strSymbol, out oObj))
 				oObj = null;
 
 			return oObj;
 		}
 
-		public object GetSymbolAndScope(string in_strSymbol, out Scope oScope)
+		public object? GetSymbolAndScope(string in_strSymbol, out Scope oScope)
 		{
-			object oObj = null;
+			object? oObj = null;
 			if (!TryGetSymbolAndScope(in_strSymbol, out oObj, out oScope))
 				return null;
 
@@ -218,10 +221,13 @@ namespace ProtoScript.Interpretter.Symbols
 		{
 			lock (m_syncRoot)
 			{
+				if (null == m_pActiveScope)
+					throw new Exception("No active scope to get symbol from.");
+
 				bool bResult = false;
 				oObj = null;
 
-				for (Scope pAct = m_pActiveScope; !bResult && pAct != null; pAct = pAct.Parent)
+				for (Scope ? pAct = m_pActiveScope; !bResult && pAct != null; pAct = pAct.Parent)
 				{
 					bResult = pAct.TryGetSymbol(in_strSymbol, out oObj);
 				}
@@ -230,7 +236,7 @@ namespace ProtoScript.Interpretter.Symbols
 				{
 					for (int i = m_stackActiveScopes.Count - 1; !bResult && i >= 0; i--)
 					{
-						for (Scope pAct = m_stackActiveScopes[i]; !bResult && pAct != null; pAct = pAct.Parent)
+						for (Scope? pAct = m_stackActiveScopes[i]; !bResult && pAct != null; pAct = pAct.Parent)
 						{
 							bResult = pAct.TryGetSymbol(in_strSymbol, out oObj);
 						}
@@ -266,11 +272,14 @@ namespace ProtoScript.Interpretter.Symbols
 		{
 			lock (m_syncRoot)
 			{
+				if (null == m_pActiveScope)
+					throw new Exception("No active scope to get symbol from.");
+
 				bool bResult = false;
 				oObj = null;
 				oScope = null;
 
-				for (Scope pAct = m_pActiveScope; !bResult && pAct != null; pAct = pAct.Parent)
+				for (Scope? pAct = m_pActiveScope; !bResult && pAct != null; pAct = pAct.Parent)
 				{
 					bResult = pAct.TryGetSymbol(in_strSymbol, out oObj);
 					if (bResult)
@@ -281,7 +290,7 @@ namespace ProtoScript.Interpretter.Symbols
 				{
 					for (int i = m_stackActiveScopes.Count - 1; !bResult && i >= 0; i--)
 					{
-						for (Scope pAct = m_stackActiveScopes[i]; !bResult && pAct != null; pAct = pAct.Parent)
+						for (Scope? pAct = m_stackActiveScopes[i]; !bResult && pAct != null; pAct = pAct.Parent)
 						{
 							bResult = pAct.TryGetSymbol(in_strSymbol, out oObj);
 							if (bResult)
@@ -342,7 +351,7 @@ namespace ProtoScript.Interpretter.Symbols
 		}
 
 		static public bool AllowNamespaces = true;
-		public TypeInfo GetTypeInfo(string strTypeName)
+		public TypeInfo ? GetTypeInfo(string strTypeName)
 		{
 			if (!AllowNamespaces)
 				return GetGlobalScope().GetSymbol(strTypeName) as TypeInfo;
@@ -350,23 +359,23 @@ namespace ProtoScript.Interpretter.Symbols
 			if (strTypeName.StartsWith("global."))
 				return GetGlobalScope().GetSymbol(StringUtil.RightOfFirst(strTypeName, "global.")) as TypeInfo;
 
-			object oObj = null;
+			object ? oObj = null;
 			bool bResult = TryGetType(strTypeName, out oObj);
-			TypeInfo typeInfo = oObj as TypeInfo;
+			TypeInfo ? typeInfo = oObj as TypeInfo;
 
 			return typeInfo;
 		}
 
-		public TypeInfo GetTypeInfo(ProtoScript.Type type)
+		public TypeInfo? GetTypeInfo(ProtoScript.Type type)
 		{
-			TypeInfo typeInfo = GetTypeInfo(type.TypeName);
+			TypeInfo? typeInfo = GetTypeInfo(type.TypeName);
 
 			if (typeInfo is PrototypeTypeInfo)
 			{
-				PrototypeTypeInfo prototypeTypeInfo = typeInfo as PrototypeTypeInfo;
-				if (prototypeTypeInfo.IsGeneric)
+				PrototypeTypeInfo ? prototypeTypeInfo = typeInfo as PrototypeTypeInfo;
+				if (prototypeTypeInfo?.IsGeneric == true)
 				{
-					PrototypeTypeInfo typeGeneric = GetTypeInfo(type.GetNonGenericName()) as PrototypeTypeInfo;
+					PrototypeTypeInfo? typeGeneric = GetTypeInfo(type.GetNonGenericName()) as PrototypeTypeInfo;
 					if (null == typeGeneric)
 					{
 						typeGeneric = CreateGenericInstance(type, prototypeTypeInfo);
@@ -380,7 +389,7 @@ namespace ProtoScript.Interpretter.Symbols
 				DotNetTypeInfo dotNetTypeInfo = (DotNetTypeInfo)typeInfo;
 				if (dotNetTypeInfo.Type.IsGenericTypeDefinition)
 				{
-					System.Type[] typeElements = type.ElementTypes.Select(t => GetTypeInfo(t).Type).ToArray();
+					System.Type[] typeElements = type.ElementTypes.Select(t => GetTypeInfo(t)?.Type ?? throw new Exception("Could not get TypeInfo:" + t.TypeName)).ToArray();
 
 					dotNetTypeInfo.Type = dotNetTypeInfo.Type.MakeGenericType(typeElements);
 				}
@@ -395,7 +404,7 @@ namespace ProtoScript.Interpretter.Symbols
 		{
 			lock (m_syncRoot)
 			{
-				PrototypeTypeInfo nonGeneric = genericType.Clone() as PrototypeTypeInfo;
+				PrototypeTypeInfo nonGeneric = (PrototypeTypeInfo)genericType.Clone();
 				nonGeneric.Scope = genericType.Scope.Clone(); //doesn't happen automatically 
 				nonGeneric.Scope.Symbols["that"] = nonGeneric;
 				nonGeneric.Scope.Parent = genericType.Scope;
@@ -403,7 +412,7 @@ namespace ProtoScript.Interpretter.Symbols
 
 				foreach (Type type in typeOf.ElementTypes)
 				{
-					TypeInfo typeInfo = GetTypeInfo(type);
+					TypeInfo ? typeInfo = GetTypeInfo(type);
 					if (null == typeInfo)
 					{
 						TryGetSymbol(type.TypeName, out object oObj);
@@ -436,7 +445,7 @@ namespace ProtoScript.Interpretter.Symbols
 				bool bResult = false;
 				oObj = null;
 
-				for (Scope pAct = m_pActiveScope; !bResult && pAct != null; pAct = pAct.Parent)
+				for (Scope ? pAct = m_pActiveScope; !bResult && pAct != null; pAct = pAct.Parent)
 				{
 					bResult = pAct.TryGetSymbol(in_strSymbol, out oObj);
 					bResult = bResult && IsType(oObj);
@@ -446,7 +455,7 @@ namespace ProtoScript.Interpretter.Symbols
 				{
 					for (int i = m_stackActiveScopes.Count - 1; !bResult && i >= 0; i--)
 					{
-						for (Scope pAct = m_stackActiveScopes[i]; !bResult && pAct != null; pAct = pAct.Parent)
+						for (Scope ? pAct = m_stackActiveScopes[i]; !bResult && pAct != null; pAct = pAct.Parent)
 						{
 							bResult = pAct.TryGetSymbol(in_strSymbol, out oObj);
 							bResult = bResult && IsType(oObj);

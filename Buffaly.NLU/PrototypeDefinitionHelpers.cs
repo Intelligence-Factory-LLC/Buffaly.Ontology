@@ -234,7 +234,7 @@ namespace Buffaly.NLU
 
 		static private Expression PrototypeToExpression(Prototype prototype)
 		{
-			Expression expression = new Expression();
+			Expression ? expression = null;
 
 			if (prototype.TypeOf(System_String.Prototype))
 			{
@@ -256,10 +256,12 @@ namespace Buffaly.NLU
 			{
 				expression = new DoubleLiteral(DoubleWrapper.ToDouble(prototype).ToString("G17"));
 			}
-
 			
 			else if (Prototypes.TypeOf(prototype, Collection.Prototype))
 				return CollectionToArrayLiteral(prototype);
+
+			if (expression != null)
+				return expression;
 
 			return new Identifier(prototype.PrototypeName);
 

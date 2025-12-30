@@ -561,7 +561,7 @@ namespace ProtoScript.Interpretter
 				return Symbols.ActiveScope().Stack[exp.Index];
 			}
 
-			Scope scope = Symbols.ActiveScopes.LastOrDefault(x => x.ScopeType == Scope.ScopeTypes.Method || x.ScopeType == Scope.ScopeTypes.File);
+			Scope ? scope = Symbols.ActiveScopes.LastOrDefault(x => x.ScopeType == Scope.ScopeTypes.Method || x.ScopeType == Scope.ScopeTypes.File);
 			if (null == scope)
 				throw new RuntimeException("Could not find function scope", exp.Info);
 

@@ -10,10 +10,10 @@ namespace ProtoScript.Interpretter.Symbols
 		protected ConcurrentDictionary<string, object> m_mapSymbols = new ConcurrentDictionary<string, object>();
 		public enum ScopeTypes { Global, File, Namespace, Class, Method, Block, Lambda }
 
-		public Scope Parent = null;
+		public Scope ? Parent = null;
 		public ScopeTypes ScopeType;
 
-		public string Name = null;
+		public string Name = string.Empty;
 
 		private static int s_iID = 0;
 		public int ID = Interlocked.Increment(ref s_iID);
