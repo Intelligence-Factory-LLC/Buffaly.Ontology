@@ -143,6 +143,12 @@ dotnet test Ontology.Tests/Ontology.Tests.csproj
 
 ---
 
+## 📖 Documentation
+
+- [ProtoScript reference manual (modularized)](docs/ProtoScript/README.md)
+
+---
+
 ## 🤝 Contributing
 
 We welcome pull requests, issues and discussion!
