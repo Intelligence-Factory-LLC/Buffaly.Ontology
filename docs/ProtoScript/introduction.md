@@ -1,0 +1,143 @@
+# **ProtoScript Reference Manual \- Introduction**
+
+ProtoScript is a graph-based programming language developed by Matt Furnari for the Buffaly system. It is inspired by prototype-based programming, knowledge graphs, and logic programming. Welcome to **ProtoScript**, a powerful way to model and manipulate complex relationships in a flexible, dynamic way. If you’re a developer familiar with languages like C\# or JavaScript, ProtoScript offers a fresh yet approachable paradigm that blends the structure of object-oriented programming with the fluidity of graph-based knowledge representation. This reference manual is your guide to mastering ProtoScript, providing clear explanations, incremental learning, and abundant examples to help you build sophisticated applications, from natural language processing to semantic transformations.
+
+## **What is ProtoScript?**
+
+ProtoScript is a declarative, prototype-oriented language designed to work within the **Buffaly system**, a framework for representing knowledge as graphs. Unlike traditional programming languages that rely on rigid class hierarchies or procedural logic, ProtoScript uses **Prototypes**—versatile entities that act as both templates and instances—to model data and relationships as nodes and edges in a directed graph. This graph-based approach enables ProtoScript to handle diverse domains, such as:
+
+* **Code Structures**: Representing C\# variable declarations (e.g., `int i = 0`) or SQL queries.  
+* **Natural Language**: Parsing sentences like "I need to buy some covid-19 test kits" into semantic graphs.  
+* **Abstract Concepts**: Modeling causal or conditional relationships, like "New York City is in New York State."
+
+Think of ProtoScript as a blend of C\#’s structured syntax and a database’s relational power, but with the flexibility of a graph database like Neo4j. It’s designed to simplify the creation, manipulation, and serialization of complex graph structures, making it ideal for tasks requiring dynamic categorization, transformation, and reasoning.
+
+### ProtoScript has three layers
+
+ProtoScript is organized into three complementary layers that clarify how programs are represented, executed, and adapted over time. The **Representation layer** treats programs and data as typed, property-labeled graphs built from Prototypes, with primitives stored as nodes or values within that structure. The **Reasoning layer** relies on deterministic operators—such as `typeof`, the categorization arrow (`->`), and graph traversal functions—to provide auditable execution over those graphs. The **Learning layer** connects comparison and Least General Generalization to the creation of Shadows, parameterized Paths, and Hidden Context Prototypes (HCPs). It uses clustering feedback to refine these artifacts so the system can predict or complete structures based on prior observations. HCPs act as deltas from Shadows, enabling categorization, transformation, and reasoning updates without mutating the original graph directly. Together, these layers let ProtoScript represent knowledge, reason over it, and iteratively improve its models.
+
+### **Analogy to Familiar Concepts**
+
+If you know C\#, imagine ProtoScript as a language where:
+
+* **Classes** are replaced by Prototypes, which can inherit from multiple parents (like interfaces but more flexible) and change at runtime.  
+* **Objects** are graph nodes that can represent anything—a variable, a query, or a concept—linked by edges that define relationships.  
+* **Methods** are functions that traverse or modify the graph, computing results based on node connections.
+
+For JavaScript developers, ProtoScript’s prototype-based nature might feel like JavaScript’s prototypal inheritance, but with a stronger focus on graph operations and symbolic computation rather than object cloning.
+
+## **The Prototype System**
+
+At the heart of ProtoScript lies the **Prototype system**, where every entity is a Prototype—a node in a graph that encapsulates properties, behaviors, and relationships. Prototypes are more than just data structures; they’re dynamic entities that can:
+
+* **Inherit from Multiple Parents**: A Prototype like `Buffalo_City` can inherit from both `City` and `Location`, combining their properties without the limitations of single inheritance in C\#.  
+* **Store Data**: Properties like `City.State = NewYork_State` represent stored (extensional) facts, similar to fields in a class.  
+* **Compute Relationships**: Functions define computed (intensional) relationships, like determining if a city is in a specific state, akin to methods but operating on graph traversals.
+
+Prototypes form a **directed graph** (often a directed acyclic graph, or DAG, for inheritance, with cycles allowed in property relationships), where edges represent inheritance, properties, or computed links. This structure allows ProtoScript to model complex, real-world relationships—like bidirectional links between a state and its cities—more naturally than traditional class-based systems.
+
+### **Example: A Simple Prototype**
+
+Here’s a glimpse of ProtoScript modeling a city, relatable to developers familiar with object-oriented programming:
+
+```javascript
+prototype City {
+    System.String Name = "";
+    State State = new State();
+}
+prototype NewYork_City : City {
+    Name = "New York City";
+}
+prototype State {
+    Collection Cities = new Collection();
+}
+prototype NewYork_State : State;
+
+// Link them
+NewYork_City.State = NewYork_State;
+NewYork_State.Cities = [NewYork_City];
+```
+
+**What’s Happening?**
+
+* `City` and `State` are Prototypes, like classes but more flexible.  
+* `NewYork_City` inherits from `City`, setting its `Name` property.  
+* The graph links `NewYork_City` to `NewYork_State` and vice versa, forming a cycle (a bidirectional relationship).  
+* This resembles a C\# class with fields but allows runtime modifications and multiple inheritance.
+
+## **Design Goals of ProtoScript**
+
+ProtoScript is built with several key objectives, making it a unique tool for developers:
+
+1. **Simplified Graph Creation**: Streamline the process of building complex graph structures, reducing boilerplate compared to C\#’s verbose class definitions.  
+2. **Multiple Inheritance**: Allow Prototypes to inherit from multiple parents, reflecting real-world complexity where entities belong to multiple categories (e.g., a `Buffalo` as both `City` and `Location`).  
+3. **Support for Stored and Computed Relationships**: Enable both extensional facts (e.g., `City.State`) and intensional rules (e.g., a function determining valid states), akin to combining database tables with logic.  
+4. **Native Graph Operations**: Provide built-in tools for traversing and manipulating graphs, similar to querying a database but integrated into the language.  
+5. **Serialization-First Approach**: Ensure Prototypes can be easily stored or shared across systems, like JSON serialization in modern APIs.  
+6. **Dynamic Runtime Modifications**: Allow Prototypes to adapt at runtime, unlike C\#’s static type system, enabling flexible categorization and transformation.
+
+## **Why Use ProtoScript?**
+
+ProtoScript shines in scenarios requiring dynamic, interconnected data modeling, such as:
+
+* **Natural Language Processing**: Parsing sentences into semantic graphs for AI applications.  
+* **Code Analysis and Transformation**: Refactoring code (e.g., `string s1 = ""` to `string s1 = string.Empty`) or generating code from NL descriptions.  
+* **Knowledge Representation**: Building ontologies for domains like geography or fiction (e.g., modeling Simpsons characters).
+
+For developers, ProtoScript offers:
+
+* **Familiarity**: C\#-like syntax lowers the learning curve.  
+* **Power**: Graph-based flexibility surpasses traditional object-oriented limitations.  
+* **Expressiveness**: Dynamic features like subtyping and transformation functions enable sophisticated reasoning.
+
+### **Example: Modeling a Real-World Scenario**
+
+To illustrate, consider modeling characters from *The Simpsons*:
+
+```javascript
+prototype Person {
+    System.String Gender = "";
+    Location Location = new Location();
+    Collection ParentOf = new Collection();
+}
+prototype Homer : Person {
+    Gender = "Male";
+    Location = SimpsonsHouse;
+    ParentOf = [Bart, Lisa, Maggie];
+}
+prototype SimpsonsHouse : Location {
+    System.String Address = "742 Evergreen Terrace";
+}
+```
+
+**What’s Happening?**
+
+* `Person` defines a Prototype with properties, like a C\# class.  
+* `Homer` inherits from `Person`, setting specific values.  
+* `SimpsonsHouse` is a `Location` node, linked to `Homer` via the `Location` property.  
+* This creates a graph where `Homer` connects to `SimpsonsHouse` and his children, mirroring a relational database but with dynamic, graph-based querying.
+
+## **How This Manual is Organized**
+
+This manual is structured around the three layers introduced above, so you always know whether a concept is about representation, reasoning, or learning:
+
+* **Representation layer**: Learn ProtoScript’s syntax, Prototypes, NativeValuePrototypes, and core constructs, with analogies to C\# and JavaScript.
+* **Reasoning layer**: Explore `typeof`, the categorization arrow (`->`), graph traversal, and the taxonomy of relationships that drive deterministic execution.
+* **Learning layer**: Dive into shadows, paths, Hidden Context Prototypes, clustering feedback, and transformation functions for dynamic categorization and mapping.
+* **Examples and integration**: Apply ProtoScript to practical scenarios and understand its seamless integration with C\# across all three layers.
+
+Each section is packed with examples, drawing on familiar programming concepts to make ProtoScript accessible. Whether you’re building AI-driven applications or exploring symbolic computation, this manual equips you to harness ProtoScript’s full potential.
+
+## **Getting Started**
+
+To begin, you’ll need a basic understanding of:
+
+* **Object-Oriented Programming**: Familiarity with classes, objects, and inheritance (e.g., in C\# or Java).  
+* **Graph Concepts**: A high-level grasp of nodes and edges, as in graph databases or data structures.  
+* **C\# Syntax**: ProtoScript’s syntax is C\#-inspired, so knowledge of C\# will accelerate your learning.
+
+No prior experience with graph-based languages is required—ProtoScript’s intuitive design and this manual’s examples will guide you step-by-step. Ready to explore the graph-based world of ProtoScript? Let’s dive into the core concepts in the next section\!
+
+---
+
+**Previous:** [Overview](README.md) | **Next:** [**ProtoScript Reference Manual**](ontology-context.md)
