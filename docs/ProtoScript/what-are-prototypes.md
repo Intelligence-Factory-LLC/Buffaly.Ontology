@@ -60,7 +60,7 @@ Prototypes are designed to be versatile and expressive, with the following defin
 
 Here’s a simple ProtoScript example to illustrate Prototypes, relatable to object-oriented programming:
 
-```javascript
+```protoscript
 prototype City {
     System.String Name = "";
     State State = new State();
@@ -101,7 +101,7 @@ For example, the `City`/`State` graph above resembles an ontology with object pr
 
 To further illustrate, consider modeling characters from *The Simpsons*:
 
-```javascript
+```protoscript
 prototype Person {
     System.String Gender = "";
     Location Location = new Location();
@@ -150,7 +150,7 @@ This graph-centric approach enables ProtoScript to handle dynamic, real-world re
 
 Prototypes can adapt at runtime, a feature not easily achievable in C\#:
 
-```javascript
+```protoscript
 prototype Buffalo {
     System.String Name = "Buffalo";
 }
@@ -187,7 +187,7 @@ For developers, Prototypes offer a familiar yet powerful abstraction, combining 
 
 Prototypes can model programming constructs, such as a C\# variable declaration:
 
-```javascript
+```protoscript
 prototype CSharp_VariableDeclaration {
     CSharp_Type Type = new CSharp_Type();
     System.String VariableName = "";
@@ -218,7 +218,7 @@ This example shows how Prototypes unify code representation with graph-based mod
 
 ## **Moving Forward**
 
-Prototypes are the foundation of ProtoScript, providing a flexible, graph-based way to model entities and relationships. In the next section, we’ll explore ProtoScript’s **syntax and features**, diving into how you define, manipulate, and extend Prototypes using C\#-inspired constructs. With Prototypes under your belt, you’re ready to start building dynamic, interconnected systems\!
+Prototypes are the foundation of ProtoScript, providing a flexible, graph-based way to model entities and relationships. Next: ProtoScript syntax and features, covering how to define, manipulate, and extend Prototypes using C\#-inspired constructs.
 
 ---
 

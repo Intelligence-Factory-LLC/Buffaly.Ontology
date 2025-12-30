@@ -40,7 +40,7 @@ Prototypes form a **directed graph** (often a directed acyclic graph, or DAG, fo
 
 Here’s a glimpse of ProtoScript modeling a city, relatable to developers familiar with object-oriented programming:
 
-```javascript
+```protoscript
 prototype City {
     System.String Name = "";
     State State = new State();
@@ -94,7 +94,7 @@ For developers, ProtoScript offers:
 
 To illustrate, consider modeling characters from *The Simpsons*:
 
-```javascript
+```protoscript
 prototype Person {
     System.String Gender = "";
     Location Location = new Location();
@@ -136,7 +136,7 @@ To begin, you’ll need a basic understanding of:
 * **Graph Concepts**: A high-level grasp of nodes and edges, as in graph databases or data structures.  
 * **C\# Syntax**: ProtoScript’s syntax is C\#-inspired, so knowledge of C\# will accelerate your learning.
 
-No prior experience with graph-based languages is required—ProtoScript’s intuitive design and this manual’s examples will guide you step-by-step. Ready to explore the graph-based world of ProtoScript? Let’s dive into the core concepts in the next section\!
+No prior experience with graph-based languages is required—ProtoScript’s intuitive design and this manual’s examples will guide you step-by-step. Next: ProtoScript in the context of ontologies.
 
 ---
 

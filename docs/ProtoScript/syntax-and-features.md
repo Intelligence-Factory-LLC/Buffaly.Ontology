@@ -10,7 +10,7 @@ ProtoScript uses a C\#-like syntax, with semicolons to terminate statements, cur
 
 Here’s a simple ProtoScript example to set the stage:
 
-```javascript
+```protoscript
 prototype City {
     System.String Name = "";
     State State = new State();
@@ -50,7 +50,7 @@ ProtoScript’s features are tailored for graph-based programming, enabling deve
 
 **Syntax**:
 
-```javascript
+```protoscript
 prototype Name : Parent1, Parent2 {
     // Properties, functions, and other members
 }
@@ -67,7 +67,7 @@ prototype Name : Parent1, Parent2 {
 
 **Example**:
 
-```javascript
+```protoscript
 prototype Location {
     System.String Name = "";
 }
@@ -106,7 +106,7 @@ Type Name \= DefaultValue;
 
 **Example**:
 
-```javascript
+```protoscript
 prototype Person {
     System.String Gender = "";
     Location Location = new Location();
@@ -125,7 +125,7 @@ prototype SimpsonsHouse : Location {
 * `Person` defines `Gender` (a native value) and `Location` (a Prototype instance).  
 * `Homer` sets `Gender` to "Male" and links `Location` to `SimpsonsHouse`.  
 * `SimpsonsHouse` has an `Address` property.  
-* **Graph View**: `Homer` has edges to `System.String[Male]` and `SimpsonsHouse`.
+* **Graph View**: `Homer` has edges to `"Male"` and `SimpsonsHouse`.
 
 ### **3\. Functions**
 

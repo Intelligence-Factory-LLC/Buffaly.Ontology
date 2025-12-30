@@ -10,8 +10,8 @@ A **NativeValuePrototype** is a Prototype that wraps a primitive value, such as 
 
 1. **Encapsulation of Primitive Values**
 
-   * NativeValuePrototypes hold a single primitive value and its type (e.g., `string`, `System.String`).  
-   * **Example**: `"Buffalo"` or `System.String["Buffalo"]` represents the string "Buffalo" as a graph node.  
+   * NativeValuePrototypes hold a single primitive value and its type (e.g., `string`, `System.String`).
+   * **Example**: `"Buffalo"` represents the string "Buffalo" as a graph node; the runtime stores it as a NativeValuePrototype.
 2. **Graph Integration**
 
    * They are nodes with edges to other Prototypes, functioning as properties or linking to complex structures.  
@@ -33,7 +33,7 @@ A **NativeValuePrototype** is a Prototype that wraps a primitive value, such as 
 
 For **C\# developers**:
 
-* NativeValuePrototypes are like boxed primitives (e.g., `object x = 5`), but as graph nodes. Using `string` with `"hello"` is like `string s = "hello"`, while `System.String["hello"]` is a structured node with metadata, akin to a lightweight class.  
+* NativeValuePrototypes are like boxed primitives (e.g., `object x = 5`), but as graph nodes. Using `string` with `"hello"` is like `string s = "hello"`, while the runtime retains metadata alongside the value, akin to a lightweight class node.
 * Unlike C\#’s `struct` types, NativeValuePrototypes are graph-integrated, not standalone.
 
 For **JavaScript developers**:
@@ -46,7 +46,7 @@ For **database developers**:
 
 ## **Syntax and Usage**
 
-NativeValuePrototypes are used as property values or function inputs/outputs, with ProtoScript allowing direct literal initializers (`"hello"`, `true`, `42`) or explicit type notation (`System.String["hello"]`). The runtime translates literals into NativeValuePrototypes, ensuring graph consistency.
+NativeValuePrototypes are used as property values or function inputs/outputs, with ProtoScript allowing direct literal initializers (`"hello"`, `true`, `42`). Literal syntax is the canonical authoring form. The runtime translates literals into NativeValuePrototypes, ensuring graph consistency.
 
 **Syntax Options**:
 
@@ -72,27 +72,27 @@ System.Int32 Number \= 42;
 
 **Details**:
 
-* Both forms create graph nodes, but lowercase types emphasize simplicity, while uppercase types highlight the Prototype nature.  
-* The notation `Type["value"]` (e.g., `System.String["hello"]`) explicitly indicates a NativeValuePrototype instance, though direct literals (e.g., `"hello"`) are preferred for brevity.  
-* The runtime ensures literals are treated as NativeValuePrototypes, preserving type and value for graph operations.
+  * Both forms create graph nodes, but lowercase types emphasize simplicity, while uppercase types highlight the Prototype nature.
+  * Literal syntax is the canonical way to write primitive values. Internally, the runtime represents these literals as NativeValuePrototype nodes so primitives participate uniformly in graph traversal and serialization.
+  * The runtime ensures literals are treated as NativeValuePrototypes, preserving type and value for graph operations.
 
-**C\# Analogy**: Assigning `string s = "hello"` in C\# is like `string Name = "hello"` in ProtoScript, but the latter creates a graph node. Using `System.String["hello"]` adds explicit Prototype metadata, like a structured object.
+**C\# Analogy**: Assigning `string s = "hello"` in C\# is like `string Name = "hello"` in ProtoScript, but the latter creates a graph node. Using `System.String` for the property highlights the Prototype metadata around the literal value.
 
 **Example**:
 
 prototype City {  
     string Name \= "";  
-    System.Boolean IsCapital \= false;  
+    bool IsCapital \= false;  
 }  
 prototype Buffalo\_City : City {  
     Name \= "Buffalo";  
-    IsCapital \= System.Boolean\[False\];  
+    IsCapital \= false;  
 }
 
 **What’s Happening?**
 
-* `City` defines `Name` as a `string` with a literal `""` and `IsCapital` as a `System.Boolean` with `false`.  
-* `Buffalo_City` sets `Name` to `"Buffalo"` (runtime translates to a `string` node) and `IsCapital` to `System.Boolean[False]` (explicit Prototype).  
+* `City` defines `Name` as a `string` with a literal `""` and `IsCapital` as a `bool` with `false`.
+* `Buffalo_City` sets `Name` to `"Buffalo"` (runtime translates to a `string` node) and `IsCapital` to `false` (runtime translates to a boolean node).
 * **Graph View**: `Buffalo_City` links to nodes for `"Buffalo"` and `false`.
 
 ## **Common Native Types**
@@ -105,10 +105,10 @@ ProtoScript supports native types aligned with C\# primitives, available in two 
   * `int`: 32-bit integers (e.g., `42`).  
   * `double`: Floating-point numbers (e.g., `3.14`).  
 * **Prototype Types** (uppercase):  
-  * `System.String`: Text nodes (e.g., `System.String["hello"]`).  
-  * `System.Boolean`: Boolean nodes (e.g., `System.Boolean[True]`).  
-  * `System.Int32`: Integer nodes (e.g., `System.Int32[42]`).  
-  * `System.Double`: Floating-point nodes (e.g., `System.Double[3.14]`).
+  * `System.String`: Text nodes (e.g., the literal `"hello"` stored with string metadata).
+  * `System.Boolean`: Boolean nodes (e.g., the literal `true` stored with boolean metadata).
+  * `System.Int32`: Integer nodes (e.g., the literal `42` stored with int metadata).
+  * `System.Double`: Floating-point nodes (e.g., the literal `3.14` stored with double metadata).
 
 Both forms are NativeValuePrototypes in the graph, with uppercase types emphasizing their node structure.
 
@@ -131,7 +131,7 @@ NativeValuePrototypes are crucial for ProtoScript’s graph-based model:
 4. **Serialization and Interoperability**
 
    * Type metadata ensures accurate serialization (e.g., to JSON).  
-   * **Example**: `System.Int32[0]` serializes with its type.  
+  * **Example**: `0` serializes with its type metadata.
 5. **Flexibility**
 
    * They support diverse domains without special cases.  
@@ -188,7 +188,7 @@ prototype Need\_BuyTestKits : Need {
     Object \= BuyAction;  
 }  
 prototype Person\_I : BaseObject {  
-    System.String Pronoun \= "I";  
+    string Pronoun \= "I";
 }  
 prototype BuyAction : Action {  
     Infinitive \= "ToBuy";  
@@ -200,7 +200,7 @@ prototype TestKit : COVID\_TestKit {
 
 **What’s Happening?**
 
-* `Need_BuyTestKits` uses `string` for `Infinitive` (`"ToBuy"`) and `Quantity` (`"Some"`), and `System.String` for `Pronoun` (`"I"`).  
+* `Need_BuyTestKits` uses `string` for `Infinitive` (`"ToBuy"`), `Quantity` (`"Some"`), and `Pronoun` (`"I"`).
 * Literals are translated to NativeValuePrototypes by the runtime.  
 * **Graph View**: Links to nodes for `"I"`, `"ToBuy"`, and `"Some"`.  
 * **Use Case**: Enables semantic parsing for AI.

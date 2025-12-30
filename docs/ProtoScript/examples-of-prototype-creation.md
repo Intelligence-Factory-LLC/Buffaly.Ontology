@@ -1,8 +1,8 @@
 # **Examples of Prototype Creation**
 
-ProtoScript’s Prototypes are exceptionally versatile, capable of modeling any data type—from C\# code and SQL queries to database objects and natural language semantics—with the same ease and flexibility. This ability to unify diverse domains within a single graph-based framework sets ProtoScript apart from traditional ontologies, which often rely on rigid, domain-specific schemas and complex logical axioms. By representing everything as Prototypes, ProtoScript enables developers to discover relationships and transformations across domains, such as mapping a natural language request to a SQL query or transforming C\# code into a semantic model. This section showcases four examples of Prototype creation, illustrating how ProtoScript handles C\# variable declarations, SQL queries, database objects, and natural language, and highlights the power of cross-domain integration.
+ProtoScript’s Prototypes can model varied data types—from C\# code and SQL queries to database objects and natural language semantics—within a single graph-based framework. Representing these domains as Prototypes enables discovery of relationships and transformations, such as mapping a natural language request to a SQL query or transforming C\# code into a semantic model. This section showcases four examples of Prototype creation, illustrating how ProtoScript handles C\# variable declarations, SQL queries, database objects, and natural language while enabling cross-domain integration.
 
-## **Why Prototypes Go Beyond Traditional Ontologies**
+## **Cross-Domain Modeling with Prototypes**
 
 Traditional ontologies, such as those built with OWL or RDF, are designed for structured knowledge representation, typically within a single domain (e.g., medical terminology or geographic data). They use static classes, predefined properties, and formal axioms, which can be inflexible and labor-intensive to adapt across diverse data types. ProtoScript’s Prototypes overcome these limitations in several key ways:
 
@@ -76,7 +76,7 @@ prototype IntegerLiteral\_0 : CSharp\_Expression {
 * `CSharp_VariableDeclaration` defines a template for variable declarations, with properties for type, name, and initializer.  
 * `Int_Declaration` models `int i = 0`, using string literals (`"int"`, `"i"`, `"0"`) that the runtime translates to NativeValuePrototypes.  
 * **Graph View**: `Int_Declaration` links to nodes for `"int"`, `"i"`, and `"0"`, forming a hierarchical structure.  
-* **Beyond Ontologies**: Unlike OWL, which would require a specific ontology for code constructs, ProtoScript uses a generic `prototype` construct, easily adaptable to other languages (e.g., Java).
+* Unlike OWL, which would require a specific ontology for code constructs, ProtoScript uses a generic `prototype` construct, easily adaptable to other languages (e.g., Java).
 
 **Cross-Domain Potential**:
 
@@ -125,7 +125,7 @@ prototype NumberLiteral\_1 : SQL\_Expression {
 * `SQL_Select` defines a template for SQL SELECT queries, with properties for columns, table, limit, and order-by clauses.  
 * `Select_Prototypes` models the query, using literals (`"Prototypes"`, `"10"`, `"*"`).  
 * **Graph View**: `Select_Prototypes` links to nodes for `"Prototypes"`, `"10"`, and `"*"` (wildcard), with `OrderBys` linking to `"1"` and `SortDirection`.  
-* **Beyond Ontologies**: Traditional ontologies struggle with procedural constructs like queries; ProtoScript models them as easily as static data, using the same graph structure.
+* Traditional ontologies struggle with procedural constructs like queries; ProtoScript models them as easily as static data, using the same graph structure.
 
 **Cross-Domain Potential**:
 
@@ -162,7 +162,7 @@ prototype Name\_Column : Database\_Column {
 * `Database_Table` defines a template for tables, with a name and column collection.  
 * `Employees_Table` models the `Employees` table, linking to `ID_Column` and `Name_Column`.  
 * **Graph View**: `Employees_Table` links to `"Employees"` and a collection of column nodes (`"ID"`, `"int"`, `"Name"`, `"varchar"`).  
-* **Beyond Ontologies**: ProtoScript’s generic Prototypes model database schemas as easily as conceptual data, unlike OWL’s domain-specific ontologies.
+* ProtoScript’s generic Prototypes model database schemas as easily as conceptual data, unlike OWL’s domain-specific ontologies.
 
 **Cross-Domain Potential**:
 
@@ -203,7 +203,7 @@ prototype TestKit : COVID\_TestKit {
 
 * `Need_BuyTestKits` models the sentence, with literals `"I"`, `"ToBuy"`, and `"Some"` as NativeValuePrototypes.  
 * **Graph View**: `Need_BuyTestKits` links to nodes for `"I"`, `"ToBuy"`, and `"Some"`, forming a semantic graph.  
-* **Beyond Ontologies**: ProtoScript handles linguistic structures as naturally as code or data, unlike OWL’s focus on static concepts.
+* ProtoScript handles linguistic structures as naturally as code or data, unlike OWL’s focus on static concepts.
 
 **Cross-Domain Potential**:
 
@@ -245,7 +245,7 @@ prototype Wildcard\_Expression : SQL\_Expression {
 * The function checks if the `Need` involves a `COVID_TestKit`, setting the query’s table to `"TestKits"`.  
 * **Graph View**: Links `Need_BuyTestKits` to a new `SQL_Select` node with `"TestKits"` and `"*"`.  
 * **Result**: Produces `SELECT * FROM TestKits`.  
-* **Beyond Ontologies**: ProtoScript’s graph unifies NLP and SQL, enabling seamless transformation without external mappings.
+* ProtoScript’s graph unifies NLP and SQL, enabling seamless transformation without external mappings.
 
 ## **Internal Mechanics**
 

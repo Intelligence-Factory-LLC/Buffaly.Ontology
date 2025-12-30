@@ -17,14 +17,7 @@ Subtypes are a cornerstone of ProtoScript’s dynamic ontology, enabling:
 * **Scalable and Interpretable**: Subtypes use bounded graph traversals and reuse cached Shadow/Path results, keeping categorization explainable.  
 * **Context-Sensitive**: By evaluating conditions at runtime, Subtypes adapt to evolving data, making them ideal for real-world, dynamic ontologies.
 
-### **Beyond Traditional Ontologies**
-
-Traditional ontologies (e.g., OWL, RDF) use static class definitions and axioms, requiring upfront design and external inference engines for categorization. ProtoScript’s Subtypes offer:
-
-1. **Runtime Flexibility**: Subtypes are created and applied dynamically, unlike OWL’s fixed class hierarchies.  
-2. **Unsupervised Categorization**: No labeled data is needed, unlike supervised ontology learning tools.  
-3. **Graph-Centric Reasoning**: Subtypes use graph traversals for categorization, ensuring interpretability.  
-4. **Simplified Development**: C\#-like syntax makes Subtype creation intuitive, unlike ontology editors like Protégé.
+Subtypes categorize Prototypes dynamically through graph traversals, providing runtime flexibility without the static class definitions or external inference engines used in traditional ontology stacks.
 
 ### **Analogy to Familiar Concepts**
 
@@ -158,6 +151,8 @@ prototype IntegerLiteral\_0 : CSharp\_Expression {
 
 }
 
+> Note: The following snippet is conceptual pseudocode. The actual runtime API is very similar and equivalent in behavior; treat this as an explanatory representation of the operation.
+
 UnderstandUtil.SubType(Int\_Declaration\_I, \_interpreter);
 
 **What’s Happening?**
@@ -168,7 +163,7 @@ UnderstandUtil.SubType(Int\_Declaration\_I, \_interpreter);
 * **Graph View**: `Int_Declaration_I` gains an `isa` edge to `InitializedIntVariable_SubType`.  
 * **Use Case**: Enables queries like “find all initialized integer variables” or transformations (e.g., to another language).
 
-**Beyond Ontologies**: Unlike OWL’s static class membership, Subtypes dynamically reclassify Prototypes, leveraging Shadows for unsupervised categorization.
+Subtypes dynamically reclassify Prototypes, leveraging Shadows for unsupervised categorization, rather than relying on static class membership in OWL.
 
 ### **Example 2: Subtyping Simpsons Characters**
 
@@ -274,7 +269,7 @@ UnderstandUtil.SubType(Homer, \_interpreter);
 * **Graph View**: `Homer` links to `SimpsonsHouseParent_SubType` via an `isa` edge.  
 * **Use Case**: Supports queries like “who are the parents in the Simpsons’ house?” or transformations (e.g., generating a family report).
 
-**Beyond Ontologies**: Subtypes enable context-sensitive categorization, adapting to runtime data unlike OWL’s predefined classes.
+Subtypes enable context-sensitive categorization, adapting to runtime data instead of predefined classes.
 
 ### **Example 3: Cross-Domain Subtyping**
 
@@ -361,7 +356,7 @@ UnderstandUtil.SubType(ID\_Column, \_interpreter);
 * **Graph View**: `Int_Declaration_I` and `ID_Column` link to `IntDataElement_SubType` via `isa` edges.  
 * **Use Case**: Enables cross-domain queries (e.g., “find all integer data elements”) or transformations (e.g., mapping a variable to a column).
 
-**Beyond Ontologies**: Subtypes unify code and database domains dynamically, unlike OWL’s separate ontologies.
+Subtypes unify code and database domains dynamically, avoiding the separation found in static ontology models.
 
 ## **Integration with Shadows and Paths**
 

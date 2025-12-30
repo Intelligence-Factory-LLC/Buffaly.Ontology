@@ -50,7 +50,7 @@ A traditional ontology defines **classes** (concepts), **properties** (attribute
 
 Consider modeling a geographic ontology:
 
-```javascript
+```protoscript
 prototype Location {
     System.String Name = "";
 }
