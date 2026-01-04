@@ -37,6 +37,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simpsons", "Simpsons", "{25
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology", "Ontology\Ontology.csproj", "{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.GraphInduction", "Ontology.GraphInduction\Ontology.GraphInduction.csproj", "{58ED50D9-EE4B-4DA4-84F3-FB0487050BC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2C9A9CA-DC69-4F6D-19BE-1230170A0CA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58ED50D9-EE4B-4DA4-84F3-FB0487050BC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58ED50D9-EE4B-4DA4-84F3-FB0487050BC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58ED50D9-EE4B-4DA4-84F3-FB0487050BC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58ED50D9-EE4B-4DA4-84F3-FB0487050BC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
