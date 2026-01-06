@@ -12,6 +12,9 @@
 		<Reference Include="BasicUtilities">
 			<HintPath>..\lib\BasicUtilities.dll</HintPath>
 		</Reference>
+		<Reference Include="WebAppUtilities">
+		  <HintPath>..\lib\WebAppUtilities.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 </Project>

@@ -18,5 +18,7 @@ xcopy /y c:\RooTrax\RooTrax.Utilities\Deploy\kScript.dll %LIB_ROOT%*.*
 
 xcopy /y C:\dev\BuffalyNet6\Deploy\Buffaly.*.dll %LIB_ROOT%*.*
 
+xcopy /y C:\dev\Buffaly.Development\Deploy\CSharp*.dll %LIB_ROOT%*.*
+
 
 

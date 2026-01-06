@@ -2,6 +2,7 @@
 using BasicUtilities;
 using BasicUtilities.Collections;
 using Ontology.BaseTypes;
+using System.Runtime.CompilerServices;
 
 namespace Ontology
 {
@@ -49,7 +50,7 @@ namespace Ontology
 				nv.InsertTypeOf(System_String.Prototype);
 				return nv;
 			}
-			
+
 			if (prototype is not NativeValuePrototype nv2)
 			{
 				throw new Exception("Prototype with name '" + strPrototypeName + "' is not a NativeValuePrototype, but " + prototype.GetType().Name);
@@ -120,29 +121,96 @@ namespace Ontology
 		}
 
 
-		//public NativeValuePrototype(Object obj, bool bInstance = true)
-		//{
-		//	Prototype protoType = ExtractTypeHierarchy(obj.GetType());
-		//	if (bInstance)
-		//	{
-		//		this.PrototypeName = protoType.PrototypeName + "[" + obj.GetHashCode() + "]";
-		//		this.PrototypeID = TemporaryPrototypes.GetOrCreateTemporaryPrototype(PrototypeName).PrototypeID;
-		//		this.NativeValue = obj;
-		//		this.InsertTypeOf(protoType);
-		//		this.m_bObjectInstance = true;
-		//	}
-		//	else
-		//	{
-		//		this.NativeValue = obj;
-		//		this.PrototypeName = protoType.PrototypeName;
-		//		this.PrototypeID = protoType.PrototypeID;
 
-		//		foreach (int protoTypeOf in protoType.GetTypeOfs())
-		//		{
-		//			this.InsertTypeOf(protoTypeOf);
-		//		}
-		//	}
-		//}
+
+		static public NativeValuePrototype GetOrCreateNativeObjectPrototype(object obj, Prototype protoType)
+		{
+			// We follow the “instance name” convention you used historically: TypeName[hash]
+			string strPrototypeName = protoType.PrototypeName + "[" + obj.GetHashCode() + "]";
+
+			Prototype? existing = TemporaryPrototypes.GetTemporaryPrototypeOrNull(strPrototypeName);
+			if (existing != null)
+			{
+				if (existing is not NativeValuePrototype nvExisting)
+					throw new Exception("Prototype with name '" + strPrototypeName + "' is not a NativeValuePrototype, but " + existing.GetType().Name);
+
+				// Keep the native attached (best-effort; native instance identity may vary across calls)
+				nvExisting.NativeValue = obj;
+				return nvExisting;
+			}
+
+			NativeValuePrototype nv = new NativeValuePrototype();
+			nv.NativeValue = obj;
+			nv.PrototypeName = strPrototypeName;
+			nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
+
+			// Type the instance
+			nv.InsertTypeOf(protoType);
+
+			// Mark as object-instance so ShallowEquivalent uses base-type comparison rules
+			// (matches the intent of m_bObjectInstance behavior already in this file)
+			nv.m_bObjectInstance = true;
+
+			return nv;
+		}
+
+		internal static Prototype GetOrCreateTypePrototype(System.Type type)
+		{
+			return ExtractTypeHierarchy(type);
+		}
+
+		internal static NativeValuePrototype GetOrCreateNativeObjectPrototype(object obj, Prototype protoType, string strInstanceName)
+		{
+			string strPrototypeName;
+			if (strInstanceName != null)
+				strPrototypeName = protoType.PrototypeName + "[" + strInstanceName + "]";
+			else
+				strPrototypeName = protoType.PrototypeName + "[" + RuntimeHelpers.GetHashCode(obj) + "]";
+
+			Prototype? prototype = TemporaryPrototypes.GetTemporaryPrototypeOrNull(strPrototypeName);
+			if (null == prototype)
+			{
+				NativeValuePrototype nv = new NativeValuePrototype();
+				nv.NativeValue = obj;
+				nv.PrototypeName = strPrototypeName;
+				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
+				nv.InsertTypeOf(protoType);
+				nv.m_bObjectInstance = true;
+				return nv;
+			}
+
+			if (prototype is not NativeValuePrototype nv2)
+				throw new Exception("Prototype with name '" + strPrototypeName + "' is not a NativeValuePrototype, but " + prototype.GetType().Name);
+
+			nv2.NativeValue = obj;
+			return nv2;
+		}
+
+		internal static NativeValuePrototype GetOrCreateNativeEnumerablePrototype(System.Collections.IEnumerable obj)
+		{
+			// Collections do not need per-instance names; children define identity.
+			string strPrototypeName = Ontology.Collection.Prototype.PrototypeName + "[" + RuntimeHelpers.GetHashCode(obj) + "]";
+
+			Prototype? prototype = TemporaryPrototypes.GetTemporaryPrototypeOrNull(strPrototypeName);
+			if (null == prototype)
+			{
+				NativeValuePrototype nv = new NativeValuePrototype();
+				nv.NativeValue = obj;
+				nv.PrototypeName = strPrototypeName;
+				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
+				nv.InsertTypeOf(Ontology.Collection.Prototype);
+				nv.m_bObjectInstance = true;
+				return nv;
+			}
+
+			if (prototype is not NativeValuePrototype nv2)
+				throw new Exception("Prototype with name '" + strPrototypeName + "' is not a NativeValuePrototype, but " + prototype.GetType().Name);
+
+			nv2.NativeValue = obj;
+			return nv2;
+		}
+
+
 
 		private static Prototype ExtractTypeHierarchy(System.Type type)
 		{
@@ -359,8 +427,8 @@ namespace Ontology
 								continue;
 
 							if (strKey == nameof(Prototype.NormalProperties)
-							//TODO: Currently the JsonSerializer in WebAppUtilities is not called on every property
-							//so a prototype nested in another object won't have the right format
+								//TODO: Currently the JsonSerializer in WebAppUtilities is not called on every property
+								//so a prototype nested in another object won't have the right format
 								|| strKey == nameof(Prototype.Properties) || strKey == nameof(Prototype.Value)
 								)
 								continue;
@@ -455,7 +523,7 @@ namespace Ontology
 					prototype = null;
 
 				else
-throw;
+					throw;
 			}
 
 			return prototype;
@@ -464,15 +532,18 @@ throw;
 
 	public class NativeValuePrototypes : Prototypes
 	{
-		static public NativeValuePrototype ToPrototype(object obj)
+		static public NativeValuePrototype ? ToPrototype(object obj)
+		{
+			return ToPrototypeCircular(obj, new Map<int, NativeValuePrototype>(), new Map<string, NativeValuePrototype>());
+		}
+
+		static private NativeValuePrototype ? ToPrototypeCircular(object obj, Map<int, NativeValuePrototype> m_mapObjectIdToPrototype, Map<string, NativeValuePrototype> m_mapInstanceNameToPrototype)
 		{
 			if (obj == null)
 				return null;
 
 			if (obj is NativeValuePrototype)
 				return obj as NativeValuePrototype;
-
-
 
 			if (obj is int || obj is Enum)
 				return NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj);
@@ -486,46 +557,168 @@ throw;
 			if (obj is bool)
 				return NativeValuePrototype.GetOrCreateNativeValuePrototype((bool)obj);
 
-			if (obj is System.Collections.IEnumerable)
-				return ToPrototype((System.Collections.IEnumerable)obj);
+			if (obj is System.Collections.IEnumerable && obj is not string)
+				return ToPrototype((System.Collections.IEnumerable)obj, m_mapObjectIdToPrototype, m_mapInstanceNameToPrototype);
 
 			if (obj is Prototype)
 				throw new NotImplementedException();
 
-			//if (obj is System.Type)
-			//	return ToPrototype((System.Type)obj);
-
-			return ToPrototypeByReflection(obj);
+			return ToPrototypeByReflection(obj, m_mapObjectIdToPrototype, m_mapInstanceNameToPrototype);
 		}
 
-
-
-		static private NativeValuePrototype ToPrototypeByReflection(object obj)
+		static private NativeValuePrototype ToPrototype(System.Collections.IEnumerable obj, Map<int, NativeValuePrototype> m_mapObjectIdToPrototype, Map<string, NativeValuePrototype> m_mapInstanceNameToPrototype)
 		{
-			throw new NotImplementedException();
+			// Collections: build a Collection node; children are circular-safe conversions.
+			NativeValuePrototype protoResult = NativeValuePrototype.GetOrCreateNativeEnumerablePrototype(obj);
+
+			foreach (var el in obj)
+			{
+				if (el != null)
+					protoResult.Children.Add(ToPrototypeCircular(el, m_mapObjectIdToPrototype, m_mapInstanceNameToPrototype));
+			}
+
+			return protoResult;
 		}
 
-		static private NativeValuePrototype ToPrototype(System.Collections.IEnumerable obj)
+		static private NativeValuePrototype ToPrototypeByReflection(object obj, Map<int, NativeValuePrototype> m_mapObjectIdToPrototype, Map<string, NativeValuePrototype> m_mapInstanceNameToPrototype)
 		{
+			// Object identity key (not overridable GetHashCode())
+			int iObjId = RuntimeHelpers.GetHashCode(obj);
 
-			throw new NotImplementedException("ToPrototype for IEnumerable is not implemented yet..");
+			NativeValuePrototype? protoExisting;
+			if (m_mapObjectIdToPrototype.TryGetValue(iObjId, out protoExisting))
+			{
+				return protoExisting;
+			}
 
-			////This method should be private so it isn't used by strings
+			System.Type t = obj.GetType();
 
-			//List<Prototype> lstChildren = new List<Prototype>();
-			//foreach (var el in obj)
-			//{
-			//	//N-20181228-02
-			//	if (null != el)
-			//		lstChildren.Add(ToPrototype(el));
-			//}
+			// 1) Create/get the temporary prototype representing the CLR type + base chain
+			Prototype protoType = NativeValuePrototype.GetOrCreateTypePrototype(t);
 
-			////Collections do not need instances, the instance will be defined by the children
-			//NativeValuePrototype protoResult = new NativeValuePrototype(obj, false);
-			//protoResult.Children = lstChildren;
-			//protoResult.InsertTypeOf(Ontology.Collection.Prototype.PrototypeID);
-			//return protoResult;
+			// 2) InstanceName-based early de-dupe (old behavior)
+			// If present, we treat (Type + InstanceName) as a stable identity.
+			string strInstanceName = null;
+			try
+			{
+				var propInstance = t.GetProperty("InstanceName", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+				if (propInstance != null && propInstance.CanRead && propInstance.GetIndexParameters().Length == 0)
+				{
+					object ? v = propInstance.GetValue(obj, null);
+					if (v != null)
+						strInstanceName = v.ToString();
+				}
+			}
+			catch
+			{
+				// ignore
+			}
+
+			if (strInstanceName != null)
+			{
+				string strPrototypeName = protoType.PrototypeName + "[" + strInstanceName + "]";
+
+				NativeValuePrototype nvByName;
+				if (m_mapInstanceNameToPrototype.TryGetValue(strPrototypeName, out nvByName))
+				{
+					m_mapObjectIdToPrototype[iObjId] = nvByName;
+					return nvByName;
+				}
+
+				Prototype ? existingByName = TemporaryPrototypes.GetTemporaryPrototypeOrNull(strPrototypeName);
+				if (existingByName != null && existingByName is NativeValuePrototype nvExistingByName)
+				{
+					nvExistingByName.NativeValue = obj;
+					m_mapInstanceNameToPrototype[strPrototypeName] = nvExistingByName;
+					m_mapObjectIdToPrototype[iObjId] = nvExistingByName;
+					return nvExistingByName;
+				}
+			}
+
+			// 3) Create/get a per-instance wrapper (NativeValuePrototype) typed by protoType.
+			// IMPORTANT: register in map BEFORE descending to break cycles.
+			NativeValuePrototype result = NativeValuePrototype.GetOrCreateNativeObjectPrototype(obj, protoType, strInstanceName);
+			m_mapObjectIdToPrototype[iObjId] = result;
+			if (strInstanceName != null)
+				m_mapInstanceNameToPrototype[result.PrototypeName] = result;
+
+			// 4) Ensure we have stable “grouping” parents for keys
+			Prototype protoPropsParent = TemporaryPrototypes.GetOrCreateTemporaryPrototype(t.FullName + ".Property");
+			Prototype protoFieldsParent = TemporaryPrototypes.GetOrCreateTemporaryPrototype(t.FullName + ".Field");
+
+			// 5) Public instance properties
+			foreach (var prop in t.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
+			{
+				if (!prop.CanRead)
+					continue;
+
+				if (prop.Name == "InstanceName")
+					continue;
+
+				if (prop.GetIndexParameters().Length != 0)
+					continue;
+
+				object propValue;
+				try
+				{
+					propValue = prop.GetValue(obj, null);
+				}
+				catch
+				{
+					continue;
+				}
+
+				if (propValue == null)
+					continue;
+
+				Prototype protoPropKey = TemporaryPrototypes.GetOrCreateTemporaryPrototype(t.FullName + ".Property." + prop.Name, protoPropsParent);
+
+				result.Properties[protoPropKey.PrototypeID] = ToPrototypeCircular(propValue, m_mapObjectIdToPrototype, m_mapInstanceNameToPrototype);
+			}
+
+			// 6) Public instance fields
+			foreach (var field in t.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
+			{
+				if (field.IsStatic)
+					continue;
+
+				object fieldValue;
+				try
+				{
+					fieldValue = field.GetValue(obj);
+				}
+				catch
+				{
+					continue;
+				}
+
+				if (fieldValue == null)
+					continue;
+
+				Prototype protoFieldKey = TemporaryPrototypes.GetOrCreateTemporaryPrototype(t.FullName + ".Field." + field.Name, protoFieldsParent);
+
+				NativeValuePrototype ? protoValue = ToPrototypeCircular(fieldValue, m_mapObjectIdToPrototype, m_mapInstanceNameToPrototype);
+
+				Prototype ? protoExisting2 = result.Properties[protoFieldKey.PrototypeID];
+				if (protoExisting2 != null && protoExisting2.TypeOf(Ontology.Collection.Prototype))
+				{
+					protoExisting2.Children.Clear();
+					if (null != protoValue)
+						protoExisting2.Children.AddRange(protoValue.Children);
+				}
+				else
+				{
+					result.Properties[protoFieldKey.PrototypeID] = protoValue;
+				}
+			}
+
+			return result;
 		}
+
+
+
+
+
 
 		static public object FromPrototype(NativeValuePrototype prototype)
 		{

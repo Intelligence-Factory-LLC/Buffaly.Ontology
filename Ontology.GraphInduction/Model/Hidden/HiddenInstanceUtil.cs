@@ -8,7 +8,7 @@ public static class HiddenInstanceUtil
 	public static Prototype CreateHiddenInstance(Prototype hiddenBase, IReadOnlyList<Prototype?> entities)
 	{
 		// Ensure it is a Hidden.Base type
-		PrototypeParents.GetOrInsertPrototypeParent(hiddenBase, Hidden.Base.Prototype);
+		hiddenBase.InsertTypeOf(Ontology.Hidden.Base.Prototype);
 
 		Prototype inst = hiddenBase.Clone();
 

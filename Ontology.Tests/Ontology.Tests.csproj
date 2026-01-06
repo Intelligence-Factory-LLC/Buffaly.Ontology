@@ -48,8 +48,14 @@
     <Reference Include="Buffaly.SemanticDB.Data">
       <HintPath>..\lib\Buffaly.SemanticDB.Data.dll</HintPath>
     </Reference>
+    <Reference Include="CSharp">
+      <HintPath>..\lib\CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="CSharp.Extensions">
       <HintPath>..\lib\CSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="CSharp.Parsers">
+      <HintPath>..\lib\CSharp.Parsers.dll</HintPath>
     </Reference>
     <Reference Include="RooTrax.Cache">
       <HintPath>..\lib\RooTrax.Cache.dll</HintPath>

@@ -6,6 +6,12 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{91884219-52B4-45C1-A114-BB6E59121488}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{FCE82B27-2B9C-4418-9001-99CDB1782F02}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\add_jsstubs.bat = Scripts\add_jsstubs.bat
+		Scripts\build_deployment_portal.bat = Scripts\build_deployment_portal.bat
+		Scripts\set_params.bat = Scripts\set_params.bat
+		Scripts\update_dlls.bat = Scripts\update_dlls.bat
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ontology.Tests", "Ontology.Tests\Ontology.Tests.csproj", "{552340BD-1E04-4898-8767-27FBFCCDE6C1}"
 EndProject

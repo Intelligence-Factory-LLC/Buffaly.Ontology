@@ -5,15 +5,15 @@ using BasicUtilities;
 
 namespace Ontology
 {
-	public class PrototypePropertiesCollection : IEnumerable<KeyValuePair<int, Prototype>>
+	public class PrototypePropertiesCollection : IEnumerable<KeyValuePair<int, Prototype?>>
 	{
 		private readonly Prototype m_protoParent;
-		private Map<int, Prototype> m_mapProperties;
+		private Map<int, Prototype?> m_mapProperties;
 
-		private Map<int, Prototype> MapProperties =>
-			m_mapProperties ?? (m_mapProperties = new Map<int, Prototype>());
+		private Map<int, Prototype?> MapProperties =>
+			m_mapProperties ?? (m_mapProperties = new Map<int, Prototype?>());
 
-		public Prototype this[int iPrototypeID]
+		public Prototype? this[int iPrototypeID]
 		{
 			get
 			{
@@ -26,7 +26,7 @@ namespace Ontology
 			}
 		}
 
-		public Prototype this[string strPrototypeName]
+		public Prototype? this[string strPrototypeName]
 		{
 			get
 			{
@@ -58,9 +58,9 @@ namespace Ontology
 			}
 		}
 
-		public IEnumerator<KeyValuePair<int, Prototype>> GetEnumerator()
+		public IEnumerator<KeyValuePair<int, Prototype?>> GetEnumerator()
 		{
-			return (m_mapProperties ?? Enumerable.Empty<KeyValuePair<int, Prototype>>())
+			return (m_mapProperties ?? Enumerable.Empty<KeyValuePair<int, Prototype?>>())
 				   .GetEnumerator();
 		}
 
@@ -93,7 +93,7 @@ namespace Ontology
 		public override string ToString()
 		{
 			var sb = new StringBuilder();
-			var entries = m_mapProperties ?? Enumerable.Empty<KeyValuePair<int, Prototype>>();
+			var entries = m_mapProperties ?? Enumerable.Empty<KeyValuePair<int, Prototype?>>();
 			foreach (var pair in entries)
 			{
 				if (sb.Length > 0) sb.Append(", ");
@@ -115,7 +115,7 @@ namespace Ontology
 
 		public Prototype GetParent() => m_protoParent;
 
-		public Prototype GetOrNull(Prototype protoKey) =>
+		public Prototype ? GetOrNull(Prototype protoKey) =>
 			ContainsKey(protoKey.PrototypeID) ? this[protoKey.PrototypeID] : null;
 
 		public void AddRange(IEnumerable<KeyValuePair<int, Prototype>> properties)

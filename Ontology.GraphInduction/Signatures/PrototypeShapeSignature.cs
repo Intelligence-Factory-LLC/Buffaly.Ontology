@@ -28,8 +28,7 @@ public static class PrototypeShapeSignature
 			return;
 		}
 
-		// Collapse native values to type only (ignore literal value)
-		Prototype p = prototype is NativeValuePrototype ? new Prototype(prototype.PrototypeID) : prototype;
+		Prototype p = prototype;
 
 		sb.Append(p.PrototypeID);
 
