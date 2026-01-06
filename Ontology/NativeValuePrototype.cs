@@ -540,37 +540,40 @@ return prototype;
 			Skip = 2,
 		}
 	
-	internal static SerializationAction Classify(object obj)
-	{
-		if (obj == null)
-		return SerializationAction.Skip;
-		
-		if (obj is string || obj is bool || obj is int || obj is double || obj is Enum)
-		return SerializationAction.Atom;
-		
-		if (obj is long || obj is short || obj is byte || obj is uint || obj is ulong || obj is ushort || obj is sbyte)
-		return SerializationAction.Atom;
-		
-		if (obj is float || obj is decimal)
-		return SerializationAction.Atom;
-		
-		if (obj is System.DateTime || obj is System.DateTimeOffset || obj is System.TimeSpan)
-		return SerializationAction.Atom;
-		
-		if (obj is System.Guid)
-		return SerializationAction.Atom;
-		
-		if (obj is System.Collections.IEnumerable && obj is not string)
-		return SerializationAction.Recurse;
-		
-		System.Type t = obj.GetType();
-		string ns = t.Namespace;
-		
-		if (ns != null && (ns.StartsWith("System", StringComparison.Ordinal) || ns.StartsWith("Microsoft", StringComparison.Ordinal)))
-		return SerializationAction.Skip;
-		
-		return SerializationAction.Recurse;
-	}
+		internal static SerializationAction Classify(object obj)
+		{
+			if (obj == null)
+				return SerializationAction.Skip;
+
+			if (obj is string || obj is bool || obj is int || obj is double || obj is Enum)
+				return SerializationAction.Atom;
+
+			if (obj is long || obj is short || obj is byte || obj is uint || obj is ulong || obj is ushort || obj is sbyte)
+				return SerializationAction.Atom;
+
+			if (obj is float || obj is decimal)
+				return SerializationAction.Atom;
+
+			if (obj is System.DateTime || obj is System.DateTimeOffset || obj is System.TimeSpan)
+				return SerializationAction.Atom;
+
+			if (obj is System.Guid)
+				return SerializationAction.Atom;
+
+			if (obj is System.Collections.IEnumerable && obj is not string)
+				return SerializationAction.Recurse;
+
+			System.Type t = obj.GetType();
+			string ns = t.Namespace;
+
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(System.Collections.Generic.KeyValuePair<,>))
+				return SerializationAction.Recurse;
+
+			if (ns != null && (ns.StartsWith("System", StringComparison.Ordinal) || ns.StartsWith("Microsoft", StringComparison.Ordinal)))
+				return SerializationAction.Skip;
+
+			return SerializationAction.Recurse;
+		}
 
 	static public NativeValuePrototype ? ToPrototype(object obj)
 	{
