@@ -33,6 +33,19 @@
 			return protoHidden.Properties[protoHidden.PrototypeName + ".Field." + strField];
 		}
 
+		static public Prototype CreateHiddenInstance(Prototype protoHidden, List<Prototype> lstEntities)
+		{
+			Prototype protoHiddenInstance = protoHidden.CreateInstance();
+			protoHiddenInstance.InsertTypeOf(Base.Prototype);
+
+			for (int i = 0; i < lstEntities.Count; i++)
+			{
+				Prototype protoProperty = Prototypes.GetOrInsertPrototype(protoHidden.PrototypeName + ".Field." + i);
+				protoHiddenInstance.Properties[protoProperty.PrototypeID] = lstEntities[i];
+			}
+
+			return protoHiddenInstance;
+		}
 
 	}
 }

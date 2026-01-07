@@ -11,5 +11,8 @@
 			}
 		}
 
+		public static string CSharp_Code_Hidden = "CSharp.Code.Hidden";
+
+
 	}
 }

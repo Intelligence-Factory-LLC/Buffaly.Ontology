@@ -8,9 +8,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Buffaly.NLU\Buffaly.NLU.csproj" />
+		<ProjectReference Include="..\Ontology.Simulation\Ontology.Simulation.csproj" />
 		<ProjectReference Include="..\Ontology\Ontology.csproj" />
+		<ProjectReference Include="..\ProtoScript.Parsers\ProtoScript.Parsers.csproj" />
+		<ProjectReference Include="..\ProtoScript\ProtoScript.csproj" />
 		<Reference Include="BasicUtilities">
 			<HintPath>..\lib\BasicUtilities.dll</HintPath>
+		</Reference>
+		<Reference Include="CSharp">
+		  <HintPath>..\lib\CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="CSharp.Parsers">
+		  <HintPath>..\lib\CSharp.Parsers.dll</HintPath>
 		</Reference>
 		<Reference Include="WebAppUtilities">
 		  <HintPath>..\lib\WebAppUtilities.dll</HintPath>

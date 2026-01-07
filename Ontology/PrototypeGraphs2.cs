@@ -349,6 +349,141 @@ namespace Ontology
 			}
 		}
 
+		public static Prototype ? ComparePrototypes(Prototype prototype1, Prototype prototype2, bool bShallow = false)
+		{
+			Prototype ? result = null;
+
+			if (prototype1 == null || prototype2 == null)
+				return null;
+
+			if (Prototypes.AreShallowEqual(prototype1, prototype2))
+			{
+				result = prototype1.ShallowClone();
+			}
+
+			else
+			{
+				Prototype common = GetCommonRoot(prototype1, prototype2);
+				if (null != common)
+				{
+					result = common.ShallowClone();
+				}
+
+				if (bShallow)
+					return result;
+			}
+
+			if (null != result)
+			{
+				Set<int> setProperties = new Set<int>();
+				setProperties.AddRange(prototype1.Properties.Select(x => x.Key));
+				setProperties.AddRange(prototype2.Properties.Select(x => x.Key));
+
+				foreach (var key in setProperties)
+				{
+					Prototype ? protoValue1 = prototype1.Properties[key];
+					Prototype ? protoValue2 = prototype2.Properties[key];
+
+					if (null != protoValue1 && null != protoValue2)
+					{
+
+						
+							Prototype child = ComparePrototypes(protoValue1, protoValue2);
+
+							//N20190426-08
+							if (null == child)
+							{
+								result.Properties.Remove(key);
+							}
+							else
+							{
+								result.Properties[key] = child;
+							}
+
+						
+					}
+				}
+
+				//N20191011-02 - Don't compare for non-collections, don't add Compare property
+				if (Prototypes.TypeOf(prototype1, Ontology.Collection.Prototype))
+				{
+					//N20190418-01 - Preserve StartsWith when comparing against a shadow
+					if (prototype1.Properties[Compare.Comparison.PrototypeID]?.PrototypeID == Compare.StartsWith.PrototypeID ||
+						prototype2.Properties[Compare.Comparison.PrototypeID]?.PrototypeID == Compare.StartsWith.PrototypeID)
+					{
+						//naive comparison 
+						for (int i = 0; i < prototype1.Children.Count && i < prototype2.Children.Count; i++)
+						{
+							Prototype child = ComparePrototypes(prototype1.Children[i], prototype2.Children[i]);
+
+							//May want to stop when they don't match at all 
+							if (child == null)
+								break;
+
+							result.Children.Add(child);
+						}
+
+						result.Properties[Compare.Comparison.PrototypeID] = Compare.StartsWith.Prototype.Clone();
+					}
+
+					//Preserve Interesection when comparing a shadow
+					else if (prototype1.Properties[Compare.Comparison.PrototypeID]?.PrototypeID == Compare.Intersection.PrototypeID ||
+						prototype2.Properties[Compare.Comparison.PrototypeID]?.PrototypeID == Compare.Intersection.PrototypeID)
+					{
+						//For intersections there should only be a single element
+						for (int i = 0; i < prototype1.Children.Count && i < prototype2.Children.Count; i++)
+						{
+							Prototype child = ComparePrototypes(prototype1.Children[i], prototype2.Children[i]);
+
+							//May want to stop when they don't match at all 
+							if (child == null)
+								break;
+
+							result.Children.Add(child);
+						}
+
+						result.Properties[Compare.Comparison.PrototypeID] = Compare.Intersection.Prototype.Clone();
+					}
+
+					else if (prototype1.Children.Count > 0 || prototype2.Children.Count > 0)
+					{
+						//naive comparison 
+						for (int i = 0; i < prototype1.Children.Count && i < prototype2.Children.Count; i++)
+						{
+							Prototype child = ComparePrototypes(prototype1.Children[i], prototype2.Children[i]);
+
+							//May want to stop when they don't match at all 
+							if (child == null)
+								break;
+
+							result.Children.Add(child);
+						}
+
+						if ((result.Children.Count != prototype1.Children.Count || result.Children.Count != prototype2.Children.Count))
+						{
+							//N20181218-01
+							result.Properties[Compare.Comparison.PrototypeID] = Compare.StartsWith.Prototype.Clone();
+						}
+
+						else
+						{
+							result.Properties[Compare.Comparison.PrototypeID] = Compare.Exact.Prototype.Clone();
+						}
+					}
+
+					//N20190330-02, N20200214-02
+					else if (prototype1.Children.Count == 0 && prototype2.Children.Count == 0)
+					{
+						result.Properties[Compare.Comparison.PrototypeID] = Compare.Exact.Prototype.Clone();
+					}
+				}
+
+			}
+
+			return result;
+		}
+
+
 
 		public static void DepthFirst(Prototype prototype, Func<Prototype, Prototype> func)
 		{
@@ -403,6 +538,58 @@ namespace Ontology
 			}
 		}
 
+		public static Prototype? GetCommonRoot(Prototype prototype1, Prototype prototype2)
+		{
+			if (prototype1 == null || prototype2 == null)
+				return null;
+
+			if (Prototypes.TypeOf(prototype2, prototype1))
+				return prototype1.ShallowClone();
+
+			if (Prototypes.TypeOf(prototype1, prototype2))
+				return prototype2.ShallowClone();
+
+			List<Prototype> lstCommonRoots = PrototypeGraphs.GetCommonRoots(prototype1, prototype2);
+			Prototype? protoCommonRoot = null;
+			foreach (Prototype protoRoot in lstCommonRoots)
+			{
+				if (null == protoCommonRoot)
+				{
+					protoCommonRoot = protoRoot.ShallowClone();
+				}
+
+				else if (!Prototypes.TypeOf(protoCommonRoot, protoRoot))
+				{
+					protoCommonRoot.InsertTypeOf(protoRoot.ShallowClone());
+				}
+			}
+
+			return protoCommonRoot;
+		}
+
+
+		public static List<Prototype> GetCommonRoots(Prototype prototype1, Prototype prototype2)
+		{
+			List<Prototype> lstResults = new List<Prototype>();
+
+			if (prototype1 == null || prototype2 == null)
+				return lstResults;
+
+			if (Prototypes.TypeOf(prototype2, prototype1))
+				lstResults.Add(prototype1.ShallowClone());
+
+			List<int> lstParents1 = new List<int>(prototype1.GetAllParents());
+			foreach (int protoParent in prototype2.GetAllParents())
+			{
+				if (lstParents1.Contains(protoParent))
+				{
+					lstResults.Add(Prototypes.GetPrototype(protoParent).ShallowClone());
+				}
+			}
+
+			return lstResults;
+		}
+
 		static public Prototype GetIntersection(Prototype protoCollection1, Prototype protoCollection2)
 		{
 			return CollectionUtil.GetIntersection(protoCollection1, protoCollection2);
@@ -419,6 +606,60 @@ namespace Ontology
 			}
 
 			return lstResults;
+		}
+
+		public static Prototype ? GetValue(Prototype prototype, Prototype path)
+		{
+			if (path.PrototypeID == Compare.Entity.PrototypeID)
+				return prototype;
+
+			if (null == prototype)
+				return null;
+
+			if (Prototypes.TypeOf(prototype, path))      //should always match 
+			{
+				foreach (var pair in path.NormalProperties)           //should only be one
+				{
+					if (pair.Value.PrototypeID == Compare.Intersection.PrototypeID)
+					{
+						throw new NotImplementedException();
+					}
+
+					if (pair.Value.PrototypeID == Compare.Exact.PrototypeID)
+						continue;
+
+					Prototype ? protoValue = prototype.Properties[pair.Key];
+					if (null == protoValue)
+					{
+						return null;
+					}
+
+					return GetValue(protoValue, path.Properties[pair.Key]);
+				}
+
+				if (path.Children.Count > 0)
+				{
+					//N20200630-03 - If the prototype doesn't have the child then returna null
+					if (path.Children.Count > prototype.Children.Count)
+						return null;
+
+					//This doesn't really need to iterate, just graph the last element of each 
+					{
+						Prototype childPath = path.Children.Last();
+						Prototype child = prototype.Children[path.Children.Count - 1];
+
+						return GetValue(child, childPath);
+					}
+				}
+
+				//I added this because it was descending into a typeof collection as a dead end
+				if (path.PrototypeID != Compare.Entity.PrototypeID)
+					throw new Exception("Path ended without an Entity, possible error");
+
+				return prototype;
+			}
+
+			return null;
 		}
 
 
@@ -638,21 +879,17 @@ namespace Ontology
 			return prototype.Children.Count == 0 && prototype.NormalProperties.Count() == 0;
 		}
 
-
-		public static Prototype GetAsPrototype(string PrototypeGraphName, bool bConvertErrorToNull = false)
+		static public List<Prototype?> GetEntitiesOrNull(Prototype prototype, List<Prototype> lstPaths)
 		{
-			throw new NotImplementedException();
-		}
+			List<Prototype?> lstEntities = new List<Prototype?>();
 
-		public static Prototype GetAsPrototypeOrNull(string PrototypeGraphName)
-		{
-			throw new NotImplementedException();
-		}
+			foreach (Prototype path in lstPaths)
+			{
+				Prototype? protoEntity = PrototypeGraphs.GetValue(prototype, path);
+				lstEntities.Add(protoEntity);
+			}
 
-
-		public static Prototype GetAsPrototype(int PrototypeGraphID)
-		{
-			throw new NotImplementedException();
+			return lstEntities;
 		}
 
 		static public string GetHash(Prototype prototype)
@@ -1196,6 +1433,28 @@ namespace Ontology
 			return protoResult;
 		}
 
+		static public Prototype RemoveComparisonOperations(Prototype shadow)
+		{
+			List<int> lstToRemove = new List<int>();
+			foreach (var pair in shadow.Properties)
+			{
+				if (pair.Key == Ontology.Compare.Comparison.PrototypeID)
+					lstToRemove.Add(pair.Key);
+
+				else if (null != pair.Value)
+					RemoveComparisonOperations(pair.Value);
+			}
+
+			foreach (int iKey in lstToRemove)
+				shadow.Properties.Remove(iKey);
+
+			foreach (var child in shadow.Children)
+			{
+				RemoveComparisonOperations(child);
+			}
+
+			return shadow;
+		}
 
 
 

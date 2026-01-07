@@ -12,40 +12,19 @@
 			return lstCloned;
 		}
 
+		static public Prototype ? ComparePrototypes(List<Prototype> protoInputs, bool bShallow = false)
+		{
+			Prototype ? protoShadowTree = protoInputs[0];
 
-
-        private static List<Prototype> GetCommonRoots(Prototype prototype, List<Prototype> prototypes)
-        {
-            List<Prototype> lstResults = new List<Prototype>();
-
-            if (prototypes.Any(x => x == null))
-                return lstResults;
-
-            bool bIsTypeOf = true;
-            for (int i = 1; i < prototypes.Count && bIsTypeOf; i++)
-            {
-                if (!Prototypes.TypeOf(prototypes[i], prototype))
-                    bIsTypeOf = false;
-            }
-
-			if (bIsTypeOf)
+			for (int i = 1; i < protoInputs.Count; i++)
 			{
-				if (!lstResults.Any(x => Prototypes.AreShallowEqual(x, prototype)))
-					lstResults.Add(prototype.ShallowClone());
+				protoShadowTree = PrototypeGraphs.ComparePrototypes(protoShadowTree, protoInputs[i]);
 			}
 
-            foreach (int protoParent in prototype.GetParents())
-            {
-				List<Prototype> lstParentRoots = GetCommonRoots(Prototypes.GetPrototype(protoParent), prototypes);
-				foreach (Prototype protoParentRoot in lstParentRoots)
-				{
-					if (!lstResults.Any(x => Prototypes.AreShallowEqual(x, protoParentRoot)))
-						lstResults.Add(protoParentRoot);
-				}
-            }
+			return protoShadowTree;
+		}
 
-            return lstResults;
-        }
+
 
 		public static List<List<Prototype>> MinusValues(List<Prototype> lstSources, List<Prototype> lstShadows)
 		{
