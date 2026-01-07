@@ -115,7 +115,6 @@ namespace Ontology
 					continue;
 
 				Prototype protoValue = pair.Value;
-				object oValue = FromPrototypeCircular(protoValue, m_mapPrototypeToObjects);
 
 				string prefixProp = strTypeName + ".Property.";
 				string prefixField = strTypeName + ".Field.";
@@ -123,11 +122,17 @@ namespace Ontology
 				if (strKeyName.StartsWith(prefixProp, StringComparison.Ordinal))
 				{
 					string propName = strKeyName.Substring(prefixProp.Length);
+					System.Reflection.PropertyInfo? pi = obj.GetType().GetProperty(propName);
+					System.Type? expectedType = pi?.PropertyType;
+					object? oValue = FromPrototypeCircular(protoValue, m_mapPrototypeToObjects, expectedType);
 					ReflectionUtil.SetPropertyOrIgnore(obj, oValue, propName);
 				}
 				else if (strKeyName.StartsWith(prefixField, StringComparison.Ordinal))
 				{
 					string fieldName = strKeyName.Substring(prefixField.Length);
+					System.Reflection.FieldInfo? fi = obj.GetType().GetField(fieldName);
+					System.Type? expectedType = fi?.FieldType;
+					object? oValue = FromPrototypeCircular(protoValue, m_mapPrototypeToObjects, expectedType);
 					ReflectionUtil.SetFieldOrIgnore(obj, oValue, fieldName);
 				}
 			}
@@ -135,18 +140,19 @@ namespace Ontology
 			// If the object is a list and the prototype has children, populate the list.
 			if (obj is System.Collections.IList list && prototype.Children.Count > 0)
 			{
+				System.Type? elemType = GetElementTypeFromExpected(obj.GetType());
 				foreach (Prototype child in prototype.Children)
 				{
-					object oChild = FromPrototypeCircular(child, m_mapPrototypeToObjects);
+					object? oChild = FromPrototypeCircular(child, m_mapPrototypeToObjects, elemType);
 					if (oChild != null)
-						list.Add(oChild);
+						list.Add(Coerce(oChild, elemType));
 				}
 			}
 
 			return obj;
 		}
 
-		static private object FromPrototypeCircular(Prototype prototype, Map<int, object> m_mapPrototypeToObjects)
+		static private object? FromPrototypeCircular(Prototype prototype, Map<int, object> m_mapPrototypeToObjects, System.Type? expectedType)
 		{
 			if (prototype == null)
 				return null;
@@ -197,17 +203,7 @@ namespace Ontology
 			// Collections
 			if (prototype.TypeOf(Ontology.Collection.Prototype))
 			{
-				var lst = new List<object>();
-				m_mapPrototypeToObjects[prototype.PrototypeID] = lst;
-
-				foreach (Prototype child in prototype.Children)
-				{
-					object oChild = FromPrototypeCircular(child, m_mapPrototypeToObjects);
-					if (oChild != null)
-						lst.Add(oChild);
-				}
-
-				return lst;
+				return MaterializeCollection(prototype, m_mapPrototypeToObjects, expectedType);
 			}
 
 			// Otherwise: treat as an object-like prototype and reconstruct by reflection
@@ -222,6 +218,131 @@ namespace Ontology
 			}
 
 			return FromPrototypeByReflection((NativeValuePrototype)prototype, m_mapPrototypeToObjects);
+		}
+
+		static private object MaterializeCollection(Prototype prototype, Map<int, object> m_mapPrototypeToObjects, System.Type? expectedType)
+		{
+			System.Type? elemType = GetElementTypeFromExpected(expectedType);
+
+			if (expectedType != null && expectedType.IsArray)
+			{
+				int n = prototype.Children.Count;
+				Array arr = Array.CreateInstance(elemType ?? typeof(object), n);
+				m_mapPrototypeToObjects[prototype.PrototypeID] = arr;
+
+				for (int i = 0; i < n; i++)
+				{
+					object? oChild = FromPrototypeCircular(prototype.Children[i], m_mapPrototypeToObjects, elemType);
+					arr.SetValue(Coerce(oChild, elemType), i);
+				}
+
+				return arr;
+			}
+
+			if (expectedType != null && expectedType.IsClass && !expectedType.IsAbstract)
+			{
+				object inst;
+				try
+				{
+					inst = Activator.CreateInstance(expectedType);
+				}
+				catch
+				{
+					inst = CreateDefaultList(elemType);
+				}
+
+				m_mapPrototypeToObjects[prototype.PrototypeID] = inst;
+
+				if (inst is System.Collections.IList ilist)
+				{
+					foreach (Prototype child in prototype.Children)
+					{
+						object? oChild = FromPrototypeCircular(child, m_mapPrototypeToObjects, elemType);
+						if (oChild != null)
+							ilist.Add(Coerce(oChild, elemType));
+					}
+					return inst;
+				}
+
+				System.Reflection.MethodInfo? add = FindAddMethod(inst.GetType(), elemType);
+				if (add != null)
+				{
+					foreach (Prototype child in prototype.Children)
+					{
+						object? oChild = FromPrototypeCircular(child, m_mapPrototypeToObjects, elemType);
+						if (oChild != null)
+							add.Invoke(inst, new object[] { Coerce(oChild, elemType) });
+					}
+					return inst;
+				}
+
+				return inst;
+			}
+
+			object listObj = CreateDefaultList(elemType);
+			m_mapPrototypeToObjects[prototype.PrototypeID] = listObj;
+
+			System.Collections.IList list = (System.Collections.IList)listObj;
+
+			foreach (Prototype child in prototype.Children)
+			{
+				object? oChild = FromPrototypeCircular(child, m_mapPrototypeToObjects, elemType);
+				if (oChild != null)
+					list.Add(Coerce(oChild, elemType));
+			}
+
+			return listObj;
+		}
+
+		static private System.Type? GetElementTypeFromExpected(System.Type? expectedType)
+		{
+			if (expectedType == null)
+				return null;
+
+			if (expectedType.IsArray)
+				return expectedType.GetElementType();
+
+			if (expectedType.IsGenericType)
+			{
+				System.Type[] args = expectedType.GetGenericArguments();
+				if (args.Length == 1)
+					return args[0];
+			}
+
+			return null;
+		}
+
+		static private object CreateDefaultList(System.Type? elemType)
+		{
+			System.Type tElem = elemType ?? typeof(object);
+			System.Type tList = typeof(List<>).MakeGenericType(tElem);
+			return Activator.CreateInstance(tList);
+		}
+
+		static private System.Reflection.MethodInfo? FindAddMethod(System.Type t, System.Type? elemType)
+		{
+			if (elemType == null)
+				return t.GetMethod("Add", new System.Type[] { typeof(object) });
+
+			return t.GetMethod("Add", new System.Type[] { elemType });
+		}
+
+		static private object? Coerce(object? value, System.Type? expectedType)
+		{
+			if (value == null || expectedType == null)
+				return value;
+
+			if (expectedType.IsInstanceOfType(value))
+				return value;
+
+			try
+			{
+				return Convert.ChangeType(value, expectedType);
+			}
+			catch
+			{
+				return value;
+			}
 		}
 
 		static private System.Type ResolveTypeByFullName(string fullName)
