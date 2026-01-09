@@ -206,6 +206,51 @@ prototype RootedTransform
 			return lstPath;
 		}
 
+		private Prototype GetPathToRoot2(Prototype prototype)
+		{
+			Prototype protoPath = Compare.Entity.Prototype.ShallowClone();
+
+			while (null != prototype.Parent)
+			{
+				Prototype protoParent = prototype.Parent;
+
+				Prototype protoTemp = protoPath;
+				protoPath = protoParent.ShallowClone();
+
+				bool bFound = false;
+
+				foreach (var pair in protoParent.NormalProperties)
+				{
+					if (pair.Value == prototype)
+					{
+						protoPath.Properties[pair.Key] = protoTemp;
+						bFound = true;
+						break;
+					}
+				}
+
+				if (!bFound)
+				{
+					foreach (Prototype protoChild in protoParent.Children)
+					{
+						if (protoChild == prototype)
+						{
+							protoPath.Children.Add(protoTemp);
+						}
+						else
+						{
+							protoPath.Children.Add(Compare.Ignore.Prototype.ShallowClone());
+						}
+					}
+				}
+
+				prototype = protoParent;
+			}
+
+			return protoPath;
+		}
+	
+
 		public static List<Prototype> GetEntityPathsByLeaf2(Prototype prototype)
 		{
 			//This version allows for mulitple different versions of a path 

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ontology.GraphInduction;
 using Ontology.GraphInduction.Utils;
+using Ontology.Simulation;
 using ProtoScript.Interpretter;
 using ProtoScript.Interpretter.Symbols;
 
@@ -36,57 +37,88 @@ namespace Ontology.Tests
 		public void Test_GraphInductionEngine_1()
 		{
 			string strFile = @"c:\dev\FairPath\FairPath.Data\Addresses.cs";
-			string strCode = @" 
-  public  class AddressesRow 
+			string strCode = @"
+  public partial class AddressesRow
     {
-        public string? Name { get; set; }
+        public AddressesRow(AddressesRow oRow)
+        {
+                SqlParams sqlParams = new SqlParams();
+
+                SqlParams sqlParams = new SqlParams();
+
+        }
+
 }
-"; 
-//			string strCode = @" 
-//  public partial class AddressesRow : RooTrax.Common.DB.BasicRow
-//    {
+";
 
-//        public int AddressID { get; set; }
 
-//        public string? Name { get; set; }
-
-//        public string? Line1 { get; set; }
-
-//        public string? Line2 { get; set; }
-
-//        public string? City { get; set; }
-
-//        public string? State { get; set; }
-
-//        public string? Zip { get; set; }
-
-//        public string? Country { get; set; }
-
-//        public DateTime DateCreated { get; set; }
-
-//        public DateTime LastUpdated { get; set; }
-
-//}
-//";
-
-			//CSharp.File file = CSharp.Parsers.Files.Parse(strCode);
-			//Prototype protoFile = NativeValuePrototypes.ToPrototype(file);
-
-			//PrototypeLogging.Log(protoFile);
+			CSharp.File file = CSharp.Parsers.Files.Parse(strFile);
+			Prototype ? protoFile = NativeValuePrototypes.ToPrototype(file);
 
 
 			//CSharp.ClassDefinition clsAddresses = file.Namespaces[0].Classes.First(x => x.ClassName.TypeName == "AddressesRow");
 			CSharp.ClassDefinition clsAddresses = CSharp.Parsers.ClassDefinitions.Parse(strCode);
 
-			Prototype protoAddresses = NativeValuePrototypes.ToPrototype(clsAddresses);
-			CSharp.ClassDefinition clsAddresses2 = (CSharp.ClassDefinition) NativeValuePrototypes.FromPrototype(protoAddresses);
-
-			PrototypeLogging.Log(protoAddresses);
+			Prototype ? protoAddresses = NativeValuePrototypes.ToPrototype(clsAddresses);
 			Logger.Log(protoAddresses);
 
+
+
+			Prototype protoRoot = protoAddresses;
+
+
 			List<Prototype> lstLeafPaths = LeafBasedTransforms.GetEntityPathsByLeaf2(protoAddresses);
+
+			Prototype protoLeaf1 = lstLeafPaths[2];
+			Prototype protoLeaf2 = lstLeafPaths[6];
+
+			Logger.Log(protoLeaf1);
+			Logger.Log(protoLeaf2);
+
+			Prototype protoParent1 = protoLeaf1.Parent;
+			Prototype protoParent2 = protoLeaf2.Parent;
+
+			Logger.Log(protoParent1);
+			Logger.Log(protoParent2);
+
+			PrototypeLogging.Log(protoParent1);
+			PrototypeLogging.Log(protoParent2);
+
+			bool bCategorized = TemporaryPrototypeCategorization.IsCategorized(protoParent2, protoParent1, true);
+
+
+			//Generalize the graph, longest paths first, to remove any shorter common paths 
+			foreach (Prototype protoPath in lstLeafPaths)
+			{
+				Collection lstInstances = PrototypeGraphs.Find(protoRoot, x => PrototypeGraphs.AreEqual(x, protoPath));
+
+				foreach (Prototype protoInstance in lstInstances.Children)
+				{
+					//protoInstance.InsertTypeOf(Compare.Entity.Prototype, true);
+					Revalue(protoInstance, Compare.Entity.Prototype);
+				}
+			}
+
+			PrototypeLogging.Log(protoRoot);
+
 		}
 
+
+		public static void Revalue(Prototype prototype, Prototype protoNew)
+		{
+			Prototype protoParent = prototype.Parent;
+			foreach (var pair in protoParent.Properties)
+			{
+				if (pair.Value == prototype)
+					protoParent.Properties[pair.Key] = protoNew;
+			}
+
+			for (int i = 0; i < protoParent.Children.Count; i++)
+			{
+				if (protoParent.Children[i] == prototype)
+					protoParent.Children[i] = protoNew;
+			}
+		}
 
 
 	}

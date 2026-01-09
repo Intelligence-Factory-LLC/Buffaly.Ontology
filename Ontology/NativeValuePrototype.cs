@@ -177,6 +177,7 @@ namespace Ontology
 				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
 				nv.InsertTypeOf(protoType);
 				nv.m_bObjectInstance = true;
+				nv.m_bIsInstance = true;
 				return nv;
 			}
 
@@ -201,6 +202,7 @@ namespace Ontology
 				nv.PrototypeID = TemporaryPrototypes.GetOrInsertPrototype(nv).PrototypeID;
 				nv.InsertTypeOf(Ontology.Collection.Prototype);
 				nv.m_bObjectInstance = true;
+				nv.m_bIsInstance = true;
 				return nv;
 			}
 
@@ -572,6 +574,10 @@ namespace Ontology
 			if (ns != null && (ns.StartsWith("System", StringComparison.Ordinal) || ns.StartsWith("Microsoft", StringComparison.Ordinal)))
 				return SerializationAction.Skip;
 
+			//N20260108-01 - Replace with better algorithm later
+			if (t.Name.Contains("StatementParsingInfo"))
+				return SerializationAction.Skip;
+
 			return SerializationAction.Recurse;
 		}
 
@@ -596,22 +602,22 @@ namespace Ontology
 			if (action == SerializationAction.Atom)
 			{
 				if (obj is string)
-					return NativeValuePrototype.GetOrCreateNativeValuePrototype((string)obj);
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((string)obj).Clone();
 
 				if (obj is bool)
-					return NativeValuePrototype.GetOrCreateNativeValuePrototype((bool)obj);
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((bool)obj).Clone();
 
 				if (obj is int)
-					return NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj);
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj).Clone();
 
 				if (obj is Enum)
-					return NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj);
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj).Clone();
 
 				if (obj is double)
-					return NativeValuePrototype.GetOrCreateNativeValuePrototype((double)obj);
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((double)obj).Clone();
 
 				Prototype protoType = NativeValuePrototype.GetOrCreateTypePrototype(obj.GetType());
-				return NativeValuePrototype.GetOrCreateNativeObjectPrototype(obj, protoType);
+				return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeObjectPrototype(obj, protoType).Clone();
 			}
 
 			if (obj is System.Collections.IEnumerable && obj is not string)

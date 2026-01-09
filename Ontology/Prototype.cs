@@ -150,14 +150,14 @@ namespace Ontology
 			}
 		}
 
-		public Prototype InsertTypeOf(Prototype protoParent)
+		public Prototype InsertTypeOf(Prototype protoParent, bool bOverrideSafety = false)
 		{
-			return InsertTypeOf(protoParent.PrototypeID);
+			return InsertTypeOf(protoParent.PrototypeID, bOverrideSafety);
 		}
 
-		public virtual Prototype InsertTypeOf(int iParentPrototypeID)
+		public virtual Prototype InsertTypeOf(int iParentPrototypeID, bool bOverrideSafety = false)
 		{
-			if (m_bIsCopy)
+			if (m_bIsCopy && !bOverrideSafety)
 				throw new InvalidOperationException("Cannot insert type of on a copy of a prototype.");
 
 			if (!this.TypeOfsCollection.Contains(iParentPrototypeID))

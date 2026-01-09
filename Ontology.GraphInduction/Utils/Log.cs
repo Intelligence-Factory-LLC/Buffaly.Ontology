@@ -18,7 +18,7 @@ namespace Ontology.GraphInduction.Utils
 		//}
 
 
-		static public void Log(Prototype prototype)
+		static public void Log(Prototype ? prototype)
 		{
 			Logs.DebugLog.WriteEvent("Prototype", null == prototype ? "(null)" : "\r\n" + FormatUtil.FormatPrototype(prototype).ToString());
 		}
