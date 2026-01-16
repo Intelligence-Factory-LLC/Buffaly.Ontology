@@ -217,14 +217,14 @@ namespace Ontology
 
 		private static Prototype ExtractTypeHierarchy(System.Type type)
 		{
-			string strTypeName = type.FullName;
+			string strTypeName = type.FullName ?? throw new Exception("Cannot get type name");
 			Prototype? prototype = TemporaryPrototypes.GetTemporaryPrototypeOrNull(strTypeName);
 			if (null == prototype)
 			{
 				prototype = TemporaryPrototypes.GetOrCreateTemporaryPrototype(strTypeName);
 				if (type != typeof(object))
 				{
-					Prototype protoBase = ExtractTypeHierarchy(type.BaseType);
+					Prototype protoBase = ExtractTypeHierarchy(type.BaseType!);
 					prototype.InsertTypeOf(protoBase.PrototypeID);
 				}
 			}
@@ -248,6 +248,9 @@ namespace Ontology
 
 		public override Prototype Clone()
 		{
+			if (m_bObjectInstance)			
+				return base.Clone();
+
 			return this.ShallowClone();
 		}
 
@@ -257,6 +260,7 @@ namespace Ontology
 
 			PopulateClone(nv);
 			nv.NativeValue = this.NativeValue;
+			nv.m_bObjectInstance = m_bObjectInstance;
 
 			return nv;
 		}
@@ -299,7 +303,7 @@ namespace Ontology
 
 				foreach (Prototype child in this.Children)
 				{
-					jsonChildren.Add(child == null ? null : child.ToJsonObject());
+					jsonChildren.Add(child?.ToJsonObject());
 				}
 
 				jsonPrototype[nameof(Children)] = jsonChildren;
@@ -378,39 +382,39 @@ namespace Ontology
 				yield return protoParent;
 		}
 
-		new public static Prototype FromJSON(string strJSON)
+		new public static Prototype ? FromJSON(string strJSON)
 		{
 			return FromJsonValue(new JsonValue(strJSON));
 		}
 
-		public static Prototype FromJSON(string strJSON, bool bConvertErrorToNull)
+		public static Prototype ? FromJSON(string strJSON, bool bConvertErrorToNull)
 		{
 			return FromJsonValue(new JsonValue(strJSON), bConvertErrorToNull);
 		}
 
-		new public static Prototype FromJsonValue(JsonValue jsonValue)
+		new public static Prototype ? FromJsonValue(JsonValue jsonValue)
 		{
 			return FromJsonValue(jsonValue, false);
 		}
 
-		public static Prototype FromJsonValue(JsonValue jsonValue, bool bConvertErrorToNull)
+		public static Prototype ? FromJsonValue(JsonValue jsonValue, bool bConvertErrorToNull)
 		{
-			Prototype prototype = null;
+			Prototype ? prototype = null;
 
 			try
 			{
 
 				if (jsonValue.ToJsonObject() != null)
 				{
-					JsonObject jsonPrototype = jsonValue.ToJsonObject();
+					JsonObject jsonPrototype = jsonValue.ToJsonObject()!;
 
 					if (jsonPrototype.ContainsKey(nameof(NativeValuePrototype.NativeValue)))
 					{
 						if (!jsonPrototype.ContainsKey(nameof(Prototype.PrototypeName)))
 							throw new Exception("JsonObject does not contain PrototypeName - required for NativeValuePrototype");
 
-						JsonValue jsonNV = jsonPrototype[nameof(NativeValuePrototype.NativeValue)];
-						string strPrototypeName = jsonPrototype[nameof(Prototype.PrototypeName)].ToString();
+						JsonValue jsonNV = jsonPrototype[nameof(NativeValuePrototype.NativeValue)]!;
+						string strPrototypeName = jsonPrototype[nameof(Prototype.PrototypeName)]!.ToString();
 
 						if (strPrototypeName.StartsWith(System_Boolean.PrototypeName))
 							prototype = NativeValuePrototype.GetOrCreateNativeValuePrototype(jsonNV.ToBoolean());
@@ -520,7 +524,7 @@ namespace Ontology
 					prototype = Prototypes.GetPrototypeByPrototypeName(jsonValue.ToString());
 				}
 			}
-			catch (Exception err)
+			catch (Exception)
 			{
 				if (bConvertErrorToNull)
 					prototype = null;
@@ -566,7 +570,7 @@ namespace Ontology
 				return SerializationAction.Recurse;
 
 			System.Type t = obj.GetType();
-			string ns = t.Namespace;
+			string ? ns = t.Namespace;
 
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(System.Collections.Generic.KeyValuePair<,>))
 				return SerializationAction.Recurse;
@@ -602,22 +606,22 @@ namespace Ontology
 			if (action == SerializationAction.Atom)
 			{
 				if (obj is string)
-					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((string)obj).Clone();
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((string)obj).ShallowClone();
 
 				if (obj is bool)
-					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((bool)obj).Clone();
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((bool)obj).ShallowClone();
 
 				if (obj is int)
-					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj).Clone();
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj).ShallowClone();
 
 				if (obj is Enum)
-					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj).Clone();
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((int)obj).ShallowClone();
 
 				if (obj is double)
-					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((double)obj).Clone();
+					return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeValuePrototype((double)obj).ShallowClone();
 
 				Prototype protoType = NativeValuePrototype.GetOrCreateTypePrototype(obj.GetType());
-				return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeObjectPrototype(obj, protoType).Clone();
+				return (NativeValuePrototype)NativeValuePrototype.GetOrCreateNativeObjectPrototype(obj, protoType).ShallowClone();
 			}
 
 			if (obj is System.Collections.IEnumerable && obj is not string)
@@ -638,7 +642,7 @@ namespace Ontology
 			{
 				if (el != null)
 				{
-					NativeValuePrototype protoChild = ToPrototypeCircular(el, m_mapObjectIdToPrototype, m_mapInstanceNameToPrototype);
+					NativeValuePrototype ? protoChild = ToPrototypeCircular(el, m_mapObjectIdToPrototype, m_mapInstanceNameToPrototype);
 					if (protoChild != null)
 						protoResult.Children.Add(protoChild);
 				}

@@ -150,14 +150,22 @@ namespace Ontology
 			}
 		}
 
-		public Prototype InsertTypeOf(Prototype protoParent, bool bOverrideSafety = false)
+		//N20260110-01 - A switch to allow us to change the TypeOfs
+		private bool m_bIsMutable = false;
+		public bool IsMutable
 		{
-			return InsertTypeOf(protoParent.PrototypeID, bOverrideSafety);
+			get { return m_bIsMutable; }
+			set { m_bIsMutable = value; }
 		}
 
-		public virtual Prototype InsertTypeOf(int iParentPrototypeID, bool bOverrideSafety = false)
+		public Prototype InsertTypeOf(Prototype protoParent)
 		{
-			if (m_bIsCopy && !bOverrideSafety)
+			return InsertTypeOf(protoParent.PrototypeID);
+		}
+
+		public virtual Prototype InsertTypeOf(int iParentPrototypeID)
+		{
+			if (m_bIsCopy && !m_bIsMutable)
 				throw new InvalidOperationException("Cannot insert type of on a copy of a prototype.");
 
 			if (!this.TypeOfsCollection.Contains(iParentPrototypeID))
@@ -294,7 +302,7 @@ namespace Ontology
 			prototype.m_mapAssociations = protoSource.m_mapAssociations;
 			prototype.m_mapPartOfValues = protoSource.m_mapPartOfValues;
 			prototype.m_mapData = protoSource.m_mapData;
-			prototype.m_protoParent = protoSource.m_protoParent;
+			prototype.m_protoParent = null;
 			prototype.m_lstTypeOfs = protoSource.m_lstTypeOfs;
 			prototype.m_bIsCopy = true;
 			prototype.m_bIsInstance = protoSource.m_bIsInstance;
@@ -346,8 +354,9 @@ namespace Ontology
 		}
 		public virtual IEnumerable<int> GetAllParents()
 		{
-			//always use the singleton here 
-			Prototype prototype = Prototypes.GetPrototype(this.PrototypeID);
+			//always use the singleton here,
+			//N20260109-01 - unless we've marked mutable
+			Prototype prototype = (m_bIsMutable ? this : Prototypes.GetPrototype(this.PrototypeID));
 
 			if (null == prototype.m_lstCachedParents)
 				prototype.m_lstCachedParents = prototype.GetAllParentsCircular(new List<int>());

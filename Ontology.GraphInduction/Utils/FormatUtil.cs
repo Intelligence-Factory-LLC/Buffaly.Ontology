@@ -114,67 +114,70 @@ namespace Ontology.GraphInduction.Utils
 
 		}
 
-		//public static StringBuilder ToFriendlyString(HCPTree.Node node, int iLevels, int i = 1)
-		//{
-		//	StringBuilder sb = new StringBuilder();
+		public static StringBuilder ToFriendlyString(HCPTree.Node node, int iLevels, int i = 1)
+		{
+			StringBuilder sb = new StringBuilder();
 
-		//	if (null != node.Categorization)
-		//	{
-		//		sb.Append(new string('\t', iLevels)).Append(i).Append(": ").AppendLine("Categorization:");
+			if (null != node.Categorization)
+			{
+				string strCategorization = FormatUtil.FormatPrototype(node.Categorization, iLevels).ToString();
+				if (strCategorization.Count(x => x == '\n') > 1)
+				{
+					sb.Append(new string('\t', iLevels)).AppendLine($"Categorization {i}:");
+					sb.Append(new string('\t', ++iLevels));
+					sb.Append(strCategorization).AppendLine();
+					--iLevels;
+				}
+				else
+					sb.Append(new string('\t', iLevels)).Append(i).Append(": ").AppendLine(strCategorization.Trim());
+			}
 
-		//		iLevels++;
-		//		sb.Append(new string('\t', iLevels));
-		//		sb.Append(FormatUtil.FormatPrototype(node.Categorization, iLevels)).AppendLine();
+			if (null != node.Unpacked)
+			{
+				sb.Append(new string('\t', iLevels));
+				sb.AppendLine("Unpacked:");
+				sb.Append(new string('\t', ++iLevels));
+				sb.Append(FormatUtil.FormatPrototype(node.Unpacked, iLevels)).AppendLine();
+				--iLevels;
+			}
 
-		//		--iLevels;
-		//	}
+			if (null != node.Context)
+			{
+				sb.Append(new string('\t', iLevels));
+				sb.AppendLine("Context:");
+				sb.Append(new string('\t', ++iLevels));
+				sb.Append(FormatUtil.FormatPrototype(node.Context, iLevels)).AppendLine();
+				--iLevels;
+			}
 
-		//	if (null != node.Unpacked)
-		//	{
-		//		sb.Append(new string('\t', iLevels));
-		//		sb.AppendLine("Unpacked:");
-		//		sb.Append(new string('\t', ++iLevels));
-		//		sb.Append(FormatUtil.FormatPrototype(node.Unpacked, iLevels)).AppendLine();
-		//		--iLevels;
-		//	}
-
-		//	if (null != node.Context)
-		//	{
-		//		sb.Append(new string('\t', iLevels));
-		//		sb.AppendLine("Context:");
-		//		sb.Append(new string('\t', ++iLevels));
-		//		sb.Append(FormatUtil.FormatPrototype(node.Context, iLevels)).AppendLine();
-		//		--iLevels;
-		//	}
-
-		//	if (null != node.Label)
-		//	{
-		//		sb.Append(new string('\t', iLevels));
-		//		sb.AppendLine("Label:");
-		//		sb.Append(new string('\t', ++iLevels));
-		//		sb.Append(FormatUtil.FormatPrototype(node.Label, iLevels)).AppendLine();
-		//		--iLevels;
-		//	}
+			if (null != node.Label)
+			{
+				sb.Append(new string('\t', iLevels));
+				sb.AppendLine("Label:");
+				sb.Append(new string('\t', ++iLevels));
+				sb.Append(FormatUtil.FormatPrototype(node.Label, iLevels)).AppendLine();
+				--iLevels;
+			}
 
 
-		//	if (node.Children.Count > 0)
-		//	{
-		//		sb.Append(new string('\t', iLevels)).AppendLine("Children:");
+			if (node.Children.Count > 0)
+			{
+				sb.Append(new string('\t', iLevels)).AppendLine("Children:");
 
-		//		iLevels++;
-		//		int iSubI = 1;
-		//		foreach (HCPTree.Node nodeChild in node.Children)
-		//		{
-		//			sb.Append(ToFriendlyString(nodeChild, iLevels, iSubI));
-		//			iSubI++;
-		//		}
-		//		--iLevels;
-		//	}
+				iLevels++;
+				int iSubI = 1;
+				foreach (HCPTree.Node nodeChild in node.Children)
+				{
+					sb.Append(ToFriendlyString(nodeChild, iLevels, iSubI));
+					iSubI++;
+				}
+				--iLevels;
+			}
 
-		//	return sb;
-		//}
+			return sb;
+		}
 
-	
+
 
 		public static StringBuilder ToFriendlyString(HCP hcp, HCPFormatting formatting)
 		{

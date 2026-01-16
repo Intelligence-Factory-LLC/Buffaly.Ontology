@@ -1,7 +1,8 @@
 using BasicUtilities;
-using WebAppUtilities;
 using BasicUtilities.Collections;
 using Ontology.Utils;
+using System.Linq;
+using WebAppUtilities;
 
 namespace Ontology
 {
@@ -13,7 +14,7 @@ namespace Ontology
 				return true;
 
 			if (proto1 == null || proto2 == null)
-				return false; 
+				return false;
 
 			if (!Prototypes.AreShallowEqual(proto1, proto2))
 			{
@@ -45,7 +46,7 @@ namespace Ontology
 
 					if (null == prop1 && null == prop2)
 					{
-						continue; 
+						continue;
 					}
 
 					if (!AreEqual(prop1, prop2, bLog))
@@ -349,9 +350,9 @@ namespace Ontology
 			}
 		}
 
-		public static Prototype ? ComparePrototypes(Prototype prototype1, Prototype prototype2, bool bShallow = false)
+		public static Prototype? ComparePrototypes(Prototype prototype1, Prototype prototype2, bool bShallow = false)
 		{
-			Prototype ? result = null;
+			Prototype? result = null;
 
 			if (prototype1 == null || prototype2 == null)
 				return null;
@@ -381,26 +382,26 @@ namespace Ontology
 
 				foreach (var key in setProperties)
 				{
-					Prototype ? protoValue1 = prototype1.Properties[key];
-					Prototype ? protoValue2 = prototype2.Properties[key];
+					Prototype? protoValue1 = prototype1.Properties[key];
+					Prototype? protoValue2 = prototype2.Properties[key];
 
 					if (null != protoValue1 && null != protoValue2)
 					{
 
-						
-							Prototype child = ComparePrototypes(protoValue1, protoValue2);
 
-							//N20190426-08
-							if (null == child)
-							{
-								result.Properties.Remove(key);
-							}
-							else
-							{
-								result.Properties[key] = child;
-							}
+						Prototype child = ComparePrototypes(protoValue1, protoValue2);
 
-						
+						//N20190426-08
+						if (null == child)
+						{
+							result.Properties.Remove(key);
+						}
+						else
+						{
+							result.Properties[key] = child;
+						}
+
+
 					}
 				}
 
@@ -608,7 +609,7 @@ namespace Ontology
 			return lstResults;
 		}
 
-		public static Prototype ? GetValue(Prototype prototype, Prototype path)
+		public static Prototype? GetValue(Prototype prototype, Prototype path)
 		{
 			if (path.PrototypeID == Compare.Entity.PrototypeID)
 				return prototype;
@@ -628,7 +629,7 @@ namespace Ontology
 					if (pair.Value.PrototypeID == Compare.Exact.PrototypeID)
 						continue;
 
-					Prototype ? protoValue = prototype.Properties[pair.Key];
+					Prototype? protoValue = prototype.Properties[pair.Key];
 					if (null == protoValue)
 					{
 						return null;
@@ -736,12 +737,12 @@ namespace Ontology
 
 			//N20190426-01 - Make sure there is a common base type here
 			if (!Prototypes.TypeOf(prototype, shadow) && !Prototypes.TypeOf(shadow, prototype))
-				throw new Exception("Prototype and shadow must match except leaves");		
+				throw new Exception("Prototype and shadow must match except leaves");
 
 			foreach (var pair in prototype.Properties)
 			{
 				if (pair.Key == Compare.Comparison.PrototypeID)
-					continue; 
+					continue;
 
 				List<Prototype> lstChildParameters = FindOrphanedLeaves(prototype.Properties[pair.Key], shadow.Properties[pair.Key]);
 
@@ -759,7 +760,7 @@ namespace Ontology
 			}
 
 
-			Prototype protoChildren = shadow.ShallowClone(); 
+			Prototype protoChildren = shadow.ShallowClone();
 
 			for (int i = 0; i < shadow.Children.Count && i < prototype.Children.Count; i++)
 			{
@@ -782,13 +783,13 @@ namespace Ontology
 					lstParameters.Add(prototypePath);
 				}
 
-				protoChildren.Children.Add(Compare.Ignore.Prototype.Clone()); 
+				protoChildren.Children.Add(Compare.Ignore.Prototype.Clone());
 			}
 
 			//N20190809-04 - Remove excess children
 			for (int i = shadow.Children.Count; i < prototype.Children.Count; i++)
 			{
-				protoChildren.Children.Add(Compare.Entity.Prototype.Clone());				
+				protoChildren.Children.Add(Compare.Entity.Prototype.Clone());
 			}
 
 			if (shadow.Children.Count < prototype.Children.Count)
@@ -797,7 +798,7 @@ namespace Ontology
 			return lstParameters;
 		}
 
-	
+
 		public static List<Prototype> GetLeaves(Prototype prototype)
 		{
 			List<Prototype> lstPrototypes = new List<Prototype>();
@@ -899,47 +900,47 @@ namespace Ontology
 			return strName;
 		}
 
-        public static Prototype GetParentPath(Prototype protoPath)
-        {
-            Prototype protoParentPath = protoPath.Clone();
+		public static Prototype GetParentPath(Prototype protoPath)
+		{
+			Prototype protoParentPath = protoPath.Clone();
 
-            foreach (var pair in protoPath.Properties)
-            {
-                Prototype protoChildPath = GetParentPath(pair.Value);
-                if (null == protoChildPath)
-                {
-                    protoParentPath = Compare.Entity.Prototype;
-                }
-                else
-                {
-                    protoParentPath.Properties[pair.Key] = protoChildPath;
-                }
+			foreach (var pair in protoPath.Properties)
+			{
+				Prototype protoChildPath = GetParentPath(pair.Value);
+				if (null == protoChildPath)
+				{
+					protoParentPath = Compare.Entity.Prototype;
+				}
+				else
+				{
+					protoParentPath.Properties[pair.Key] = protoChildPath;
+				}
 
-                return protoParentPath;
-            }
+				return protoParentPath;
+			}
 
-            for (int i = 0; i < protoPath.Children.Count; i++)
-            {
-                Prototype protoChild = protoPath.Children[i];
+			for (int i = 0; i < protoPath.Children.Count; i++)
+			{
+				Prototype protoChild = protoPath.Children[i];
 
-                if (protoChild.PrototypeID != Compare.Ignore.PrototypeID)
-                {
-                    Prototype protoChildPath = GetParentPath(protoChild);
-                    if (null == protoChild)
-                    {
-                        protoParentPath = Compare.Entity.Prototype;
-                    }
-                    else
-                    {
-                        protoParentPath.Children[i] = protoChildPath;
-                    }
+				if (protoChild.PrototypeID != Compare.Ignore.PrototypeID)
+				{
+					Prototype protoChildPath = GetParentPath(protoChild);
+					if (null == protoChild)
+					{
+						protoParentPath = Compare.Entity.Prototype;
+					}
+					else
+					{
+						protoParentPath.Children[i] = protoChildPath;
+					}
 
-                    return protoParentPath;
-                }
-            }
+					return protoParentPath;
+				}
+			}
 
-            return null;
-        }
+			return null;
+		}
 
 
 
@@ -981,7 +982,7 @@ namespace Ontology
 				{
 					if (prototype.Properties[pair.Key] != null)
 					{
-						 if(pair.Value != null)
+						if (pair.Value != null)
 						{
 							List<Prototype> lstChildParameters = MinusCircular(prototype.Properties[pair.Key], pair.Value, setHashes, bShallow);
 
@@ -1088,7 +1089,7 @@ namespace Ontology
 					if (shadow.Properties[pair.Key] == null && pair.Key != Compare.Comparison.PrototypeID)
 					{
 						Prototype prototypePath = shadow.ShallowClone();
-						prototypePath.Properties[pair.Key] = pair.Value.ShallowClone();	//Use shallow here
+						prototypePath.Properties[pair.Key] = pair.Value.ShallowClone(); //Use shallow here
 						lstParameters.Add(prototypePath);
 					}
 				}
@@ -1191,16 +1192,34 @@ namespace Ontology
 
 			Prototype prototype = lstPrototypes.First();
 
-			//N20190109-01 - Continue comparing past a match
-			if (Prototypes.TypeOf(prototype, shadow))
-			{
-				if (lstPrototypes.Any(x => !Prototypes.AreShallowEqual(x, shadow)))
-				{
-					lstParameters.Add(Compare.Entity.Prototype.Clone());
-					if (bShallow)
-						return lstParameters;				
-				}
 
+			//N20231006-01 - Allow use to mark the entities with Compare.Entity in the shadow
+			//N20260110-01 - Moved this first, so we can non-destructively mark a graph with Compare.Entity to indicate parameters
+			if (shadow.TypeOf(Compare.Entity.Prototype))
+			{
+				lstParameters.Add(Compare.Entity.Prototype.Clone());
+				return lstParameters;
+			}
+
+			//N20190109-01 - Continue comparing past a match
+			else if (Prototypes.TypeOf(prototype, shadow))
+			{
+				//N20260116-01
+				//We want bShallow=false to return the *deepest* non-matching nodes (not every leaf).
+				//So we detect whether THIS node mismatches, but only return Compare.Entity at THIS node if there are
+				//no deeper mismatches. If bShallow=true, return immediately on first mismatch boundary.
+				bool bMismatchHere = false;
+
+				if ((shadow.TypeOf(Ontology.Collection.Prototype) && lstPrototypes.Any(x => !Prototypes.TypeOf(x, shadow))) ||
+					(!shadow.TypeOf(Ontology.Collection.Prototype) && lstPrototypes.Any(x => !Prototypes.AreShallowEqual(x, shadow))))
+				{
+					bMismatchHere = true;
+					if (bShallow)
+					{
+						lstParameters.Add(Compare.Entity.Prototype.Clone());
+						return lstParameters;
+					}
+				}
 
 				//N20190122-01
 				foreach (var pair in prototype.Properties)
@@ -1208,20 +1227,27 @@ namespace Ontology
 					if (shadow.Properties[pair.Key] == null && pair.Value != null)
 					{
 						//Entity can be added by the block above
-						if (!lstParameters.Any(x => x.PrototypeID == Compare.Entity.PrototypeID))
+						bMismatchHere = true;
+
+						if (bShallow)
 						{
 							lstParameters.Add(Compare.Entity.Prototype.Clone());
-
-							if (bShallow)
-								return lstParameters;
+							return lstParameters;
 						}
 
 						break;
 					}
 				}
 
+				//N20260116-01
+				//Collect deeper parameters separately. If any deeper mismatches exist, return only those.
+				List<Prototype> lstDeepParameters = new List<Prototype>();
+
 				foreach (var pair in shadow.Properties)
 				{
+					if (pair.Key == Compare.Comparison.PrototypeID)
+						continue;
+
 					if (prototype.Properties[pair.Key] != null)
 					{
 						{
@@ -1236,44 +1262,32 @@ namespace Ontology
 								Prototype prototypePath = shadow.ShallowClone();
 								prototypePath.Properties[pair.Key] = child;
 
-								lstParameters.Add(prototypePath);
+								lstDeepParameters.Add(prototypePath);
 							}
 						}
 					}
 				}
 
 
-				//N-20181231-01, N20181218-01
-				if (Prototypes.TypeOf(shadow, Ontology.Collection.Prototype) &&
-					shadow.Properties[Compare.Comparison.PrototypeID]?.PrototypeID == Compare.StartsWith.PrototypeID
-
-					//NN20200801-02 - StartsWith indicates at least one example had the element while others didn't so 
-					//the whole collection is required as a parameter
-					/* && shadow.Children.Count != prototype.Children.Count */)
-				{
-					//Entity can be added by the block above
-					if (!lstParameters.Any(x => x.PrototypeID == Compare.Entity.PrototypeID))
-					{
-						lstParameters.Add(Compare.Entity.Prototype.Clone());
-					}
-				}
-				//N20190420-01
-				else if (shadow.Children.Count == 0 && shadow.Properties[Compare.Comparison.PrototypeID]?.PrototypeID == Compare.Exact.PrototypeID)
-				{
-					if (prototype.Children.Count == 0)
-					{
-						//N20200216-02
-					}
-					//Entity can be added by the block above
-					else if (!lstParameters.Any(x => x.PrototypeID == Compare.Entity.PrototypeID))
-					{
-						lstParameters.Add(Compare.Entity.Prototype.Clone());
-					}
-				}
 
 				//N20190914-01
-				else if (Prototypes.TypeOf(prototype, Ontology.Collection.Prototype))
+				if (Prototypes.TypeOf(prototype, Ontology.Collection.Prototype))
 				{
+					if (Prototypes.TypeOf(prototype, Ontology.Collection.Prototype) &&
+						(shadow.Properties[Compare.Comparison.PrototypeID]?.PrototypeID ?? Compare.Exact.PrototypeID) == Compare.Exact.PrototypeID)
+					{
+						int expected = prototype.Children.Count;
+						if (lstPrototypes.Any(x => x.Children.Count != expected))
+						{
+							bMismatchHere = true;
+							if (bShallow)
+							{
+								lstParameters.Add(Compare.Entity.Prototype.Clone());
+								return lstParameters;
+							}
+						}
+					}
+
 					for (int i = 0; i < shadow.Children.Count && i < prototype.Children.Count; i++)
 					{
 						List<Prototype> lstChildren = lstPrototypes.Select(x => x.Children[i]).ToList();
@@ -1292,14 +1306,32 @@ namespace Ontology
 
 							//Keep the child parameters separate until after this node has been added so that it doesn't add
 							//this node to parameters on a different path -- I don't know if it would anyways	
-							lstParameters.Add(prototypePath);
+							lstDeepParameters.Add(prototypePath);
 						}
 					}
 				}
+
+				//N20260116-01
+				//If we found any deeper mismatches, return ONLY those (deepest-only behavior).
+				if (lstDeepParameters.Count > 0)
+				{
+					lstParameters.AddRange(lstDeepParameters);
+					return lstParameters;
+				}
+
+				//N20260116-01
+				//No deeper mismatches exist; if this node mismatched, return Compare.Entity at this node boundary.
+				if (bMismatchHere)
+				{
+					lstParameters.Add(Compare.Entity.Prototype.Clone());
+					return lstParameters;
+				}
+
+				//If the node matches and nothing below differs, return no parameters.
 			}
 
-			//N20231006-01 - Allow use to mark the entities with Compare.Entity in the shadow
-			else if (shadow.ShallowEqual(Compare.Entity.Prototype))
+			//If prototype doesn't categorize under shadow, this is a mismatch boundary at this node.
+			else
 			{
 				lstParameters.Add(Compare.Entity.Prototype.Clone());
 			}
@@ -1329,7 +1361,7 @@ namespace Ontology
 					}
 				}
 
-				for (int i = prototype.Children.Count-1; i >= 0; i--)
+				for (int i = prototype.Children.Count - 1; i >= 0; i--)
 				{
 					if (i >= path.Children.Count)
 						continue;
@@ -1344,7 +1376,7 @@ namespace Ontology
 					if (childPath.PrototypeID == Compare.Entity.PrototypeID)
 					{
 						prototype.Children.RemoveAt(i);
-						continue; 
+						continue;
 					}
 
 					RemovePath(child, childPath);
@@ -1356,7 +1388,7 @@ namespace Ontology
 			throw new Exception($"Prototype {prototype.PrototypeName} does not match path {path.PrototypeName}");
 		}
 
-	
+
 		static public Prototype Merge(Prototype shadow, Prototype value)
 		{
 			//See N20190425-02 for expected behavior
@@ -1372,7 +1404,7 @@ namespace Ontology
 
 			if (value.PrototypeID == Compare.Ignore.PrototypeID && shadow.PrototypeID == Compare.Ignore.PrototypeID)
 				return Compare.Ignore.Prototype;
-				//throw new Exception("Both shadow and value are to be ignored");
+			//throw new Exception("Both shadow and value are to be ignored");
 
 			if (value.PrototypeID == Compare.Ignore.PrototypeID)
 				return shadow.Clone();
@@ -1391,7 +1423,7 @@ namespace Ontology
 
 			else
 				protoResult = value.ShallowClone();
-			
+
 			Set<int> setProperties = new Set<int>();
 			foreach (var pair in shadow.Properties)
 			{
@@ -1399,12 +1431,12 @@ namespace Ontology
 				if (pair.Key == Compare.Entity.PrototypeID)
 					continue;
 
-				setProperties.Add(pair.Key);			
+				setProperties.Add(pair.Key);
 			}
 
 			foreach (var pair in value.Properties)
 			{
-				setProperties.Add(pair.Key);				
+				setProperties.Add(pair.Key);
 			}
 
 			foreach (int iKey in setProperties)
@@ -1429,7 +1461,7 @@ namespace Ontology
 			{
 				protoResult.Children.Add(shadow.Children[i]);
 			}
-			
+
 			return protoResult;
 		}
 
@@ -1561,7 +1593,7 @@ namespace Ontology
 					//N20190510-03 - Add properties if needed
 					if (protoProp == null)
 					{
-						protoProp = pairPath.Value.Clone(); 
+						protoProp = pairPath.Value.Clone();
 					}
 
 					Prototype protoResult = SetValue(protoProp, pairPath.Value, value, bMergeAugmentedProperties, bMerge);
@@ -1582,5 +1614,4 @@ namespace Ontology
 			return result;
 		}
 	}
-}    
-		
+}

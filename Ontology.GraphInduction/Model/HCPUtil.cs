@@ -8,16 +8,15 @@ namespace Ontology.GraphInduction.Model
 	{
 		static public HCP Create(List<Prototype> lstPrototypes, Prototype protoShadow, string strNamespace)
 		{
-			HCP? hcp = HCPUtil.CreateHcpFromShadow(strNamespace, protoShadow, lstPrototypes, true);
-			if (hcp != null)
-				HCPs.Add(hcp);
+			HCP hcp = HCPUtil.CreateHcpFromShadow(strNamespace, protoShadow, lstPrototypes, true);
+			HCPs.Add(hcp);
 			return hcp;
 		}
 
-		private static HCP? CreateHcpFromShadow(string strNamespace, Prototype shadow, List<Prototype> lstExamples, bool bIncludeInstances = true)
+		private static HCP CreateHcpFromShadow(string strNamespace, Prototype shadow, List<Prototype> lstExamples, bool bIncludeInstances = true)
 		{
 			if (lstExamples == null || lstExamples.Count == 0)
-				return null;
+				throw new Exception(strNamespace + ": Cannot create HCP from empty example list");
 
 			if (shadow.PrototypeID == Hidden.Base.PrototypeID)
 			{
@@ -31,9 +30,10 @@ namespace Ontology.GraphInduction.Model
 			}
 
 			string strShortForm = PrototypeGraphs.GetHash(shadow);
-			Prototype protoHiddenBase = Prototypes.GetOrInsertPrototype(strNamespace + "." + strShortForm);
+			Prototype protoHiddenBase = Prototypes.GetOrInsertPrototype(strNamespace + "." + strShortForm, Hidden.Base.PrototypeName);
 
-			List<Prototype> paths = PrototypeGraphs.Parameterize(lstExamples, shadow, true);
+			//If we use shallow here, it stops at every instance
+			List<Prototype> paths = PrototypeGraphs.Parameterize(lstExamples, shadow, false);
 
 			// If we include instances, infer HiddenShadow by comparing the instance graphs.
 			// If not, at least set HiddenShadow to the base prototype so Paths keys are stable.
@@ -68,6 +68,40 @@ namespace Ontology.GraphInduction.Model
 			return hcp;
 		}
 
-	
+		public static HCPTree.Node ExtractNewHCPs(string strNamespace, HCPTree.Node tree, bool bMaterialize = true)
+		{
+			Prototype protoShadow = tree.Categorization;
+
+			if (!Prototypes.TypeOf(protoShadow, Hidden.Base.Prototype) && tree.Children.Count > 0)
+			{
+				List<Prototype> lstExamples = HCPTrees.GetLeaves(tree).Select(x => x.Categorization).ToList();
+				HCP hcp = HCPUtil.Create(lstExamples, protoShadow, strNamespace);
+
+
+				if (HCPs.HCPCollection.ContainsKey(hcp.HiddenShadow.PrototypeID))
+					hcp = HCPs.Get(hcp.HiddenShadow.PrototypeID);
+
+				if (!PrototypeGraphs.AreEqual(protoShadow, hcp.HiddenShadow))
+				{
+					tree.Categorization = hcp.HiddenShadow;
+					tree.Unpacked = hcp.Shadow;
+				}
+				else
+				{
+					tree.Unpacked = hcp.Shadow;
+				}
+
+				HCPs.Add(hcp, bMaterialize);
+			}
+
+			foreach (HCPTree.Node node in tree.Children)
+			{
+				ExtractNewHCPs(strNamespace, node, bMaterialize);
+			}
+
+			return tree;
+		}
+
+
 	}
 }

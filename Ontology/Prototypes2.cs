@@ -71,7 +71,7 @@ namespace Ontology
 				return null;
 
 			object existing;
-			if (m_mapPrototypeToObjects.TryGetValue(prototype.PrototypeID, out existing))
+			if (prototype.IsInstance() && m_mapPrototypeToObjects.TryGetValue(prototype.PrototypeID, out existing))
 				return existing;
 
 			// Recover the CLR type name from "Namespace.Type[...]" or "Namespace.Type"
@@ -154,12 +154,13 @@ namespace Ontology
 
 		static private object? FromPrototypeCircular(Prototype prototype, Map<int, object> m_mapPrototypeToObjects, System.Type? expectedType)
 		{
-			if (prototype == null)
+			if (prototype == null || prototype.ShallowEqual(Compare.Entity.Prototype))
 				return null;
 
 			// circular break by prototype id (graph identity)
+			//N20260114-01 - Don't trigger this cache for non-instances
 			object existing;
-			if (m_mapPrototypeToObjects.TryGetValue(prototype.PrototypeID, out existing))
+			if (prototype.IsInstance() && m_mapPrototypeToObjects.TryGetValue(prototype.PrototypeID, out existing))
 				return existing;
 
 			if (prototype is NativeValuePrototype nvp)
@@ -206,18 +207,7 @@ namespace Ontology
 				return MaterializeCollection(prototype, m_mapPrototypeToObjects, expectedType);
 			}
 
-			// Otherwise: treat as an object-like prototype and reconstruct by reflection
-			// (If it isn't a NativeValuePrototype, we still can attempt if its name maps to a CLR type.)
-			if (prototype is not NativeValuePrototype)
-			{
-				// If you want to strictly require NativeValuePrototype for reflection objects, throw here.
-				// For now, attempt to wrap it.
-				NativeValuePrototype wrapper = prototype as NativeValuePrototype;
-				if (wrapper == null)
-					throw new Exception("Cannot reflect FromPrototype for non-NativeValuePrototype: " + prototype.PrototypeName);
-			}
-
-			return FromPrototypeByReflection((NativeValuePrototype)prototype, m_mapPrototypeToObjects);
+			return FromPrototypeByReflection(prototype, m_mapPrototypeToObjects);
 		}
 
 		static private object MaterializeCollection(Prototype prototype, Map<int, object> m_mapPrototypeToObjects, System.Type? expectedType)

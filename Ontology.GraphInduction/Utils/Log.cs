@@ -1,4 +1,5 @@
 ﻿using Ontology.GraphInduction.Model;
+using System.Text;
 
 namespace Ontology.GraphInduction.Utils
 {
@@ -12,10 +13,10 @@ namespace Ontology.GraphInduction.Utils
 		}
 
 
-		//public static void Log(HCPTree.Node node)
-		//{
-		//	Logs.DebugLog.WriteEvent("HCPTree", "\r\n" + FormatUtil.ToFriendlyString(node, 0).ToString());
-		//}
+		public static void Log(HCPTree.Node node)
+		{
+			Logs.DebugLog.WriteEvent("HCPTree", "\r\n" + FormatUtil.ToFriendlyString(node, 0).ToString());
+		}
 
 
 		static public void Log(Prototype ? prototype)
@@ -26,10 +27,13 @@ namespace Ontology.GraphInduction.Utils
 		static public void Log(IEnumerable<Prototype> lstPrototypes)
 		{
 			int i = 0; 
+			StringBuilder sb = new StringBuilder();
 			foreach (Prototype child in lstPrototypes)
 			{
-				Logs.DebugLog.WriteEvent("Prototype " + i++ + " (" + child.Value + ")", "\r\n" + FormatUtil.FormatPrototype(child).ToString());
+				sb.AppendLine($"Prototype {i++} ({child.Value})");
+				sb.AppendLine(FormatUtil.FormatPrototype(child).ToString());
 			}
+			Logs.DebugLog.WriteEvent("Prototypes", sb.ToString());
 		}
 
 		static public void Log(Collection collection)
