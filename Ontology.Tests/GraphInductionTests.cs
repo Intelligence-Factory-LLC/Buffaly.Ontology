@@ -367,31 +367,215 @@ namespace Ontology.Tests
 
 			//From each tree extract an label all of the entities. 
 			List<HCPTree.Node> nodes1 = HCPTrees.GetNonLeaves(root1);
-			List<Prototype> lstHiddens = new List<Prototype>();
+			List<Prototype> lstEntities = new List<Prototype>();
 			foreach (HCPTree.Node node in nodes1)
 			{
 				List<Prototype> lstLeaves = HCPTreeUtil.GetLeavesAsHidden(node);
-				lstHiddens.AddRange(lstLeaves);
+				lstEntities.AddRange(lstLeaves);
 			}
 
 			List<HCPTree.Node> nodes2 = HCPTrees.GetNonLeaves(root2);
 			foreach (HCPTree.Node node in nodes2)
 			{
 				List<Prototype> lstLeaves = HCPTreeUtil.GetLeavesAsHidden(node);
-				lstHiddens.AddRange(lstLeaves);
+				lstEntities.AddRange(lstLeaves);
 			}
 
-			Map<int, List<Prototype>> mapECHPs = ExtractEntityCentricHiddenPrototypesHierarchies(lstHiddens);
+			Map<int, List<Prototype>> mapECHPs = ExtractEntityCentricHiddenPrototypesHierarchies(lstEntities);
 
 			foreach (var pair in mapECHPs)
 			{
 				Logs.DebugLog.WriteEvent(Prototypes.GetPrototypeName(pair.Key), PrototypeLogging.ToChildString(new Collection(pair.Value)));
 			}
 
+			//Finding latent subtypes 
+			//Add associations between each entity and the slots
+			PrototypeSet setSlots = new PrototypeSet();
+			foreach (var pair in mapECHPs)
+			{
+				Prototype protoSlotPrototype = Prototypes.GetPrototype(pair.Key);
+				setSlots.Add(protoSlotPrototype);
+				foreach (Prototype protoEntity in pair.Value)
+				{
+					//Get the singleton
+					Prototype protoEntitySingleton = Prototypes.GetPrototype(protoEntity.PrototypeID);
+					protoSlotPrototype.BidirectionalAssociate(protoEntitySingleton);
+				}
+			}
 
 
+			foreach (Prototype prototype in setSlots)
+			{
+				foreach (var tuple in prototype.Associations)
+				{
+					Logs.DebugLog.WriteEvent("Association", prototype.PrototypeName + " -> " + tuple.Key.PrototypeName + " (" + tuple.Value + ")");
+				}
+			}
+
+			//Do a two step hop from a slot to find the largest overlapping sets
+			foreach (Prototype slot in setSlots)
+			{
+				// Hop 1: slot -> entities
+				List<Prototype> lstEntities1 = slot.Associations.Select(x => x.Key).ToList();
+
+				// Intersection counts: otherSlotId -> count shared entities
+				Map<int, int> mapIntersect = new Map<int, int>();
+
+				foreach (Prototype entity in lstEntities1)
+				{
+					// Hop 2: entity -> slots (since edges are bidirectional)
+					foreach (var assoc2 in entity.Associations)
+					{
+						Prototype other = assoc2.Key;
+
+						// Only count other nodes that are also slots we are tracking
+						if (!setSlots.Contains(other))
+							continue;
+
+						// Ignore self
+						if (other.PrototypeID == slot.PrototypeID)
+							continue;
+
+						if (mapIntersect.ContainsKey(other.PrototypeID))
+							mapIntersect[other.PrototypeID] = mapIntersect[other.PrototypeID] + 1;
+						else
+							mapIntersect[other.PrototypeID] = 1;
+					}
+				}
+
+				// Optional: compute Jaccard for ranking (unweighted)
+				int nA = slot.Associations.Count;
+
+				// Build ranked results
+				var ranked = mapIntersect
+					.Select(pair =>
+					{
+						Prototype otherSlot = Prototypes.GetPrototype(pair.Key);
+						int inter = pair.Value;
+
+						int nB = otherSlot.Associations.Count;
+						int union = nA + nB - inter;
+						double j = union > 0 ? (double)inter / (double)union : 0.0;
+
+						return new
+						{
+							OtherSlot = otherSlot,
+							Intersection = inter,
+							Jaccard = j,
+							OtherCount = nB
+						};
+					})
+					.OrderByDescending(x => x.Jaccard)
+					.ThenByDescending(x => x.Intersection)
+					.ToList();
+
+				// Log top overlaps for this slot
+				foreach (var res in ranked.Take(10))
+				{
+					Logs.DebugLog.WriteEvent(
+						"Overlap",
+						slot.PrototypeName + " ↔ " + res.OtherSlot.PrototypeName +
+						$" |∩|={res.Intersection} |A|={nA} |B|={res.OtherCount} J={res.Jaccard:F3}"
+					);
+				}
+			}
+
+
+			// ---- Call it for the specific overlaps you logged ----
+
+			Prototype slot_AddVar = Prototypes.GetPrototypeByPrototypeName("CSharp.Code.Hidden.5EB2F9E1745589129389BD4E5FFD4CE4.Field.1");
+			Prototype slot_Param = Prototypes.GetPrototypeByPrototypeName("CSharp.Code.Hidden.78BA054917E3C80A2C50BEBAB5AAB875.Field.0");
+			Prototype slot_StrVar = Prototypes.GetPrototypeByPrototypeName("CSharp.Code.Hidden.5A141C5500096E9FE1309E1E7482038F.Field.1");
+			Prototype slot_AddLit = Prototypes.GetPrototypeByPrototypeName("CSharp.Code.Hidden.5EB2F9E1745589129389BD4E5FFD4CE4.Field.0");
+			Prototype slot_StrLit = Prototypes.GetPrototypeByPrototypeName("CSharp.Code.Hidden.5A141C5500096E9FE1309E1E7482038F.Field.0");
+
+			DumpOverlap(mapECHPs, slot_AddVar, slot_Param);
+			DumpOverlap(mapECHPs, slot_AddVar, slot_StrVar);
+			DumpOverlap(mapECHPs, slot_AddLit, slot_StrLit);
+			DumpOverlap(mapECHPs, slot_Param, slot_StrVar);
+
+
+			//Finding one to one relationships (bijections)
 
 		}
+
+		// Dump the entity sets, intersection, and union for the overlaps you logged.
+		// Assumes:
+		// - mapECHPs: Map<int, List<Prototype>> from ExtractEntityCentricHiddenPrototypesHierarchies
+		// - setSlots: PrototypeSet containing the slot prototypes (Prototypes.GetPrototype(pair.Key))
+		// - PrototypeGraphs.AreEquivalentCircular is available (use AreEqual if you prefer)
+
+		static List<Prototype> GetSet(Map<int, List<Prototype>> mapECHPs, Prototype slot)
+		{
+			if (!mapECHPs.ContainsKey(slot.PrototypeID))
+				return new List<Prototype>();
+
+			// Deduplicate by structural equivalence (important if instances exist)
+			List<Prototype> src = mapECHPs[slot.PrototypeID];
+			List<Prototype> res = new List<Prototype>();
+			foreach (Prototype p in src)
+			{
+				if (!res.Any(x => PrototypeGraphs.AreEquivalentCircular(x, p)))
+					res.Add(p);
+			}
+			return res;
+		}
+
+		static List<Prototype> IntersectSets(List<Prototype> a, List<Prototype> b)
+		{
+			List<Prototype> inter = new List<Prototype>();
+			foreach (Prototype x in a)
+			{
+				if (b.Any(y => PrototypeGraphs.AreEquivalentCircular(y, x)))
+					inter.Add(x);
+			}
+			return inter;
+		}
+
+		static List<Prototype> UnionSets(List<Prototype> a, List<Prototype> b)
+		{
+			List<Prototype> uni = new List<Prototype>();
+			foreach (Prototype x in a)
+			{
+				if (!uni.Any(y => PrototypeGraphs.AreEquivalentCircular(y, x)))
+					uni.Add(x);
+			}
+			foreach (Prototype x in b)
+			{
+				if (!uni.Any(y => PrototypeGraphs.AreEquivalentCircular(y, x)))
+					uni.Add(x);
+			}
+			return uni;
+		}
+
+		static void DumpOverlap(
+			Map<int, List<Prototype>> mapECHPs,
+			Prototype slotA,
+			Prototype slotB)
+		{
+			List<Prototype> setA = GetSet(mapECHPs, slotA);
+			List<Prototype> setB = GetSet(mapECHPs, slotB);
+
+			List<Prototype> inter = IntersectSets(setA, setB);
+			List<Prototype> uni = UnionSets(setA, setB);
+
+			double j = uni.Count > 0 ? (double)inter.Count / (double)uni.Count : 0.0;
+
+			Logs.DebugLog.WriteEvent("SetA", slotA.PrototypeName + " |A|=" + setA.Count);
+			Logs.DebugLog.WriteEvent("SetA", PrototypeLogging.ToChildString(new Collection(setA)));
+
+			Logs.DebugLog.WriteEvent("SetB", slotB.PrototypeName + " |B|=" + setB.Count);
+			Logs.DebugLog.WriteEvent("SetB", PrototypeLogging.ToChildString(new Collection(setB)));
+
+			Logs.DebugLog.WriteEvent("Intersect", "|∩|=" + inter.Count);
+			Logs.DebugLog.WriteEvent("Intersect", PrototypeLogging.ToChildString(new Collection(inter)));
+
+			Logs.DebugLog.WriteEvent("Union", "|∪|=" + uni.Count + " J=" + j.ToString("F3"));
+			Logs.DebugLog.WriteEvent("Union", PrototypeLogging.ToChildString(new Collection(uni)));
+		}
+
+	
+
 
 		static public Map<int, List<Prototype>> ExtractEntityCentricHiddenPrototypesHierarchies(List<Prototype> lstInstances)
 		{
