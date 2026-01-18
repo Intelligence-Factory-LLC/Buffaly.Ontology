@@ -1,4 +1,5 @@
 ﻿using BasicUtilities;
+using BasicUtilities.Collections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ontology.GraphInduction;
@@ -357,11 +358,66 @@ namespace Ontology.Tests
 			Logger.Log(root2);
 
 
-			root1 = HCPUtil.ExtractNewHCPs(Dimensions.CSharp_Code_Hidden, root1);
+			root1 = HCPTreeUtil.ExtractNewHCPs(Dimensions.CSharp_Code_Hidden, root1);
 			Logger.Log(root1);
 
-			root2 = HCPUtil.ExtractNewHCPs(Dimensions.CSharp_Code_Hidden, root2);
+			root2 = HCPTreeUtil.ExtractNewHCPs(Dimensions.CSharp_Code_Hidden, root2);
 			Logger.Log(root2);
+
+
+			//From each tree extract an label all of the entities. 
+			List<HCPTree.Node> nodes1 = HCPTrees.GetNonLeaves(root1);
+			List<Prototype> lstHiddens = new List<Prototype>();
+			foreach (HCPTree.Node node in nodes1)
+			{
+				List<Prototype> lstLeaves = HCPTreeUtil.GetLeavesAsHidden(node);
+				lstHiddens.AddRange(lstLeaves);
+			}
+
+			List<HCPTree.Node> nodes2 = HCPTrees.GetNonLeaves(root2);
+			foreach (HCPTree.Node node in nodes2)
+			{
+				List<Prototype> lstLeaves = HCPTreeUtil.GetLeavesAsHidden(node);
+				lstHiddens.AddRange(lstLeaves);
+			}
+
+			Map<int, List<Prototype>> mapECHPs = ExtractEntityCentricHiddenPrototypesHierarchies(lstHiddens);
+
+			foreach (var pair in mapECHPs)
+			{
+				Logs.DebugLog.WriteEvent(Prototypes.GetPrototypeName(pair.Key), PrototypeLogging.ToChildString(new Collection(pair.Value)));
+			}
+
+
+
+
+		}
+
+		static public Map<int, List<Prototype>> ExtractEntityCentricHiddenPrototypesHierarchies(List<Prototype> lstInstances)
+		{
+			//This version uses an AreEqual, not a AreShallowEqual
+			Map<int, List<Prototype>> mapEHCPs = new Map<int, List<Prototype>>();
+
+			foreach (Prototype protoInstance in lstInstances)
+			{
+				foreach (var pairProp in protoInstance.Properties)
+				{
+					if (null == pairProp.Value)
+						continue;
+
+					List<Prototype> protoECHPs = new List<Prototype>();
+					if (mapEHCPs.ContainsKey(pairProp.Key))
+						protoECHPs = mapEHCPs[pairProp.Key];
+
+					if (!protoECHPs.Any(x => PrototypeGraphs.AreEqual(x, pairProp.Value)))
+						protoECHPs.Add(pairProp.Value);
+
+					mapEHCPs[pairProp.Key] = protoECHPs;
+				}
+			}
+
+
+			return mapEHCPs;
 		}
 
 

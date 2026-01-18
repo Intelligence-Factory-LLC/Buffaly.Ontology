@@ -403,6 +403,24 @@ namespace Ontology.GraphInduction.Model
 			return lstAllChildren;
 		}
 
+		public static List<HCPTree.Node> GetNonLeaves(HCPTree.Node root)
+		{
+			List<HCPTree.Node> lstResults = new List<HCPTree.Node>();
+
+			if (root.Children.Count > 0)
+			{
+				foreach (HCPTree.Node node in root.Children)
+				{
+					if (node.Children.Count > 0)
+					{
+						lstResults.Add(node);
+						lstResults.AddRange(GetNonLeaves(node));
+					}
+				}
+			}
+
+			return lstResults;
+		}
 
 
 		static public List<HCPTree.Node> GetLeaves(HCPTree.Node root)

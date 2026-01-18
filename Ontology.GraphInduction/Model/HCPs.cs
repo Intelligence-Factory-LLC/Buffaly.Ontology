@@ -125,23 +125,23 @@ namespace Ontology.GraphInduction.Model
 		//	return hcp;
 		//}
 
-		//static public Prototype Convert(Prototype prototype, Prototype target)
-		//{
-		//	if (Prototypes.AreShallowEqual(prototype, target))
-		//		return prototype;
+		static public Prototype Convert(Prototype prototype, Prototype target)
+		{
+			if (Prototypes.AreShallowEqual(prototype, target))
+				return prototype;
 
-		//	Prototype protoUnpacked = null;
+			Prototype protoUnpacked;
 
-		//	if (Prototypes.TypeOf(prototype, Hidden.Base.Prototype))
-		//		protoUnpacked = HCPs.Unpack(prototype);
-		//	else
-		//		protoUnpacked = prototype;
+			if (Prototypes.TypeOf(prototype, Hidden.Base.Prototype))
+				protoUnpacked = HCPs.Unpack(prototype);
+			else
+				protoUnpacked = prototype;
 
-		//	HCP hcp = HCPs.Get(target.PrototypeID);
-		//	Prototype protoInstance = HCPs.GetHCPInstance(protoUnpacked, hcp);
+			HCP hcp = HCPs.Get(target.PrototypeID);
+			Prototype protoInstance = HCPs.GetHCPInstance(protoUnpacked, hcp);
 
-		//	return protoInstance;
-		//}
+			return protoInstance;
+		}
 
 
 		static public Prototype GetHCPInstance(Prototype prototype, HCP hcp)

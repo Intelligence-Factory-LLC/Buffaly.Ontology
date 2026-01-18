@@ -1208,10 +1208,11 @@ namespace Ontology
 				//We want bShallow=false to return the *deepest* non-matching nodes (not every leaf).
 				//So we detect whether THIS node mismatches, but only return Compare.Entity at THIS node if there are
 				//no deeper mismatches. If bShallow=true, return immediately on first mismatch boundary.
+				//N20260117-01
+				//Switched to ShallowEquivalent because it was pulling every composite object as different
 				bool bMismatchHere = false;
 
-				if ((shadow.TypeOf(Ontology.Collection.Prototype) && lstPrototypes.Any(x => !Prototypes.TypeOf(x, shadow))) ||
-					(!shadow.TypeOf(Ontology.Collection.Prototype) && lstPrototypes.Any(x => !Prototypes.AreShallowEqual(x, shadow))))
+				if (lstPrototypes.Any(x => !x.ShallowEquivalent(shadow)))
 				{
 					bMismatchHere = true;
 					if (bShallow)
