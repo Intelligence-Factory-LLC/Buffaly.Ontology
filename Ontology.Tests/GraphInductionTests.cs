@@ -381,6 +381,7 @@ namespace Ontology.Tests
 				lstEntities.AddRange(lstLeaves);
 			}
 
+			//This just extracts entities, it doesn't do any equivalence to find latent subtypes. 
 			Map<int, List<Prototype>> mapECHPs = ExtractEntityCentricHiddenPrototypesHierarchies(lstEntities);
 
 			foreach (var pair in mapECHPs)
@@ -388,6 +389,7 @@ namespace Ontology.Tests
 				Logs.DebugLog.WriteEvent(Prototypes.GetPrototypeName(pair.Key), PrototypeLogging.ToChildString(new Collection(pair.Value)));
 			}
 
+			//N20260118-01- New mechanism to find latent subtypes. The old did exact or partial set overlaps. This does Jaccard similarity 
 			//Finding latent subtypes 
 			//Add associations between each entity and the slots
 			PrototypeSet setSlots = new PrototypeSet();
@@ -496,8 +498,352 @@ namespace Ontology.Tests
 
 
 			//Finding one to one relationships (bijections)
+			//unsolved
+
+
+			//N20260120-01 - Computing metrics
+			//Calculate compression gain on each HCP 
+			LogCompressionGainPerTree("sqlParams.Add tree", root1);
+			LogCompressionGainPerTree("parameter declaration tree", root2);
+
+			//Calculate next statement prediction 
+			LogNextStatementPredictionByLevel("sqlParams.Add tree", protoAddresses, root1);
+			LogNextStatementPredictionByLevel("parameter declaration tree", protoAddresses, root2);
+
+
+			//Calculate prediction of each slot sequence
+			LogSlotLevelNextEntityPredictionByHcpLevel("sqlParams.Add tree", protoAddresses, root1);
+			LogSlotLevelNextEntityPredictionByHcpLevel("parameter declaration tree", protoAddresses, root2);
 
 		}
+
+		public sealed class SlotSeqStats
+		{
+			public Prototype Hcp = null!;
+			public int SlotId;
+			public string SlotName = "";
+			public int Applies;   // number of slot transitions observed
+			public int UniqueFrom;
+			public int UniqueTo;
+		}
+
+		public static void LogSlotLevelNextEntityPredictionByHcpLevel(
+			string label,
+			Prototype protoRoot,
+			HCPTree.Node hcpTreeRoot,
+			int topFrom = 20,
+			int topTo = 10)
+		{
+			Logs.DebugLog.WriteEvent("SlotSeq", $"=== {label} ===");
+
+			List<HCPTree.Node> nodes = HCPTrees
+				.GetNonLeaves(hcpTreeRoot)
+				.Where(x => x.Categorization != null)
+				.ToList();
+
+			// Order by tree depth, then by unpacked size
+			nodes = nodes
+				.OrderBy(x => GetDepth(x))
+				.ThenByDescending(x => PrototypeGraphs.Size(x.Unpacked))
+				.ToList();
+
+			foreach (HCPTree.Node node in nodes)
+			{
+				// Get slot ids for this HCP level from the hidden instances under this node.
+				// This avoids any assumptions about how fields are represented in the prototype.
+				List<Prototype> hiddenLeaves = HCPTreeUtil.GetLeavesAsHidden(node);
+
+				HashSet<int> slotIds = new HashSet<int>();
+				foreach (Prototype hidden in hiddenLeaves)
+					foreach (var prop in hidden.Properties)
+						slotIds.Add(prop.Key);
+
+				if (slotIds.Count == 0)
+					continue;
+
+				string indent = new string(' ', GetDepth(node) * 2);
+
+				Logs.DebugLog.WriteEvent(
+					"SlotSeq",
+					indent + node.Categorization.PrototypeName + " Slots=" + slotIds.Count);
+
+				foreach (int slotId in slotIds.OrderBy(x => x))
+				{
+					Map<int, Map<int, int>> counts = CountSlotEntityTransitions(protoRoot, node, slotId);
+
+					int applies = 0;
+					HashSet<int> setFrom = new HashSet<int>();
+					HashSet<int> setTo = new HashSet<int>();
+
+					foreach (var from in counts)
+					{
+						setFrom.Add(from.Key);
+						foreach (var to in from.Value)
+						{
+							setTo.Add(to.Key);
+							applies += to.Value;
+						}
+					}
+
+					Prototype slotProto = Prototypes.GetPrototype(slotId);
+
+					Logs.DebugLog.WriteEvent(
+						"SlotSeq",
+						indent + "  " + slotProto.PrototypeName +
+						" Applies=" + applies +
+						" UniqueFrom=" + setFrom.Count +
+						" UniqueTo=" + setTo.Count);
+
+					LogTopFollowers(indent + "    ", counts, topFrom, topTo);
+				}
+			}
+		}
+
+		// For one HCP node and one slot id, build a Markov table:
+		// entityA -> entityB counts, where entities are the fillers of that slot
+		// in consecutive categorized statements under the same parent.Children ordering.
+		private static Map<int, Map<int, int>> CountSlotEntityTransitions(
+			Prototype protoRoot,
+			HCPTree.Node node,
+			int slotPrototypeId)
+		{
+			Map<int, Map<int, int>> counts = new Map<int, Map<int, int>>();
+
+			List<Prototype> parents = PrototypeGraphs.FindUniqueParents(protoRoot, child =>
+				TemporaryPrototypeCategorization.IsCategorized(child, node.Unpacked));
+
+			foreach (Prototype parent in parents)
+			{
+				Prototype? prevEnt = null;
+
+				for (int i = 0; i < parent.Children.Count; i++)
+				{
+					Prototype stmt = parent.Children[i];
+
+					if (!TemporaryPrototypeCategorization.IsCategorized(stmt, node.Unpacked))
+						continue;
+
+					Prototype hidden = HCPs.Convert(stmt, node.Categorization);
+
+					if (!hidden.Properties.ContainsKey(slotPrototypeId))
+						continue;
+
+					Prototype? filler = hidden.Properties[slotPrototypeId];
+					if (filler == null)
+						continue;
+
+					Prototype ent = Prototypes.GetPrototype(filler.PrototypeID);
+
+					if (prevEnt != null)
+						Increment(counts, prevEnt.PrototypeID, ent.PrototypeID);
+
+					prevEnt = ent;
+				}
+			}
+
+			return counts;
+		}
+
+		private static void Increment(Map<int, Map<int, int>> counts, int fromId, int toId)
+		{
+			Map<int, int> inner;
+			if (counts.ContainsKey(fromId))
+				inner = counts[fromId];
+			else
+				inner = new Map<int, int>();
+
+			if (inner.ContainsKey(toId))
+				inner[toId] = inner[toId] + 1;
+			else
+				inner[toId] = 1;
+
+			counts[fromId] = inner;
+		}
+
+		private static void LogTopFollowers(string indent, Map<int, Map<int, int>> counts, int topFrom, int topTo)
+		{
+			var rankedFrom = counts
+				.Select(p =>
+				{
+					int total = 0;
+					foreach (var q in p.Value)
+						total += q.Value;
+
+					return new { FromId = p.Key, Total = total };
+				})
+				.OrderByDescending(x => x.Total)
+				.Take(topFrom)
+				.ToList();
+
+			foreach (var from in rankedFrom)
+			{
+				Prototype fromEnt = Prototypes.GetPrototype(from.FromId);
+
+				Logs.DebugLog.WriteEvent("SlotSeq", indent + fromEnt.PrototypeName + " Total=" + from.Total);
+
+				var rankedTo = counts[from.FromId]
+					.OrderByDescending(x => x.Value)
+					.Take(topTo)
+					.ToList();
+
+				foreach (var to in rankedTo)
+				{
+					Prototype toEnt = Prototypes.GetPrototype(to.Key);
+
+					Logs.DebugLog.WriteEvent(
+						"SlotSeq",
+						indent + "  -> " + toEnt.PrototypeName + " Count=" + to.Value);
+				}
+			}
+		}
+
+
+
+		public static void LogNextStatementPredictionByLevel(
+	string label,
+	Prototype protoRoot,
+	HCPTree.Node hcpTreeRoot)
+		{
+			Logs.DebugLog.WriteEvent("NextStatement", $"=== {label} ===");
+
+			List<HCPTree.Node> nodes = HCPTrees
+				.GetNonLeaves(hcpTreeRoot)
+				.Where(x => x.Categorization != null)
+				.ToList();
+
+			// Order by depth so output is “by level” without a recursive walk.
+			nodes = nodes
+				.OrderBy(x => GetDepth(x))
+				.ThenByDescending(x => PrototypeGraphs.Size(x.Unpacked))
+				.ToList();
+
+			foreach (HCPTree.Node node in nodes)
+			{
+				int depth = GetDepth(node);
+				int bits = PrototypeGraphs.Size(node.Unpacked);
+
+				int applies = 0;
+				int correct = 0;
+				int incorrect = 0;
+
+				List<Prototype> parents = PrototypeGraphs.FindUniqueParents(protoRoot, x =>
+					TemporaryPrototypeCategorization.IsCategorized(x, node.Unpacked));
+
+				foreach (Prototype parent in parents)
+				{
+					for (int i = 0; i < parent.Children.Count - 1; i++)
+					{
+						Prototype cur = parent.Children[i];
+						Prototype nxt = parent.Children[i + 1];
+
+						if (!TemporaryPrototypeCategorization.IsCategorized(cur, node.Unpacked))
+							continue;
+
+						applies++;
+
+						if (TemporaryPrototypeCategorization.IsCategorized(nxt, node.Unpacked))
+							correct++;
+						else
+							incorrect++;
+					}
+				}
+
+				double acc = applies > 0 ? (double)correct / (double)applies : 0.0;
+				int score = correct * bits;
+
+				string indent = new string(' ', depth * 2);
+
+				Logs.DebugLog.WriteEvent(
+					"NextStatement",
+					indent +
+					node.Categorization.PrototypeName +
+					" Bits=" + bits +
+					" Applies=" + applies +
+					" Correct=" + correct +
+					" Incorrect=" + incorrect +
+					" Acc=" + acc.ToString("F3") +
+					" Score=" + score);
+			}
+		}
+
+
+
+		private static int GetDepth(HCPTree.Node node)
+		{
+			int depth = 0;
+			HCPTree.Node? cur = node;
+
+			while (cur.Parent != null)
+			{
+				depth++;
+				cur = cur.Parent;
+			}
+
+			return depth;
+		}
+
+
+		static void LogCompressionGainPerTree(string label, HCPTree.Node root)
+		{
+			Logs.DebugLog.WriteEvent("CompressionGain", $"=== {label} ===");
+
+			void Walk(HCPTree.Node node, int depth)
+			{
+				if (node.Categorization != null && node.Children.Count > 0)
+				{
+					int gain = ComputeCompressionGain(node);
+					string indent = new string(' ', depth * 2);
+
+					Logs.DebugLog.WriteEvent(
+						"CompressionGain",
+						indent +
+						node.Categorization.PrototypeName +
+						" Gain=" + gain);
+				}
+
+				foreach (HCPTree.Node child in node.Children)
+					Walk(child, depth + 1);
+			}
+
+			Walk(root, 0);
+		}
+
+
+
+		// Computes compression gain for each non-leaf HCP node.
+		//
+		// Gain is defined as the total size of concrete instances under the node
+		// minus the cost of encoding them as one unpacked HCP skeleton plus the
+		// sizes of the hidden instances (hole contents).
+		//
+		// Uses PrototypeGraphs.Size for all costs and avoids unit-cost holes.
+		public static int ComputeCompressionGain(HCPTree.Node node)
+		{
+			// Computes compression gain for a single HCP tree node.
+
+			Prototype hcp = node.Categorization;
+			if (hcp == null)
+				return 0;
+
+			// Baseline: store each concrete instance directly
+			int baseline = 0;
+			List<Prototype> leavesConcrete = HCPTreeUtil.GetLeafInstances(node);
+			foreach (Prototype inst in leavesConcrete)
+				baseline += PrototypeGraphs.Size(inst);
+
+			// Skeleton: unpacked shadow counted once
+			int skeleton = PrototypeGraphs.Size(node.Unpacked);
+
+			// Holes: sum size of hidden instances minus hidden root
+			int holes = 0;
+			List<Prototype> leavesHidden = HCPTreeUtil.GetLeavesAsHidden(node);
+			foreach (Prototype hidden in leavesHidden)
+				holes += (PrototypeGraphs.Size(hidden) - 1);
+
+			return baseline - (skeleton + holes);
+		}
+
+
 
 		// Dump the entity sets, intersection, and union for the overlaps you logged.
 		// Assumes:

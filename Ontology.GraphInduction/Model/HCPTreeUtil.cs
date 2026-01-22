@@ -8,6 +8,12 @@ namespace Ontology.GraphInduction.Model
 {
 	public class HCPTreeUtil
 	{
+		public static List<Prototype> GetLeafInstances(HCPTree.Node tree)
+		{
+			List<Prototype> lstInstances = HCPTrees.GetLeaves(tree).Select(x => x.Categorization).ToList();
+			return lstInstances;
+		}
+
 		public static List<Prototype> GetLeavesAsHidden(HCPTree.Node tree)
 		{
 			//Convert each leaf to the Context on the tree, which should be a hidden

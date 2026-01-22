@@ -717,6 +717,49 @@ namespace Ontology
 			return lstResults;
 		}
 
+		static public List<Prototype> FindUniqueParents(Prototype prototype, Func<Prototype, bool> func)
+		{
+			List<Prototype> lstResults = new List<Prototype>();
+
+			void AddUnique(Prototype p)
+			{
+				if (!lstResults.Any(x => x == p))
+					lstResults.Add(p);
+			}
+
+			void Recurse(Prototype p)
+			{
+				foreach (var pair in p.Properties)
+				{
+					Prototype? v = pair.Value;
+					if (v == null)
+						continue;
+
+					if (func(v))
+					{
+						AddUnique(p);
+						return;
+					}
+					Recurse(v);
+				}
+
+				foreach (Prototype child in p.Children)
+				{
+					if (func(child))
+					{
+						AddUnique(p);
+						return;
+					}
+
+					Recurse(child);
+				}
+			}
+
+			Recurse(prototype);
+
+			return lstResults;
+		}
+
 
 		static public List<Prototype> FindOrphanedLeaves(Prototype prototype, Prototype shadow)
 		{
@@ -1490,7 +1533,6 @@ namespace Ontology
 		}
 
 
-
 		static public Prototype SetValue(Prototype prototype, Prototype path, Prototype value, bool bMergeAugmentedProperties = false, bool bMerge = true)
 		{
 			Prototype result = null;
@@ -1613,6 +1655,28 @@ namespace Ontology
 				result = prototype;
 
 			return result;
+		}
+
+
+		static public int Size(Prototype p)
+		{
+			if (p == null)
+				return 0;
+
+			int cost = 1; // count this node
+
+			// Count children
+			foreach (Prototype child in p.Children)
+				cost += Size(child);
+
+			// Count property values
+			foreach (var pair in p.Properties)
+			{
+				if (pair.Value != null)
+					cost += Size(pair.Value);
+			}
+
+			return cost;
 		}
 	}
 }
