@@ -8,6 +8,7 @@ using Ontology.GraphInduction.Utils;
 using Ontology.Simulation;
 using ProtoScript.Interpretter;
 using ProtoScript.Interpretter.Symbols;
+using ProtoScript.Tests.Helpers;
 
 namespace Ontology.Tests
 {
@@ -178,6 +179,7 @@ namespace Ontology.Tests
 			CSharp.ClassDefinition clsAddresses = CSharp.Parsers.ClassDefinitions.Parse(strCode);
 
 			Prototype protoAddresses = NativeValuePrototypes.ToPrototype(clsAddresses)!;
+			Prototype protoGolden = protoAddresses.Clone();
 //			Prototype protoAddresses = protoFile;
 			Logger.Log(protoAddresses);
 
@@ -502,18 +504,30 @@ namespace Ontology.Tests
 
 
 			//N20260120-01 - Computing metrics
+			Collection parameterDeclarations = PrototypeGraphs.Find(protoGolden, x => x.PrototypeName != null && x.PrototypeName.Contains("ParameterDeclaration"));
+			bool hasValidParameterDeclaration = parameterDeclarations.Children.Any(param =>
+			{
+				Prototype paramName = param.Properties.GetOrDefault2("ParameterName", Compare.Entity);
+				Prototype typeProto = param.Properties.GetOrDefault2("Type", Compare.Entity);
+				Prototype typeName = typeProto != null ? typeProto.Properties.GetOrDefault2("TypeName", Compare.Entity) : Compare.Entity;
+				return paramName != Compare.Entity && typeName != Compare.Entity;
+			});
+
+			if (!hasValidParameterDeclaration)
+				throw new InvalidOperationException("Golden graph parameter declarations were unexpectedly corrupted.");
+
 			//Calculate compression gain on each HCP 
 			LogCompressionGainPerTree("sqlParams.Add tree", root1);
 			LogCompressionGainPerTree("parameter declaration tree", root2);
 
 			//Calculate next statement prediction 
-			LogNextStatementPredictionByLevel("sqlParams.Add tree", protoAddresses, root1);
-			LogNextStatementPredictionByLevel("parameter declaration tree", protoAddresses, root2);
+			LogNextStatementPredictionByLevel("sqlParams.Add tree", protoGolden, root1);
+			LogNextStatementPredictionByLevel("parameter declaration tree", protoGolden, root2);
 
 
 			//Calculate prediction of each slot sequence
-			LogSlotLevelNextEntityPredictionByHcpLevel("sqlParams.Add tree", protoAddresses, root1);
-			LogSlotLevelNextEntityPredictionByHcpLevel("parameter declaration tree", protoAddresses, root2);
+			LogSlotLevelNextEntityPredictionByHcpLevel("sqlParams.Add tree", protoGolden, root1);
+			LogSlotLevelNextEntityPredictionByHcpLevel("parameter declaration tree", protoGolden, root2);
 
 		}
 
