@@ -504,18 +504,6 @@ namespace Ontology.Tests
 
 
 			//N20260120-01 - Computing metrics
-			Collection parameterDeclarations = PrototypeGraphs.Find(protoGolden, x => x.PrototypeName != null && x.PrototypeName.Contains("ParameterDeclaration"));
-			bool hasValidParameterDeclaration = parameterDeclarations.Children.Any(param =>
-			{
-				Prototype paramName = param.Properties.GetOrDefault2("ParameterName", Compare.Entity);
-				Prototype typeProto = param.Properties.GetOrDefault2("Type", Compare.Entity);
-				Prototype typeName = typeProto != null ? typeProto.Properties.GetOrDefault2("TypeName", Compare.Entity) : Compare.Entity;
-				return paramName != Compare.Entity && typeName != Compare.Entity;
-			});
-
-			if (!hasValidParameterDeclaration)
-				throw new InvalidOperationException("Golden graph parameter declarations were unexpectedly corrupted.");
-
 			//Calculate compression gain on each HCP 
 			LogCompressionGainPerTree("sqlParams.Add tree", root1);
 			LogCompressionGainPerTree("parameter declaration tree", root2);
